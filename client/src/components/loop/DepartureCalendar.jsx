@@ -130,8 +130,10 @@ export default function DepartureCalendar({ lineId, onPick }) {
                     : 'border border-line text-inkSec hover:border-primary hover:text-ink'
                 }`}
               >
-                <span className="text-caption font-light">
-                  {d.toLocaleDateString(lang === 'ko' ? 'ko-KR' : 'en-US', { weekday: 'narrow' })}
+                {/* 요일 — 언어별 글리프 폭이 달라 겹침 렌더(시프트 0) */}
+                <span className="grid text-caption font-light">
+                  <span aria-hidden={lang !== 'en'} className={`col-start-1 row-start-1 ${lang === 'en' ? '' : 'invisible'}`}>{d.toLocaleDateString('en-US', { weekday: 'narrow' })}</span>
+                  <span aria-hidden={lang !== 'ko'} className={`col-start-1 row-start-1 ${lang === 'ko' ? '' : 'invisible'}`}>{d.toLocaleDateString('ko-KR', { weekday: 'narrow' })}</span>
                 </span>
                 <span className="font-display text-body font-medium">{d.getDate()}</span>
                 <span className="font-display text-caption font-medium text-inkMeta">

@@ -2,6 +2,9 @@
 // 정류장마다 사진·이름(EN/KR 병기)·체류 시간·선주문 대행 문구.
 import { useLang } from '../../i18n/LangContext';
 import LangSwap from '../../i18n/LangSwap';
+// 언어별 포맷 문자열 겹침 렌더용(PATTERNS §1) — 시프트 0
+import en from '../../i18n/en';
+import ko from '../../i18n/ko';
 
 // 라인 컬러 정적 클래스 매핑(토큰 클래스만)
 const STRIPE = {
@@ -16,7 +19,7 @@ const NODE = {
 };
 
 export default function StopStrip({ lineId, stops }) {
-  const { lang, t } = useLang();
+  const { lang } = useLang();
 
   return (
     <ol className="flex flex-col">
@@ -35,8 +38,10 @@ export default function StopStrip({ lineId, stops }) {
             <div className="flex flex-wrap items-baseline gap-x-12 gap-y-4">
               <h3 className="font-display text-h3 font-semibold">{stop.name_en}</h3>
               <span className="text-small font-light text-inkSec">{stop.name_ko}</span>
-              <span className="font-display text-caption font-medium text-inkMeta">
-                {stop.stay_min} {t('loop.detail.stayUnit')}
+              {/* 체류 시간 — 언어별 단위 폭이 달라 겹침 렌더(시프트 0) */}
+              <span className="grid font-display text-caption font-medium text-inkMeta">
+                <span aria-hidden={lang !== 'en'} className={`col-start-1 row-start-1 ${lang === 'en' ? '' : 'invisible'}`}>{stop.stay_min} {en.loop.detail.stayUnit}</span>
+                <span aria-hidden={lang !== 'ko'} className={`col-start-1 row-start-1 ${lang === 'ko' ? '' : 'invisible'}`}>{stop.stay_min} {ko.loop.detail.stayUnit}</span>
               </span>
             </div>
             <img

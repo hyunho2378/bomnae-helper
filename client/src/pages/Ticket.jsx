@@ -135,8 +135,6 @@ export default function Ticket() {
     );
   }
 
-  const name = (item) => (lang === 'ko' ? item.name_ko : item.name_en);
-
   return (
     <Container>
       <div className="mx-auto flex w-full max-w-dialog flex-col gap-32 py-64 lg:pt-96">
@@ -150,7 +148,11 @@ export default function Ticket() {
               <span className="font-display text-small font-semibold uppercase tracking-eyebrow text-white">
                 Bomnae Helper
               </span>
-              <span className="truncate text-small font-medium text-white">{name(line)}</span>
+              {/* 라인명 EN/KR 겹침(시프트 0) */}
+              <span className="grid text-small font-medium text-white">
+                <span aria-hidden={lang !== 'en'} className={`col-start-1 row-start-1 truncate ${lang === 'en' ? '' : 'invisible'}`}>{line.name_en}</span>
+                <span aria-hidden={lang !== 'ko'} className={`col-start-1 row-start-1 truncate ${lang === 'ko' ? '' : 'invisible'}`}>{line.name_ko}</span>
+              </span>
             </div>
             <div className="flex flex-col gap-4">
               <LangSwap
@@ -171,7 +173,11 @@ export default function Ticket() {
               </TicketRow>
               <TicketRow labelKey="booking.summary.meeting">
                 <span className="flex flex-wrap items-baseline gap-8">
-                  <span>{name(meetingPoint)}</span>
+                  {/* 미팅포인트명 EN/KR 겹침(시프트 0) */}
+                  <span className="grid">
+                    <span aria-hidden={lang !== 'en'} className={`col-start-1 row-start-1 ${lang === 'en' ? '' : 'invisible'}`}>{meetingPoint.name_en}</span>
+                    <span aria-hidden={lang !== 'ko'} className={`col-start-1 row-start-1 ${lang === 'ko' ? '' : 'invisible'}`}>{meetingPoint.name_ko}</span>
+                  </span>
                   <Link
                     to="/loop"
                     className="text-small font-medium text-white underline underline-offset-4"

@@ -16,6 +16,9 @@ import Button from '../components/ui/Button';
 import Skeleton from '../components/ui/Skeleton';
 import { useLang } from '../i18n/LangContext';
 import LangSwap from '../i18n/LangSwap';
+// 숫자 삽입 문장 겹침 렌더용(PATTERNS §1) — 시프트 0
+import en from '../i18n/en';
+import ko from '../i18n/ko';
 
 const VALID = ['potato', 'dakgalbi', 'lake'];
 
@@ -25,7 +28,7 @@ export default function LineDetail() {
   const [stops, setStops] = useState(null);
   const [pick, setPick] = useState(null); // {date, time} — 캘린더 선택 → book 쿼리 프리필
   const [riders, setRiders] = useState(7); // IA §2.5 예시 기본값 — 회차 선택 시 booked_count로 갱신
-  const { t } = useLang();
+  const { lang } = useLang();
 
   const valid = VALID.includes(lineId);
 
@@ -108,11 +111,14 @@ export default function LineDetail() {
         <div className="flex flex-col gap-24">
           <DepartureCalendar lineId={lineId} onPick={setPick} />
           <div className="flex flex-col gap-8 rounded-md border border-line p-20">
-            <p className="text-body" aria-live="polite">
-              {/* 좌석 = 매칭 — 프로필 매칭 없음, 좌석이 곧 매칭(IA §2.5) */}
-              <span>{t('loop.detail.ridersPre')} </span>
-              <span className="font-display font-semibold">{riders}</span>
-              <span> {t('loop.detail.ridersPost')}</span>
+            {/* 좌석 = 매칭 — 숫자 삽입 문장은 언어별 완성 문장 겹침(시프트 0) */}
+            <p className="grid text-body" aria-live="polite">
+              <span aria-hidden={lang !== 'en'} className={`col-start-1 row-start-1 ${lang === 'en' ? '' : 'invisible'}`}>
+                {en.loop.detail.ridersPre} <span className="font-display font-semibold">{riders}</span> {en.loop.detail.ridersPost}
+              </span>
+              <span aria-hidden={lang !== 'ko'} className={`col-start-1 row-start-1 ${lang === 'ko' ? '' : 'invisible'}`}>
+                {ko.loop.detail.ridersPre} <span className="font-display font-semibold">{riders}</span> {ko.loop.detail.ridersPost}
+              </span>
             </p>
             <p className="flex flex-wrap items-baseline gap-x-8 text-small text-inkSec">
               <LangSwap

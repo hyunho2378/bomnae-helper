@@ -1,5 +1,5 @@
 // 예약 — IA §2.6: 3스텝(출발 프리필 → 인원 → 요약) + 확정에서만 LoginGate(Guest-first, ROUTES §3).
-// 게스트 진행 상태는 in-memory BookingContext(localStorage 금지). 성공 시 SuccessStamp → /ticket/:id.
+// 게스트 진행 상태는 in-memory BookingContext(웹스토리지 금지 — DESIGN §15). 성공 시 SuccessStamp → /ticket/:id.
 import { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
@@ -188,11 +188,14 @@ export default function Booking() {
                       active={draft.date === dateStr}
                       onClick={() => setDraft({ ...draft, date: dateStr, time: null })}
                     >
-                      <span className="font-display">
-                        {new Date(`${dateStr}T00:00:00`).toLocaleDateString(
-                          lang === 'ko' ? 'ko-KR' : 'en-US',
-                          { month: 'short', day: 'numeric', weekday: 'short' },
-                        )}
+                      {/* 언어별 날짜 포맷 폭이 달라 겹침 렌더(PATTERNS §1, 시프트 0) */}
+                      <span className="grid font-display">
+                        <span aria-hidden={lang !== 'en'} className={`col-start-1 row-start-1 ${lang === 'en' ? '' : 'invisible'}`}>
+                          {new Date(`${dateStr}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', weekday: 'short' })}
+                        </span>
+                        <span aria-hidden={lang !== 'ko'} className={`col-start-1 row-start-1 ${lang === 'ko' ? '' : 'invisible'}`}>
+                          {new Date(`${dateStr}T00:00:00`).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric', weekday: 'short' })}
+                        </span>
                       </span>
                     </Chip>
                   </li>

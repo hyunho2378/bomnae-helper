@@ -1,6 +1,9 @@
 // 예약 Step 3 — 요약(IA §2.6): 라인·회차·미팅포인트·동승 인원·호스트·선주문 안내·합계.
 import { useLang } from '../../i18n/LangContext';
 import LangSwap from '../../i18n/LangSwap';
+// 숫자 삽입 문장 겹침 렌더용(PATTERNS §1) — 시프트 0
+import en from '../../i18n/en';
+import ko from '../../i18n/ko';
 
 // 라인 컬러 정적 클래스 매핑(토큰 클래스만)
 const DOT = {
@@ -23,8 +26,7 @@ function Row({ labelKey, children }) {
 }
 
 export default function SummaryStep({ line, draft, departure, meetingPoint, total }) {
-  const { lang, t } = useLang();
-  const name = (item) => (lang === 'ko' ? item.name_ko : item.name_en);
+  const { lang } = useLang();
 
   return (
     <div className="flex flex-col gap-24">
@@ -32,7 +34,11 @@ export default function SummaryStep({ line, draft, departure, meetingPoint, tota
         <Row labelKey="booking.summary.line">
           <span className="flex items-center justify-end gap-8">
             <span aria-hidden="true" className={`h-8 w-8 rounded-pill ${DOT[line.id]}`} />
-            <span className="font-semibold">{name(line)}</span>
+            {/* 라인명 EN/KR 겹침(시프트 0) */}
+            <span className="grid font-semibold">
+              <span aria-hidden={lang !== 'en'} className={`col-start-1 row-start-1 ${lang === 'en' ? '' : 'invisible'}`}>{line.name_en}</span>
+              <span aria-hidden={lang !== 'ko'} className={`col-start-1 row-start-1 ${lang === 'ko' ? '' : 'invisible'}`}>{line.name_ko}</span>
+            </span>
           </span>
         </Row>
         <Row labelKey="booking.summary.departure">
@@ -41,8 +47,11 @@ export default function SummaryStep({ line, draft, departure, meetingPoint, tota
           </span>
         </Row>
         <Row labelKey="booking.summary.meeting">
-          {/* 미팅포인트 고정(IA §5) — MVP는 첫 번째 포인트, PLACEHOLDER 좌표(stops.js) */}
-          <span>{name(meetingPoint)}</span>
+          {/* 미팅포인트 고정(IA §5) — MVP는 첫 번째 포인트, PLACEHOLDER 좌표(stops.js). EN/KR 겹침(시프트 0) */}
+          <span className="grid">
+            <span aria-hidden={lang !== 'en'} className={`col-start-1 row-start-1 ${lang === 'en' ? '' : 'invisible'}`}>{meetingPoint.name_en}</span>
+            <span aria-hidden={lang !== 'ko'} className={`col-start-1 row-start-1 ${lang === 'ko' ? '' : 'invisible'}`}>{meetingPoint.name_ko}</span>
+          </span>
         </Row>
         <Row labelKey="booking.summary.party">
           <span className="flex items-baseline justify-end gap-8">
@@ -58,11 +67,14 @@ export default function SummaryStep({ line, draft, departure, meetingPoint, tota
         </Row>
       </dl>
 
-      {/* 동승 인원 — 좌석 = 매칭(IA §2.5·2.6) */}
-      <p className="text-body">
-        <span>{t('loop.detail.ridersPre')} </span>
-        <span className="font-display font-semibold">{departure.booked_count}</span>
-        <span> {t('loop.detail.ridersPost')}</span>
+      {/* 동승 인원 — 좌석 = 매칭(IA §2.5·2.6). 숫자 삽입 문장은 언어별 완성 문장 겹침(시프트 0) */}
+      <p className="grid text-body">
+        <span aria-hidden={lang !== 'en'} className={`col-start-1 row-start-1 ${lang === 'en' ? '' : 'invisible'}`}>
+          {en.loop.detail.ridersPre} <span className="font-display font-semibold">{departure.booked_count}</span> {en.loop.detail.ridersPost}
+        </span>
+        <span aria-hidden={lang !== 'ko'} className={`col-start-1 row-start-1 ${lang === 'ko' ? '' : 'invisible'}`}>
+          {ko.loop.detail.ridersPre} <span className="font-display font-semibold">{departure.booked_count}</span> {ko.loop.detail.ridersPost}
+        </span>
       </p>
 
       {/* 선주문 안내 — 핵심 차별점(IA §2.1 How it works) */}

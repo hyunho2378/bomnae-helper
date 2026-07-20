@@ -2,7 +2,13 @@
 // + 라인명(Kanit Bold) + 소요·정류장 수·가격. 풀블리드 허용(히어로 — DESIGN §5).
 import { useLang } from '../../i18n/LangContext';
 import LangSwap from '../../i18n/LangSwap';
+// 데이터 필드(en/ko) 겹침 렌더용 — LangSwap과 동일 원리(PATTERNS §1), 시프트 0
+import en from '../../i18n/en';
+import ko from '../../i18n/ko';
 import Container from '../layout/Container';
+
+const fmtDur = (min, dict) =>
+  `${Math.floor(min / 60)}${dict.loop.detail.hoursUnit} ${min % 60}${dict.loop.detail.minutesUnit}`;
 
 // 라인 컬러 정적 클래스 매핑(토큰 클래스만 — HEX 직입력 금지)
 const STRIPE = {
@@ -12,10 +18,8 @@ const STRIPE = {
 };
 
 export default function LineHero({ line, stopsCount }) {
-  const { lang, t } = useLang();
-  const name = lang === 'ko' ? line.name_ko : line.name_en;
-  const hours = Math.floor(line.duration_min / 60);
-  const minutes = line.duration_min % 60;
+  const { lang } = useLang();
+  const name = lang === 'ko' ? line.name_ko : line.name_en; // img alt 전용
 
   return (
     <header className="border-b border-line">
@@ -24,7 +28,11 @@ export default function LineHero({ line, stopsCount }) {
       <Container>
         <div className="flex flex-col gap-32 pb-48 pt-48 lg:flex-row lg:items-center lg:justify-between lg:pt-96">
           <div className="flex min-w-0 flex-col gap-16">
-            <h1 className="font-display text-h1 font-bold tracking-display">{name}</h1>
+            {/* 라인명 EN/KR 겹침 — 전환 시프트 0(PATTERNS §1 데이터 필드 적용) */}
+            <h1 className="grid font-display text-h1 font-bold tracking-display">
+              <span aria-hidden={lang !== 'en'} className={`col-start-1 row-start-1 ${lang === 'en' ? '' : 'invisible'}`}>{line.name_en}</span>
+              <span aria-hidden={lang !== 'ko'} className={`col-start-1 row-start-1 ${lang === 'ko' ? '' : 'invisible'}`}>{line.name_ko}</span>
+            </h1>
             <span aria-hidden="true" className={`h-8 w-64 rounded-pill ${STRIPE[line.id]}`} />
             <dl className="flex flex-wrap gap-x-32 gap-y-12">
               <div className="flex flex-col gap-4">
@@ -33,10 +41,10 @@ export default function LineHero({ line, stopsCount }) {
                   as="dt"
                   className="text-caption font-medium uppercase tracking-eyebrow text-inkMeta"
                 />
-                <dd className="font-display text-h3 font-semibold">
-                  {hours}
-                  {t('loop.detail.hoursUnit')} {minutes}
-                  {t('loop.detail.minutesUnit')}
+                {/* 소요 표기 — 언어별 포맷 폭이 달라 겹침 렌더(시프트 0) */}
+                <dd className="grid font-display text-h3 font-semibold">
+                  <span aria-hidden={lang !== 'en'} className={`col-start-1 row-start-1 ${lang === 'en' ? '' : 'invisible'}`}>{fmtDur(line.duration_min, en)}</span>
+                  <span aria-hidden={lang !== 'ko'} className={`col-start-1 row-start-1 ${lang === 'ko' ? '' : 'invisible'}`}>{fmtDur(line.duration_min, ko)}</span>
                 </dd>
               </div>
               <div className="flex flex-col gap-4">

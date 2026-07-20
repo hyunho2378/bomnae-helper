@@ -5,6 +5,12 @@ import { Link } from 'react-router-dom';
 import { lineColors } from '../../tokens';
 import { useLang } from '../../i18n/LangContext';
 import LangSwap from '../../i18n/LangSwap';
+// 언어별 포맷 문자열 겹침 렌더용(PATTERNS §1) — 시프트 0
+import en from '../../i18n/en';
+import ko from '../../i18n/ko';
+
+const fmtDur = (min, dict) =>
+  `${Math.floor(min / 60)}${dict.loop.detail.hoursUnit} ${min % 60}${dict.loop.detail.minutesUnit}`;
 
 // 라인 컬러 클래스 — 정적 클래스 매핑(tailwind 스캐너 대응, 토큰 클래스만)
 const DOT = {
@@ -21,7 +27,7 @@ export default function LinePanel({
   onSelectLine,
   onSelectStop,
 }) {
-  const { lang, t } = useLang();
+  const { lang } = useLang();
   const name = (item) => (lang === 'ko' ? item.name_ko : item.name_en);
 
   return (
@@ -57,10 +63,10 @@ export default function LinePanel({
                     {name(line)}
                   </span>
                   <span className="flex items-baseline gap-8 text-caption font-medium text-inkMeta">
-                    <span className="font-display">
-                      {Math.floor(line.duration_min / 60)}
-                      {t('loop.detail.hoursUnit')} {line.duration_min % 60}
-                      {t('loop.detail.minutesUnit')}
+                    {/* 소요 — 언어별 포맷 폭이 달라 겹침 렌더(시프트 0) */}
+                    <span className="grid font-display">
+                      <span aria-hidden={lang !== 'en'} className={`col-start-1 row-start-1 ${lang === 'en' ? '' : 'invisible'}`}>{fmtDur(line.duration_min, en)}</span>
+                      <span aria-hidden={lang !== 'ko'} className={`col-start-1 row-start-1 ${lang === 'ko' ? '' : 'invisible'}`}>{fmtDur(line.duration_min, ko)}</span>
                     </span>
                     <span aria-hidden="true">·</span>
                     <span className="font-display">
@@ -94,9 +100,10 @@ export default function LinePanel({
                           }`}
                         />
                         <span className="min-w-0 flex-1 truncate">{name(stop)}</span>
-                        <span className="shrink-0 font-display text-caption font-medium text-inkMeta">
-                          {stop.stay_min}
-                          {t('loop.detail.minutesUnit')}
+                        {/* 체류 — 언어별 단위 폭이 달라 겹침 렌더(시프트 0) */}
+                        <span className="grid shrink-0 font-display text-caption font-medium text-inkMeta">
+                          <span aria-hidden={lang !== 'en'} className={`col-start-1 row-start-1 ${lang === 'en' ? '' : 'invisible'}`}>{stop.stay_min}{en.loop.detail.minutesUnit}</span>
+                          <span aria-hidden={lang !== 'ko'} className={`col-start-1 row-start-1 ${lang === 'ko' ? '' : 'invisible'}`}>{stop.stay_min}{ko.loop.detail.minutesUnit}</span>
                         </span>
                       </button>
                     </li>

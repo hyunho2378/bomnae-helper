@@ -6,6 +6,9 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Clock } from 'lucide-react';
 import { useLang } from '../../i18n/LangContext';
 import LangSwap from '../../i18n/LangSwap';
+// 언어별 소요 포맷 겹침 렌더용(PATTERNS §1) — 시프트 0
+import en from '../../i18n/en';
+import ko from '../../i18n/ko';
 import Skeleton from '../ui/Skeleton';
 import { getStops } from '../../data/api';
 
@@ -27,12 +30,10 @@ function BiText({ en, ko, className = '' }) {
   );
 }
 
-const fmtDuration = (min, t) => {
+const fmtDuration = (min, units) => {
   const h = Math.floor(min / 60);
   const m = min % 60;
-  return [h ? `${h}${t('common.units.h')}` : null, m ? `${m}${t('common.units.m')}` : null]
-    .filter(Boolean)
-    .join(' ');
+  return [h ? `${h}${units.h}` : null, m ? `${m}${units.m}` : null].filter(Boolean).join(' ');
 };
 
 export default function LineCard({ line }) {
@@ -84,7 +85,11 @@ export default function LineCard({ line }) {
         <div className="flex items-end justify-between gap-16">
           <span className="flex items-center gap-8 text-small text-inkSec">
             <Clock size={16} aria-hidden="true" />
-            {fmtDuration(line.duration_min, t)}
+            {/* 언어별 포맷 폭이 달라 겹침 렌더(시프트 0) */}
+            <BiText
+              en={fmtDuration(line.duration_min, en.common.units)}
+              ko={fmtDuration(line.duration_min, ko.common.units)}
+            />
           </span>
           <span className="flex items-baseline gap-8">
             {/* 가격 DRAFT — 5일차 BM 검토 확정(IA §4), 값은 data/lines.js */}

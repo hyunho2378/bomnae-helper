@@ -8,10 +8,10 @@
 |---|---|---|---|
 | 0 SETUP | 단독 | ✅ 완료 (2026-07-20) | 미커밋 — git 저장소 미초기화 |
 | 1A 기반 | AGENT-1 | ✅ 완료 (2026-07-20) | 미커밋 — git 저장소 미초기화 |
-| 1B Gate·Home | AGENT-2 | ⬜ 대기 | |
-| 1B Loop | AGENT-3 | ⬜ 대기 | |
-| 2 검증·조립 | AGENT-REVIEW | ⬜ 대기 | |
-| 3 서버 | AGENT-SERVER | ⬜ 대기 | |
+| 1B Gate·Home | AGENT-2 (서브에이전트) | ✅ 완료 (2026-07-21) | 01606a6 [A2] |
+| 1B Loop | AGENT-3 (서브에이전트) | ✅ 완료 (2026-07-21) | 1463f05 [A3] |
+| 2 검증·조립 | AGENT-REVIEW (오케스트레이터) | ✅ 완료 (2026-07-21) | [AR] 커밋 예정 |
+| 3 서버 | AGENT-SERVER | ⬜ 대기 (.env 필요 — 이번 세션 제외) | |
 
 ## 진행 중 작업
 
@@ -19,8 +19,16 @@
 
 ## 다음 작업
 
-- git init + [A0]·[A1] 커밋 (사용자 승인 대기)
-- CC_PROMPT_2_AGENT2_GATE / CC_PROMPT_3_AGENT3_LOOP 실행 (1A 완료로 병렬 가능)
+- CC_PROMPT_5_AGENT_SERVER 실행 (전제: .env — Google OAuth ID/Secret + Neon DATABASE_URL)
+- 사용자 결정 대기 항목: PROGRESS "오케스트레이션 결정 사항" 참조
+
+## 오케스트레이션 결정 사항 (PHASE 1B·2에서 확정 — 이견 시 되돌릴 것)
+
+- i18n 사전은 공유 파일이라 서브에이전트가 fragment(소유 구역 내 임시 파일)로 납품 → 오케스트레이터가 병합 후 삭제. 최종 162키 en/ko 동형.
+- 데이터 유래 텍스트(라인·정류장·미팅포인트명, 언어별 포맷 문자열)의 fit-content 렌더가 EN↔KR 시프트를 만들던 지점 12곳을 PATTERNS §1 겹침 마크업으로 수리(전 화면 시프트 0 달성). 신규 공용 컴포넌트는 만들지 않음(사용자 규칙).
+- stories/pilot 데이터는 api.js에 접근자가 없어 페이지가 직접 import(사용자 "api.js 수정 금지" 규칙 우선; PHASE 3 API 목록에 stories/pilot 없음 — 정적 데이터 유지라 이관 영향 없음).
+- 미팅포인트는 춘천역(첫 항목) 고정, 주말 가산은 성인·아동 좌석당 동일 적용(전부 DRAFT).
+- 문서화된 명세값 예외 3곳: VideoPlayer text-[17px](DESIGN §12), Loop 패널 lg:w-[360px](IA §2.4), HeroSection min-height 인라인(DESIGN §5). LoopMap.css의 #fff 1곳은 PATTERNS §4 기준 구현.
 
 ## AGENT-1 인수인계 노트 (AGENT-2/3 필독)
 
