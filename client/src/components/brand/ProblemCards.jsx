@@ -21,7 +21,7 @@ export default function ProblemCards({ id, titleKey, cardKeys }) {
             </span>
             <LangSwap k={`${key}.title`} as="h3" className="text-h3 font-semibold" />
             {/* 본문 장문 · t() 직접 렌더 허용 영역(PATTERNS §1) */}
-            <p className="text-small font-light text-inkSec">{t(`${key}.body`)}</p>
+            <p className="text-small font-regular text-inkSec">{t(`${key}.body`)}</p>
           </li>
         ))}
       </ol>

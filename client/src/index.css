@@ -13,7 +13,7 @@
     outline-offset: 2px;
   }
 
-  /* v3.1 태국어 폰트 스택(PATTERNS §18) · Kanit이 태국 문자를 네이티브 커버 */
+  /* v3.1 태국어 폰트 스택(PATTERNS §18·§27) · Kanit이 태국 문자를 네이티브 커버 */
   :lang(th) body {
     @apply font-display;
   }
@@ -27,5 +27,16 @@
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
     }
+  }
+}
+
+@layer utilities {
+  /* v3.2 스크롤바 비표시(PATTERNS §25 기준 블록) · 스크롤 기능·키보드는 유지 */
+  .scroll-quiet {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scroll-quiet::-webkit-scrollbar {
+    display: none;
   }
 }

@@ -58,7 +58,7 @@ export default function HeroCarousel() {
             as="h1"
             className="font-display text-display font-bold tracking-display text-white"
           />
-          <LangSwap k="home.hero.sub" as="p" className="mt-16 text-h2 font-light text-white" />
+          <LangSwap k="home.hero.sub" as="p" className="mt-16 text-h2 font-regular text-white" />
           <div className="mt-32 flex flex-wrap gap-16">
             <Button as={Link} to="/gate" size="lg">
               <LangSwap k="home.hero.ctaGate" />

@@ -9,7 +9,7 @@ const SECTIONS = ['s1', 's2', 's3', 's4', 's5', 's6', 's7', 's8'];
 export default function LegalTerms() {
   const { t } = useLang();
   return (
-    <div className="pb-96 pt-48 lg:pt-128">
+    <div className="pb-96 pt-96 lg:pt-128">
       <Container>
         <LangSwap k="legal.terms.title" as="h1" className="text-h1 font-bold tracking-display" />
         <LangSwap

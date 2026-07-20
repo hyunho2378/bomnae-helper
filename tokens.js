@@ -7,15 +7,15 @@
 
 export const colors = {
   bg: '#FFFFFF',            // 배경 순백. 웜톤·파스텔·AI색 전면 금지
-  primary: '#009FE3',       // 춘천 공식 블루 — v3.1: 로고·헤더 액티브·푸터·CTA 등 크롬은 이 색 하나로 통일
+  primary: '#0073EC',       // v3.2: Apple 웹 캘리브레이션 블루로 교체(사용자 결정). 로고·액티브·푸터·CTA 등 크롬 단일색
   navy: '#27348B',          // v3.1: 크롬에서 퇴출. 티켓 카드 면 전용 액센트로만 잔존
   yellow: '#FFC400',        // 고채도 서포트 — Potato Line
   spice: '#FF4438',         // 고채도 서포트 — Dakgalbi Line
   green: '#00B865',         // 고채도 서포트 — 성공/확정 상태
   magenta: '#F0347C',       // 고채도 서포트 — 포인트(절제 사용)
-  ink: '#14172E',           // 텍스트 primary
-  inkSec: '#4E5470',        // 텍스트 secondary
-  inkMeta: '#8B90A7',       // 텍스트 meta/caption
+  ink: '#101114',           // v3.2 텍스트 primary — 니어블랙. 회색 본문 전면 금지
+  inkSec: '#2E3138',        // v3.2 secondary — 차콜. 이보다 연한 색으로 문장 조판 금지
+  inkMeta: '#4E5257',       // v3.2 caption 전용 하한선. 12~13px 캡션 외 사용 금지, 링크·본문·라벨 금지
   line: 'rgba(20,23,46,0.10)',   // 보더
   glass: 'rgba(255,255,255,0.66)', // 글래스 면 (blur 예산 3곳 전용)
   scrim: 'rgba(20,23,46,0.55)',    // 영상 자막 밴드 + 히어로 스크림(그라데이션 1곳)
@@ -31,9 +31,10 @@ export const lineColors = {
 };
 
 export const fonts = {
-  // Kanit: 영문·숫자·디스플레이 전용(한글 글리프 없음) / Pretendard Variable: 한글 전담
-  display: `'Kanit','Pretendard Variable',sans-serif`,
-  body: `'Pretendard Variable','Kanit',sans-serif`,
+  // v3.2: 본문 Pretendard → SUIT Variable 교체(라틴 회색조·얇음 문제). Kanit은 디스플레이·숫자·태국어.
+  display: `'Kanit','SUIT Variable',sans-serif`,
+  body: `'SUIT Variable','Kanit',sans-serif`,
+  thai: `'Kanit','SUIT Variable',sans-serif`,
 };
 
 // 웨이트 위계 강제: 한 화면 최소 3웨이트 공존, 인접 동일 웨이트 나열 금지
@@ -64,12 +65,13 @@ export const breakpoints = {
 };
 
 export const containers = {
-  maxLg: 1200,   // lg~2xl
-  max2xl: 1400,  // 2xl~3xl
-  max3xl: 1560,  // 3xl 이상 — 4K에서도 이 캡을 넘지 않는다
-  marginBase: 20, // ~md
-  marginMd: 32,   // md~lg
-  marginLg: 48,   // lg~
+  // v3.2: 좌우 여백 축소·콘텐츠 확폭 (사용자 크리틱: 여백 과다)
+  maxLg: 1320,   // lg~2xl
+  max2xl: 1560,  // 2xl~3xl
+  max3xl: 1800,  // 3xl 이상 — 4K에서도 이 캡
+  marginBase: 16, // ~md
+  marginMd: 24,   // md~lg
+  marginLg: 40,   // lg~
 };
 
 // v3.1: G-Local Station 마감 스케일 이식(6~20). 칩/작은 요소 sm, 카드 md~lg, 시트/패널 xl.
@@ -101,6 +103,8 @@ export const z = { map: 0, content: 10, header: 40, dock: 50, sheet: 60, dialog:
 // MapLibre 상수 (sloverthon 레포 포팅 — PATTERNS.md §4)
 export const map = {
   styleUrl: 'https://tiles.openfreemap.org/styles/liberty',
+  antialias: true,          // v3.2: 줌 시 extrusion 지글거림·검은 면 아티팩트 완화 — Map 생성 옵션에 반드시 전달
+  extrusionOpacity: 1,      // v3.2: 반투명 extrusion의 z-fighting(검게 깨짐) 방지 — 불투명 고정
   center: [127.735, 37.885], // 춘천 전경
   zoom: 11.5,
   pitch: 58,      // 시네마틱 기본

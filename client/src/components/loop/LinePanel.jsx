@@ -4,7 +4,6 @@
 // 모바일 하단 가로 스크롤 스냅. 카드: 아이콘 배지(Sprout/Flame/Waves, 라인 컬러) +
 // 라인명 + 소요·가격 + 정류장 3 미니 리스트 + "View line".
 // 정류장 리스트가 지도 대체 접근 경로(키보드 완전 지원 · DESIGN §14).
-import { Flame, Sprout, Waves } from 'lucide-react';
 import Container from '../layout/Container';
 import { useLang } from '../../i18n/LangContext';
 import LangSwap from '../../i18n/LangSwap';
@@ -20,13 +19,7 @@ const fmtDur = (min, dict) =>
   `${Math.floor(min / 60)}${dict.loop.detail.hoursUnit} ${min % 60}${dict.loop.detail.minutesUnit}`;
 
 // 라인 컬러 클래스 · 정적 클래스 매핑(tailwind 스캐너 대응, 토큰 클래스만)
-const ICONS = { potato: Sprout, dakgalbi: Flame, lake: Waves };
-// 아이콘 배지 · 라인 컬러 소프트 배경 원 + 라인 컬러 아이콘(IA §2.1.4·§2.4 v3.1 명세)
-const BADGE = {
-  potato: 'bg-yellow/10 text-yellow',
-  dakgalbi: 'bg-spice/10 text-spice',
-  lake: 'bg-primary/10 text-primary',
-};
+// v3.2 §16.1: 아이콘 배지·틴트 폐지 → 원색 컬러 도트 + shadow.sm
 const DOT = { potato: 'bg-yellow', dakgalbi: 'bg-spice', lake: 'bg-primary' };
 
 // 사전 유래 문자열 3언어 겹침(시프트 0 · PATTERNS §1·§18)
@@ -59,7 +52,6 @@ function BiText({ en: textEn, ko: textKo, className = '' }) {
 }
 
 function LineGlassCard({ line, stops, active, focusStopId, onSelectLine, onSelectStop, onViewLine }) {
-  const Icon = ICONS[line.id];
   return (
     <article
       className={`rounded-lg bg-glass shadow-lg backdrop-blur-glass ${
@@ -75,10 +67,8 @@ function LineGlassCard({ line, stops, active, focusStopId, onSelectLine, onSelec
       >
         <span
           aria-hidden="true"
-          className={`flex h-44 w-44 shrink-0 items-center justify-center rounded-pill ${BADGE[line.id]}`}
-        >
-          <Icon size={24} aria-hidden="true" />
-        </span>
+          className={`h-12 w-12 shrink-0 rounded-pill shadow-sm ${DOT[line.id]}`}
+        />
         <span className="flex min-w-0 flex-1 flex-col">
           <BiText en={line.name_en} ko={line.name_ko} className="font-display text-body font-semibold text-ink" />
           <span className="flex items-baseline gap-8 text-caption font-medium text-inkSec">
@@ -181,7 +171,7 @@ export default function LinePanel({
       {/* 모바일 · 하단 가로 스크롤 스냅(마진 = 컨테이너 규칙 px-20/md:px-32), GlassDock 위 여백 */}
       <div className="absolute inset-x-0 bottom-0 pb-96 lg:hidden">
         {/* scroll-pl = 컨테이너 마진과 동일 · 스냅 정지 위치가 마진 경계 안에 오도록 */}
-        <ul className="pointer-events-auto flex snap-x snap-mandatory gap-16 overflow-x-auto scroll-pl-20 px-20 pb-8 md:scroll-pl-32 md:px-32">
+        <ul className="pointer-events-auto flex snap-x snap-mandatory gap-16 overflow-x-auto scroll-pl-16 px-16 pb-8 md:scroll-pl-24 md:px-24">
           {cards('row')}
         </ul>
       </div>

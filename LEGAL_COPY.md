@@ -73,3 +73,11 @@ KR: 본 약관은 대한민국 법령을 준거법으로 합니다.
 ### 8. Contact / 문의
 EN: official@bomnaehelper.ac.kr
 KR: official@bomnaehelper.ac.kr
+
+---
+
+## v3.2 추가 — 위치정보 조항 (Privacy §2·§3에 병합 이식)
+
+### Location / 위치정보
+EN: If you turn on arrival check in Getting Here, we read your device location only to determine whether you have entered the Chuncheon area. The check runs only while the page is open, precise coordinates are never displayed or stored on our servers, and you can turn it off at any time.
+KR: '춘천 가는 길'에서 도착 확인을 켜면, 춘천 권역 진입 여부를 판단하기 위해서만 기기 위치를 읽습니다. 확인은 페이지가 열려 있는 동안에만 동작하며, 정확한 좌표는 화면에 표시되거나 서버에 저장되지 않고, 언제든지 끌 수 있습니다.

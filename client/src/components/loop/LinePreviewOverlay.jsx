@@ -8,7 +8,7 @@
 // 포커스 트랩 + Escape. 글래스 위 텍스트는 ink 선명색만(HIG Materials).
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Flame, Sprout, Waves, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import BottomSheet from '../ui/BottomSheet';
 import Button from '../ui/Button';
 import IconButton from '../ui/IconButton';
@@ -25,12 +25,8 @@ const LANGS = ['en', 'ko', 'th'];
 const fmtDur = (min, dict) =>
   `${Math.floor(min / 60)}${dict.loop.detail.hoursUnit} ${min % 60}${dict.loop.detail.minutesUnit}`;
 
-const ICONS = { potato: Sprout, dakgalbi: Flame, lake: Waves };
-const BADGE = {
-  potato: 'bg-yellow/10 text-yellow',
-  dakgalbi: 'bg-spice/10 text-spice',
-  lake: 'bg-primary/10 text-primary',
-};
+// v3.2 §16.1: 아이콘 배지·틴트 폐지 → 원색 컬러 도트 + shadow.sm
+const DOT = { potato: 'bg-yellow', dakgalbi: 'bg-spice', lake: 'bg-primary' };
 // 번호 원 · 라인 컬러 면 + AA 대비 텍스트(yellow 위 ink만 · DESIGN §2)
 const NUMBER = {
   potato: 'bg-yellow text-ink',
@@ -85,17 +81,14 @@ function BiText({ en: textEn, ko: textKo, className = '' }) {
 
 // 내용 순서 고정(§14) · 데스크탑 패널과 모바일 시트가 공유
 function PreviewContent({ line, stops, onClose }) {
-  const Icon = ICONS[line.id];
   return (
     <div className="flex flex-col gap-24">
       {/* 1 · 아이콘 배지 + 라인명(Kanit) + 소요·가격 */}
       <div className="flex items-center gap-16">
         <span
           aria-hidden="true"
-          className={`flex h-44 w-44 shrink-0 items-center justify-center rounded-pill ${BADGE[line.id]}`}
-        >
-          <Icon size={24} aria-hidden="true" />
-        </span>
+          className={`h-12 w-12 shrink-0 rounded-pill shadow-sm ${DOT[line.id]}`}
+        />
         <div className="flex min-w-0 flex-1 flex-col">
           <BiText en={line.name_en} ko={line.name_ko} className="font-display text-h3 font-bold tracking-display text-ink" />
           <span className="flex items-baseline gap-8 text-small font-medium text-inkSec">
@@ -105,7 +98,7 @@ function PreviewContent({ line, stops, onClose }) {
               {'₩'}
               {line.price_adult.toLocaleString('en-US')}
             </span>
-            <LangSwap k="loop.detail.priceUnit" className="font-light" />
+            <LangSwap k="loop.detail.priceUnit" className="font-regular" />
           </span>
         </div>
       </div>
@@ -134,7 +127,7 @@ function PreviewContent({ line, stops, onClose }) {
       </ol>
 
       {/* 3 · 선주문 한 줄 */}
-      <LangSwap k="loop.preview.preorderLine" as="p" className="text-small font-light text-inkSec" />
+      <LangSwap k="loop.preview.preorderLine" as="p" className="text-small font-regular text-inkSec" />
 
       {/* 4 · CTA 단 하나 → /loop/:lineId (§14) · grid 래핑 = full 폭(Button 계약에 className 없음) */}
       <div className="grid">

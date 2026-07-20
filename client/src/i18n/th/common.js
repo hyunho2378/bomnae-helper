@@ -1,16 +1,17 @@
 // common 네임스페이스(TH) · 존 A 전용. en·ko와 키 완전 동형.
 // 초안: en 기반 번역. 네이티브 검수 대기(PROGRESS 준비물). Kanit이 태국 문자를 네이티브 커버한다.
+// v3.2(§16.7): 표시명 의미역 교체 · 푸터 압축 · 공용 캘린더 라벨.
 export default {
   meta: {
     title: {
       home: "หน้าแรก",
-      gate: "Gate",
-      handsfree: "Hands-Free",
-      loop: "Loop",
+      gate: "เดินทางมาชุนชอน",
+      handsfree: "ส่งกระเป๋า",
+      loop: "สายในเมือง",
       lineDetail: "สาย",
       booking: "จองที่นั่ง",
       ticket: "ตั๋ว",
-      pilot: "เที่ยวนำร่อง",
+      pilot: "เกี่ยวกับเรา",
       about: "เกี่ยวกับเรา",
       legalPrivacy: "นโยบายความเป็นส่วนตัว",
       legalTerms: "ข้อกำหนดการใช้งาน",
@@ -19,10 +20,10 @@ export default {
   },
   nav: {
     home: "หน้าแรก",
-    gate: "Gate",
-    loop: "Loop",
-    handsfree: "Hands-Free",
     about: "เกี่ยวกับเรา",
+    gate: "เดินทางมาชุนชอน",
+    handsfree: "ส่งกระเป๋า",
+    loop: "สายในเมือง",
     login: "เข้าสู่ระบบ",
     logout: "ออกจากระบบ",
     menu: "เมนู",
@@ -61,11 +62,20 @@ export default {
       tagline: "เชื่อมทุกช่วงที่ขาดหายของทริปชุนชอน ตั้งแต่ประตูสนามบินถึงป้ายท้องถิ่นสุดท้าย",
       explore: "สำรวจ",
       contact: "ติดต่อ",
-      team: "ทีม",
-      teamName: "Team 5 · STATION C Glocal Solverthon Chuncheon",
-      copyright: "© 2026 Bomnae Helper · Team 5",
+      team: "Team 5",
+      copyright: "© 2026 Bomnae Helper. All rights reserved.",
       privacy: "นโยบายความเป็นส่วนตัว",
       terms: "ข้อกำหนดการใช้งาน",
+    },
+    calendar: {
+      monthFormat: "{month} {year}",
+      weekdays: { d0: "อา.", d1: "จ.", d2: "อ.", d3: "พ.", d4: "พฤ.", d5: "ศ.", d6: "ส." },
+      months: {
+        m1: "มกราคม", m2: "กุมภาพันธ์", m3: "มีนาคม", m4: "เมษายน", m5: "พฤษภาคม", m6: "มิถุนายน",
+        m7: "กรกฎาคม", m8: "สิงหาคม", m9: "กันยายน", m10: "ตุลาคม", m11: "พฤศจิกายน", m12: "ธันวาคม",
+      },
+      prevMonth: "เดือนก่อนหน้า",
+      nextMonth: "เดือนถัดไป",
     },
     currency: "₩",
     units: {

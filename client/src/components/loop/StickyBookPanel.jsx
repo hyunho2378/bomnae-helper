@@ -91,7 +91,7 @@ export default function StickyBookPanel({ line }) {
           {'₩'}
           {line.price_adult.toLocaleString('en-US')}
         </span>
-        <LangSwap k="loop.detail.priceUnit" className="text-small font-light text-inkSec" />
+        <LangSwap k="loop.detail.priceUnit" className="text-small font-regular text-inkSec" />
       </p>
 
       {/* 캘린더 + 회차 Chip + 잔여 좌석(§5 재사용, 폭 100%) · URL 쿼리 시드 */}
@@ -129,7 +129,7 @@ export default function StickyBookPanel({ line }) {
         <p className="flex items-baseline justify-between text-small text-inkSec">
           <span className="flex items-baseline gap-8">
             <LangSwap k="booking.adults" className="font-medium" />
-            <span className="font-display font-light">{adults}</span>
+            <span className="font-display font-regular">{adults}</span>
           </span>
           <span className="font-display">
             {'₩'}
@@ -139,7 +139,7 @@ export default function StickyBookPanel({ line }) {
         <p className="flex items-baseline justify-between text-small text-inkSec">
           <span className="flex items-baseline gap-8">
             <LangSwap k="booking.children" className="font-medium" />
-            <span className="font-display font-light">{children}</span>
+            <span className="font-display font-regular">{children}</span>
           </span>
           <span className="font-display">
             {'₩'}
@@ -178,7 +178,7 @@ export default function StickyBookPanel({ line }) {
             />
             {/* 호스트 이름 PLACEHOLDER · 확정 전(lines.js) */}
             <span className="font-display font-semibold text-ink">{line.host_name}</span>
-            <LangSwap k="loop.detail.hostIntro" className="font-light" />
+            <LangSwap k="loop.detail.hostIntro" className="font-regular" />
           </p>
         </div>
       )}

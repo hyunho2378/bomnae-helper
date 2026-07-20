@@ -17,7 +17,7 @@ export default function WhatWeRun() {
   return (
     <Section id="what-we-run" title="brand.run.title">
       <div className="flex flex-col gap-24">
-        <LangSwap k="brand.run.sub" as="p" className="text-h3 font-light text-inkSec" />
+        <LangSwap k="brand.run.sub" as="p" className="text-h3 font-regular text-inkSec" />
         <ul className="grid grid-cols-1 gap-16 md:grid-cols-3 md:gap-24">
           {PILLARS.map(({ key, to, icon: Icon }) => (
             <li key={key}>
@@ -28,13 +28,13 @@ export default function WhatWeRun() {
                 {/* 아이콘 배지 · 크롬 컬러(primary) 소프트 원(DESIGN §8 색상 토큰) */}
                 <span
                   aria-hidden="true"
-                  className="flex h-44 w-44 items-center justify-center rounded-pill bg-primary/10 text-primary"
+                  className="flex h-44 w-44 items-center justify-center rounded-pill bg-primary text-white"
                 >
                   <Icon size={24} aria-hidden="true" />
                 </span>
                 <LangSwap k={`${key}.name`} as="h3" className="font-display text-h3 font-semibold" />
                 {/* 본문 장문 · t() 직접 렌더 허용 영역(PATTERNS §1) */}
-                <p className="text-small font-light text-inkSec">{t(`${key}.body`)}</p>
+                <p className="text-small font-regular text-inkSec">{t(`${key}.body`)}</p>
               </Link>
             </li>
           ))}

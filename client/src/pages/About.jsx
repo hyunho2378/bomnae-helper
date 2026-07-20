@@ -65,7 +65,7 @@ export default function About() {
       {/* 10 · Sustainability and beyond */}
       <Section id="beyond" title="brand.beyond.title">
         {/* 본문 장문 · t() 직접 렌더 허용 영역(PATTERNS §1) */}
-        <p className="text-h3 font-light text-inkSec">{t('brand.beyond.body')}</p>
+        <p className="text-h3 font-regular text-inkSec">{t('brand.beyond.body')}</p>
       </Section>
 
       {/* 11 · CTA 밴드 */}

@@ -32,7 +32,7 @@ export default function BrandHero() {
                 className="font-display text-h1 font-bold tracking-display text-white"
               />
               {/* 장문 서브 · t() 직접 렌더 허용 영역(PATTERNS §1) */}
-              <p className="text-h3 font-light text-white">{t('brand.hero.sub')}</p>
+              <p className="text-h3 font-regular text-white">{t('brand.hero.sub')}</p>
             </div>
           </div>
         </Container>

@@ -1,15 +1,16 @@
 // common 네임스페이스(KR) · 존 A 전용. en·th와 키 완전 동형. 줄표 금지.
+// v3.2(§16.7): 표시명 교체(춘천 가는 길/짐 보내기/시내 라인) · 푸터 압축 · 공용 캘린더 라벨.
 export default {
   meta: {
     title: {
       home: "홈",
-      gate: "게이트",
-      handsfree: "핸즈프리",
-      loop: "루프",
+      gate: "춘천 가는 길",
+      handsfree: "짐 보내기",
+      loop: "시내 라인",
       lineDetail: "라인",
       booking: "좌석 예약",
       ticket: "티켓",
-      pilot: "파일럿",
+      pilot: "소개",
       about: "소개",
       legalPrivacy: "개인정보처리방침",
       legalTerms: "이용약관",
@@ -18,10 +19,10 @@ export default {
   },
   nav: {
     home: "홈",
-    gate: "게이트",
-    loop: "루프",
-    handsfree: "핸즈프리",
     about: "소개",
+    gate: "춘천 가는 길",
+    handsfree: "짐 보내기",
+    loop: "시내 라인",
     login: "로그인",
     logout: "로그아웃",
     menu: "메뉴",
@@ -60,11 +61,20 @@ export default {
       tagline: "공항 게이트부터 마지막 로컬 정류장까지, 춘천 여행의 끊긴 구간을 잇습니다.",
       explore: "둘러보기",
       contact: "문의",
-      team: "팀",
-      teamName: "Team 5 · STATION C Glocal Solverthon Chuncheon",
-      copyright: "© 2026 Bomnae Helper · Team 5",
+      team: "Team 5",
+      copyright: "© 2026 Bomnae Helper. All rights reserved.",
       privacy: "개인정보처리방침",
       terms: "이용약관",
+    },
+    calendar: {
+      monthFormat: "{year}년 {month}",
+      weekdays: { d0: "일", d1: "월", d2: "화", d3: "수", d4: "목", d5: "금", d6: "토" },
+      months: {
+        m1: "1월", m2: "2월", m3: "3월", m4: "4월", m5: "5월", m6: "6월",
+        m7: "7월", m8: "8월", m9: "9월", m10: "10월", m11: "11월", m12: "12월",
+      },
+      prevMonth: "이전 달",
+      nextMonth: "다음 달",
     },
     currency: "₩",
     units: {

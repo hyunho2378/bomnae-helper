@@ -1,16 +1,18 @@
 // common 네임스페이스(EN) · 존 A 전용. meta/nav/common/status.
 // ko·th와 키 완전 동형. 줄표 금지(DESIGN §13).
+// v3.2(§16.7): 공급자 용어 폐지 · 표시명 교체(Getting Here/Bag Delivery/City Lines).
+// v3.2(§16.5): 푸터 압축 키 · (§19) 공용 캘린더 라벨(common.calendar) 신설.
 export default {
   meta: {
     title: {
       home: "Home",
-      gate: "Gate",
-      handsfree: "Hands-Free",
-      loop: "Loop",
+      gate: "Getting Here",
+      handsfree: "Bag Delivery",
+      loop: "City Lines",
       lineDetail: "Line",
       booking: "Reserve seats",
       ticket: "Ticket",
-      pilot: "Pilot",
+      pilot: "About",
       about: "About",
       legalPrivacy: "Privacy Policy",
       legalTerms: "Terms of Service",
@@ -19,10 +21,10 @@ export default {
   },
   nav: {
     home: "Home",
-    gate: "Gate",
-    loop: "Loop",
-    handsfree: "Hands-Free",
     about: "About",
+    gate: "Getting Here",
+    handsfree: "Bag Delivery",
+    loop: "City Lines",
     login: "Sign in",
     logout: "Sign out",
     menu: "Menu",
@@ -61,11 +63,21 @@ export default {
       tagline: "The missing links of a Chuncheon trip, from the airport gate to the last local stop.",
       explore: "Explore",
       contact: "Contact",
-      team: "Team",
-      teamName: "Team 5 · STATION C Glocal Solverthon Chuncheon",
-      copyright: "© 2026 Bomnae Helper · Team 5",
+      team: "Team 5",
+      copyright: "© 2026 Bomnae Helper. All rights reserved.",
       privacy: "Privacy Policy",
       terms: "Terms of Service",
+    },
+    // v3.2 공용 캘린더 라벨(§19·§20 · CalendarGrid) · 존 B(CalendarField)·존 C(2개월 스프레드) 공유
+    calendar: {
+      monthFormat: "{month} {year}",
+      weekdays: { d0: "Sun", d1: "Mon", d2: "Tue", d3: "Wed", d4: "Thu", d5: "Fri", d6: "Sat" },
+      months: {
+        m1: "January", m2: "February", m3: "March", m4: "April", m5: "May", m6: "June",
+        m7: "July", m8: "August", m9: "September", m10: "October", m11: "November", m12: "December",
+      },
+      prevMonth: "Previous month",
+      nextMonth: "Next month",
     },
     currency: "₩",
     units: {

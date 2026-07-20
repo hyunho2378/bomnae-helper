@@ -35,7 +35,7 @@ export default function StoryClips({ stories }) {
               {lang === 'ko' ? story.title_ko : story.title_en}
             </h3>
             {/* 요약 · 데이터 본문(시프트 허용 영역) */}
-            <p className="line-clamp-2 text-small font-light text-inkSec">
+            <p className="line-clamp-2 text-small font-regular text-inkSec">
               {lang === 'ko' ? story.summary_ko : story.summary_en}
             </p>
           </div>

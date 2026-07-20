@@ -40,7 +40,7 @@ function drawTicketPng(line, booking) {
   ctx.fillText(line.name_en, 80, 220);
   ctx.font = `700 180px ${fonts.display}`;
   ctx.fillText(booking.code, 80, 420); // 예약 코드 6자 · Kanit Bold 큰 숫자
-  ctx.font = `300 44px ${fonts.display}`;
+  ctx.font = `400 44px ${fonts.display}`;
   ctx.fillText(`${booking.date} · ${booking.time}`, 80, 520);
   return new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
 }
@@ -188,9 +188,9 @@ export default function Ticket() {
               </TicketRow>
               <TicketRow labelKey="booking.summary.party">
                 <span className="flex items-baseline gap-8">
-                  <LangSwap k="booking.adults" className="text-caption font-light" />
+                  <LangSwap k="booking.adults" className="text-caption font-regular" />
                   <span className="font-display">{booking.adults}</span>
-                  <LangSwap k="booking.children" className="text-caption font-light" />
+                  <LangSwap k="booking.children" className="text-caption font-regular" />
                   <span className="font-display">{booking.children}</span>
                 </span>
               </TicketRow>
@@ -240,7 +240,7 @@ export default function Ticket() {
                 <p className="truncate text-body font-semibold">
                   {lang === 'ko' ? story.title_ko : story.title_en}
                 </p>
-                <p className="line-clamp-2 text-small font-light text-inkSec">
+                <p className="line-clamp-2 text-small font-regular text-inkSec">
                   {lang === 'ko' ? story.summary_ko : story.summary_en}
                 </p>
               </div>

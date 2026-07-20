@@ -135,7 +135,7 @@ export default function DepartureCalendar({ lineId, onPick, onPickDate, defaultD
               >
                 {/* 요일 · 언어별 글리프 폭이 달라 겹침 렌더(시프트 0).
                     로케일 포맷은 데이터 성격(th 미보유) · en 폴백: lang!=='ko'일 때 en 스팬(v3.1 규칙) */}
-                <span className="grid text-caption font-light">
+                <span className="grid text-caption font-regular">
                   <span aria-hidden={lang === 'ko'} className={`col-start-1 row-start-1 ${lang !== 'ko' ? '' : 'invisible'}`}>{d.toLocaleDateString('en-US', { weekday: 'narrow' })}</span>
                   <span aria-hidden={lang !== 'ko'} className={`col-start-1 row-start-1 ${lang === 'ko' ? '' : 'invisible'}`}>{d.toLocaleDateString('ko-KR', { weekday: 'narrow' })}</span>
                 </span>

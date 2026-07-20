@@ -17,9 +17,9 @@ const fmtDur = (min, dict) =>
 // 라인 컬러 정적 클래스 매핑(토큰 클래스만 · HEX 직입력 금지)
 // 소프트 면 = 라인 컬러 10% 틴트(v3.1 아이콘 배지 "소프트 배경"과 동일 규칙)
 const SOFT = {
-  potato: 'bg-yellow/10',
-  dakgalbi: 'bg-spice/10',
-  lake: 'bg-primary/10',
+  potato: 'bg-surface',
+  dakgalbi: 'bg-surface',
+  lake: 'bg-surface',
 };
 const STRIPE = {
   potato: 'bg-yellow',
@@ -83,7 +83,7 @@ export default function LineHero({ line, stopsCount }) {
                 </span>
                 <LangSwap
                   k="loop.detail.priceUnit"
-                  className="text-small font-light text-inkSec"
+                  className="text-small font-regular text-inkSec"
                 />
               </dd>
             </div>

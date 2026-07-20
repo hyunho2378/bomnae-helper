@@ -10,6 +10,6 @@ const CAPS = {
 export default function Container({ size, children }) {
   const cap = size ? CAPS[size] : 'lg:max-w-lg 2xl:max-w-2xl 3xl:max-w-3xl';
   return (
-    <div className={`mx-auto w-full px-20 md:px-32 lg:px-48 ${cap}`}>{children}</div>
+    <div className={`mx-auto w-full px-16 md:px-24 lg:px-40 ${cap}`}>{children}</div>
   );
 }

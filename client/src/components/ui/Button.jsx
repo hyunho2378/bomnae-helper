@@ -1,7 +1,10 @@
-// CTA 버튼 · DESIGN §7. SemiBold, pill, 높이 48(모바일)/44(데스크탑),
-// hover 시 navy 전환 160ms. focus-visible은 index.css 전역 스타일.
+// CTA 버튼 · DESIGN §7 + §16.8 v3.2 버튼 페어(Apple 패턴).
+// primary: primary 면+white / secondary: 투명+primary 텍스트+1.5px primary 보더(무보더 원칙의 명시적 예외 1호)
+//   · hover 8% 틴트는 §16.8이 허용한 상호작용 피드백 예외(스케일상 /10 스텝 적용)
+// ghost: 흐름 전진 텍스트 버튼. 폭은 텍스트+패딩으로 결정(§16.8 · 임의 고정폭 금지).
 const VARIANTS = {
   primary: 'bg-primary text-white hover:bg-navy',
+  secondary: 'border-1.5 border-primary bg-transparent text-primary hover:bg-primary/10',
   ghost: 'bg-transparent text-primary hover:text-navy',
 };
 

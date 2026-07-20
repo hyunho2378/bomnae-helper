@@ -67,7 +67,7 @@ export default function StopPopup({ map, stop, onClose, onViewLine }) {
         <span aria-hidden={lang !== 'ko'} className={`col-start-1 row-start-1 ${lang === 'ko' ? '' : 'invisible'}`}>{stop.name_ko}</span>
       </h3>
       {/* 한 줄 소개 · 데이터 본문(시프트 허용 영역), th는 en 폴백 */}
-      <p className="text-small font-light text-inkSec">
+      <p className="text-small font-regular text-inkSec">
         {lang === 'ko' ? stop.preorder_ko : stop.preorder_en}
       </p>
       {/* 체류시간 chip */}

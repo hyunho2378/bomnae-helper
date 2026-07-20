@@ -117,7 +117,7 @@ export default function LineDetail() {
 
       {/* 모바일 하단 고정 바 · 합계 + CTA(§15). GlassDock(56px+바닥 16px) 위에 띄운다.
           safe-area는 최하단 요소인 GlassDock이 처리 */}
-      <div className="fixed inset-x-0 bottom-80 z-content px-20 md:px-32 lg:hidden">
+      <div className="fixed inset-x-0 bottom-80 z-content px-16 md:px-24 lg:hidden">
         <div className="flex items-center justify-between gap-16 rounded-xl bg-white p-16 shadow-lg">
           <p aria-live="polite" className="flex min-w-0 flex-col">
             <LangSwap k="booking.total" className="text-caption font-medium text-inkMeta" />

@@ -96,9 +96,14 @@ export default function GlassDock() {
           }
         }}
         className={`fixed left-1/2 z-dock -translate-x-1/2 overflow-hidden bg-glass shadow-dock backdrop-blur-glass transition-all duration-base ease-spring motion-reduce:transition-none lg:hidden ${
-          open ? 'rounded-lg' : 'rounded-pill'
+          open ? 'max-w-dialog rounded-lg' : 'rounded-pill'
         }`}
-        style={{ bottom: `max(${spacing[4]}px, env(safe-area-inset-bottom))` }}
+        // v3.2 모바일 메뉴 깨짐 수리: 확장 시 폭이 접힘 필 폭에 갇혀 언어행이 넘치던 사고 ·
+        // 확장 폭 = 뷰포트 - 컨테이너 마진×2(spacing 토큰), 상한 max-w-dialog
+        style={{
+          bottom: `max(${spacing[4]}px, env(safe-area-inset-bottom))`,
+          width: open ? `calc(100vw - ${spacing[4] * 2}px)` : undefined,
+        }}
       >
         {/* 접힘 시 visibility로 포커스·접근성 트리에서도 제외(높이 전환과 함께 지연 적용) */}
         <div

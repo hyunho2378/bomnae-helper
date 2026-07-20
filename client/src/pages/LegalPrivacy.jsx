@@ -4,12 +4,13 @@ import Container from '../components/layout/Container';
 import { useLang } from '../i18n/LangContext';
 import LangSwap from '../i18n/LangSwap';
 
-const SECTIONS = ['s1', 's2', 's3', 's4', 's5', 's6', 's7', 's8'];
+// v3.2: 위치정보 조항(loc) 병합 이식 · 수집(§2)·목적(§3) 직후 배치(LEGAL_COPY v3.2)
+const SECTIONS = ['s1', 's2', 's3', 'loc', 's4', 's5', 's6', 's7', 's8'];
 
 export default function LegalPrivacy() {
   const { t } = useLang();
   return (
-    <div className="pb-96 pt-48 lg:pt-128">
+    <div className="pb-96 pt-96 lg:pt-128">
       <Container>
         <LangSwap k="legal.privacy.title" as="h1" className="text-h1 font-bold tracking-display" />
         <LangSwap

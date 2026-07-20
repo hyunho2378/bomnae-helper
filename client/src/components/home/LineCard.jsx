@@ -1,10 +1,8 @@
-// 라인 카드 · COMPONENTS B + v3.1 존 B 행: 사진(캐릭터) 자리 대신 lucide 아이콘 배지
-// (potato=Sprout, dakgalbi=Flame, lake=Waves · 라인 컬러 소프트 배경 원 = 토큰 클래스 + opacity 유틸),
+// 라인 카드 · COMPONENTS B + v3.2 §16.1: 아이콘 배지·틴트 폐지 → 원색 컬러 도트 + shadow.sm.
 // 정류장 3, 소요·가격. 무보더 + shadow-sm, hover shadow-md + translateY(-2px)(§16).
-// 배지의 라인 컬러 사용 근거: DESIGN §3(라인을 지칭하는 배지는 3색으로 식별) · 장식이라 aria-hidden.
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Clock, Flame, Sprout, Waves } from 'lucide-react';
+import { ArrowRight, Clock } from 'lucide-react';
 import { useLang } from '../../i18n/LangContext';
 import LangSwap from '../../i18n/LangSwap';
 // 언어별 소요 포맷 겹침 렌더용(PATTERNS §1) · 시프트 0
@@ -14,12 +12,8 @@ import th from '../../i18n/th';
 import Skeleton from '../ui/Skeleton';
 import { getStops } from '../../data/api';
 
-// 라인 식별 3색만 사용(DESIGN §3) · tokens 생성 클래스 매핑
-const BADGE = {
-  potato: { icon: Sprout, circle: 'bg-yellow/15', color: 'text-yellow' },
-  dakgalbi: { icon: Flame, circle: 'bg-spice/15', color: 'text-spice' },
-  lake: { icon: Waves, circle: 'bg-primary/15', color: 'text-primary' },
-};
+// 라인 식별 3색만 사용(DESIGN §3) · v3.2 원색 도트(틴트·아이콘 배지 금지)
+const DOT = { potato: 'bg-yellow', dakgalbi: 'bg-spice', lake: 'bg-primary' };
 
 const UNITS = { en: en.common.units, ko: ko.common.units, th: th.common.units };
 const LANGS = ['en', 'ko', 'th'];
@@ -67,9 +61,6 @@ function DurationText({ min }) {
 export default function LineCard({ line }) {
   const { t } = useLang();
   const [stops, setStops] = useState(null);
-  const badge = BADGE[line.color_token];
-  const BadgeIcon = badge.icon;
-
   useEffect(() => {
     let alive = true;
     // api.js는 전부 async · await 계약(PROGRESS 인수인계 노트)
@@ -87,13 +78,11 @@ export default function LineCard({ line }) {
       className="block h-full overflow-hidden rounded-lg bg-white shadow-sm transition-all duration-fast hover:-translate-y-0.5 hover:shadow-md"
     >
       <div className="flex flex-col gap-16 p-24">
-        {/* 아이콘 배지 · 라인 컬러 소프트 배경 원(토큰 클래스 + opacity 유틸) */}
+        {/* v3.2 §16.1: 원색 컬러 도트 + shadow.sm(아이콘 배지·틴트 폐지) */}
         <span
           aria-hidden="true"
-          className={`flex h-64 w-64 items-center justify-center rounded-pill ${badge.circle}`}
-        >
-          <BadgeIcon size={32} className={badge.color} />
-        </span>
+          className={`h-12 w-12 rounded-pill shadow-sm ${DOT[line.color_token]}`}
+        />
         <BiText en={line.name_en} ko={line.name_ko} className="text-h3 font-medium" />
         {stops ? (
           <p className="flex flex-wrap items-center gap-8 text-small text-inkSec">

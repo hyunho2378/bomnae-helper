@@ -10,6 +10,8 @@ export default {
       s2: "When you sign in with Google, we receive your name, email address and profile image reference from Google. When you reserve a seat we store your booking details: line, date, departure time and party size. When you request Hands-Free we additionally store your arrival terminal, bag count and the address of your stay in Chuncheon. We do not collect payment card numbers in this prototype. We do not use advertising trackers, and we do not store data in your browser's local storage.",
       s3h: "Why we collect it",
       s3: "We use this data only to operate your reservation: seat management, pre-ordering at partner shops on your behalf, delivery coordination for Hands-Free, and contacting you about your booking.",
+      loch: "Location",
+      loc: "If you turn on arrival check in Getting Here, we read your device location only to determine whether you have entered the Chuncheon area. The check runs only while the page is open, precise coordinates are never displayed or stored on our servers, and you can turn it off at any time.",
       s4h: "Cookies",
       s4: "We use a single session cookie to keep you signed in. It is httpOnly, is not readable by scripts, and is deleted when you sign out. We do not use analytics or advertising cookies.",
       s5h: "Sharing and processors",
