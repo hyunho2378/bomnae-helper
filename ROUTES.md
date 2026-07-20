@@ -1,0 +1,55 @@
+# ROUTES.md — Bomnae Helper 라우팅 v3 (react-router-dom@6)
+
+## 1. 라우트 테이블
+
+| Path | 컴포넌트 | 담당 | 비고 |
+|---|---|---|---|
+| `/` | `pages/Home.jsx` | AGENT-2 | |
+| `/gate` | `pages/Gate.jsx` | AGENT-2 | 쿼리 `?terminal=&time=&date=` 지원(Home 미니 입력에서 전달) |
+| `/gate/hands-free` | `pages/HandsFree.jsx` | AGENT-2 | |
+| `/loop` | `pages/Loop.jsx` | AGENT-3 | 풀블리드 맵 |
+| `/loop/:lineId` | `pages/LineDetail.jsx` | AGENT-3 | lineId ∈ potato \| dakgalbi \| lake, 그 외 404 리다이렉트 |
+| `/loop/:lineId/book` | `pages/Booking.jsx` | AGENT-3 | 쿼리 `?date=&time=` 프리필 |
+| `/ticket/:bookingId` | `pages/Ticket.jsx` | AGENT-3 | |
+| `/pilot` | `pages/Pilot.jsx` | AGENT-3 | |
+| `*` | `pages/NotFound.jsx` | AGENT-3 | |
+
+## 2. 셸 구조
+
+```jsx
+<BrowserRouter>
+  <LangProvider>
+    <AuthProvider>
+      <BookingProvider>
+        <Routes>
+          <Route element={<PageLayout />}>   {/* Header + Outlet + GlassDock + Footer */}
+            <Route path="/" element={<Home />} />
+            <Route path="/gate" element={<Gate />} />
+            <Route path="/gate/hands-free" element={<HandsFree />} />
+            <Route path="/loop" element={<Loop />} />
+            <Route path="/loop/:lineId" element={<LineDetail />} />
+            <Route path="/loop/:lineId/book" element={<Booking />} />
+            <Route path="/ticket/:bookingId" element={<Ticket />} />
+            <Route path="/pilot" element={<Pilot />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Routes>
+      </BookingProvider>
+    </AuthProvider>
+  </LangProvider>
+</BrowserRouter>
+```
+
+- `/loop`만 예외 레이아웃: PageLayout 안에서 Footer 숨김 + 맵이 헤더 아래 뷰포트 전체(`PageLayout`이 `useLocation`으로 판단, `hideFooter` 하드코딩 분기 1곳 허용).
+
+## 3. 가드 · 리다이렉트
+
+- 인증 가드는 **라우트 레벨이 아니라 액션 레벨**: 예약/접수 "확정" 버튼에서 `useAuth()` 미로그인 시 LoginGate 모달 → 성공 후 이어서 제출. 페이지 접근 자체는 전부 게스트 허용 (Guest-first).
+- `/loop/:lineId` — lineId 검증 실패 시 `<Navigate to="/loop" replace />`.
+- `/ticket/:bookingId` — 존재하지 않는 id는 EmptyState("Booking not found") 렌더(404 라우트 이동 아님).
+
+## 4. 공통 동작
+
+- 라우트 변경 시: 스크롤 top 복원(`ScrollRestoration` 커스텀 훅), GlassDock 수축, 진행 중 시트/다이얼로그 닫기.
+- 페이지 title: `Bomnae Helper — {페이지 키}` (사전 키 `meta.title.*`).
+- 내부 이동은 전부 `<Link>`/`useNavigate` — `<a href>`는 외부 링크만(`rel="noopener"`).

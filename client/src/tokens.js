@@ -1,0 +1,113 @@
+// ============================================================
+// tokens.js — Bomnae Helper 단일 진실(Single Source of Truth)
+// 모든 색·타이포·간격·모션·지도 상수는 이 파일에서만 나온다.
+// 컴포넌트/CSS에 HEX·px 하드코딩 금지. tailwind.config.js가 이 파일을 import한다.
+// 배치 경로: client/src/tokens.js
+// ============================================================
+
+export const colors = {
+  bg: '#FFFFFF',            // 배경 순백. 웜톤·파스텔·AI색 전면 금지
+  primary: '#009FE3',       // 춘천 공식 블루
+  navy: '#27348B',          // 춘천 공식 네이비 (푸터 풀블리드, 강한 대비면)
+  yellow: '#FFC400',        // 고채도 서포트 — Potato Line
+  spice: '#FF4438',         // 고채도 서포트 — Dakgalbi Line
+  green: '#00B865',         // 고채도 서포트 — 성공/확정 상태
+  magenta: '#F0347C',       // 고채도 서포트 — 포인트(절제 사용)
+  ink: '#14172E',           // 텍스트 primary
+  inkSec: '#4E5470',        // 텍스트 secondary
+  inkMeta: '#8B90A7',       // 텍스트 meta/caption
+  line: 'rgba(20,23,46,0.10)',   // 보더
+  glass: 'rgba(255,255,255,0.66)', // 글래스 면 (blur 예산 3곳 전용)
+  scrim: 'rgba(20,23,46,0.55)',    // 영상 자막 밴드 + 히어로 스크림(그라데이션 1곳)
+  surface: '#F5F6FA',       // 중립 면(스켈레톤, 지도 로딩면, 입력 배경)
+};
+
+// 라인 컬러 — 캐릭터 파스텔은 UI 팔레트가 아님(콘텐츠 이미지로만).
+// UI에서 라인을 지칭할 때는 반드시 아래 3색만 사용한다.
+export const lineColors = {
+  potato: colors.yellow,    // Potato Line: 감자밭 → 소양강댐 → 소울로스터리
+  dakgalbi: colors.spice,   // Dakgalbi Line: 통나무집 닭갈비 → 막국수체험박물관 → 구도심
+  lake: colors.primary,     // Lake/Culture Line: 소양강스카이워크 → 화동2571 → 공지천
+};
+
+export const fonts = {
+  // Kanit: 영문·숫자·디스플레이 전용(한글 글리프 없음) / Pretendard Variable: 한글 전담
+  display: `'Kanit','Pretendard Variable',sans-serif`,
+  body: `'Pretendard Variable','Kanit',sans-serif`,
+};
+
+// 웨이트 위계 강제: 한 화면 최소 3웨이트 공존, 인접 동일 웨이트 나열 금지
+export const weights = {
+  bold: 700,      // display · H1 · 숫자
+  semibold: 600,  // H2 · CTA
+  medium: 500,    // H3 · 네비 · 칩 · caption
+  regular: 400,   // 본문
+  light: 300,     // 18px 이상에서만 허용
+};
+
+export const typeScale = {
+  display: 'clamp(44px, 6vw, 104px)',
+  h1: 'clamp(32px, 4vw, 56px)',
+  h2: 'clamp(24px, 2.5vw, 36px)',
+  h3: '20px',
+  body: '16px',
+  small: '14px',
+  caption: '12px', // weight 500 고정
+};
+
+export const spacing = [0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96, 128];
+
+export const breakpoints = {
+  sm: 640, md: 768, lg: 1024, xl: 1280, '2xl': 1536, '3xl': 1920,
+  // 1920 이상(2560 QHD, 3840 4K 32")은 추가 브레이크포인트 없이 컨테이너 캡 + 여백으로 대응.
+  // QA는 3840까지 수행한다 (DESIGN.md §5 매트릭스).
+};
+
+export const containers = {
+  maxLg: 1200,   // lg~2xl
+  max2xl: 1400,  // 2xl~3xl
+  max3xl: 1560,  // 3xl 이상 — 4K에서도 이 캡을 넘지 않는다
+  marginBase: 20, // ~md
+  marginMd: 32,   // md~lg
+  marginLg: 48,   // lg~
+};
+
+export const radius = { sm: 10, md: 16, lg: 24, pill: 999 };
+
+// 그림자 예산 2곳: GlassDock / BottomSheet(Dialog 공유)
+export const shadow = {
+  dock: '0 12px 40px rgba(20,23,46,0.16)',
+  sheet: '0 -12px 40px rgba(20,23,46,0.14)',
+};
+
+// blur 예산 3곳: Header(스크롤 시) / GlassDock / BottomSheet·Dialog
+export const blur = { glass: '16px' };
+
+export const motion = {
+  spring: 'cubic-bezier(0.32, 1.32, 0.5, 1)', // 320ms — Dock 모핑, 스탬프, 시트
+  ease: 'cubic-bezier(0.4, 0, 0.2, 1)',       // 일반 전환
+  base: '320ms',
+  fast: '160ms',
+};
+
+export const z = { map: 0, content: 10, header: 40, dock: 50, sheet: 60, dialog: 70 };
+
+// MapLibre 상수 (sloverthon 레포 포팅 — PATTERNS.md §4)
+export const map = {
+  styleUrl: 'https://tiles.openfreemap.org/styles/liberty',
+  center: [127.735, 37.885], // 춘천 전경
+  zoom: 11.5,
+  pitch: 58,      // 시네마틱 기본
+  pitchFocus: 63, // 정류장 포커스
+  bearing: -18,
+  flyDuration: 1500,
+  extrusionMinZoom: 13,
+  // 3D 건물 컬러 램프 — 중립 잉크 톤(라인 컬러가 주인공이 되도록 건물은 침묵)
+  extrusion: { low: '#E8EAF2', mid: '#C3C8DA', high: '#8B90A7' },
+};
+
+const tokens = {
+  colors, lineColors, fonts, weights, typeScale, spacing,
+  breakpoints, containers, radius, shadow, blur, motion, z, map,
+};
+export default tokens;
