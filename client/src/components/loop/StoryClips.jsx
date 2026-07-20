@@ -10,9 +10,10 @@ export default function StoryClips({ stories }) {
   return (
     <ul className="-mx-20 flex snap-x gap-16 overflow-x-auto px-20 pb-8 md:-mx-32 md:px-32 lg:mx-0 lg:grid lg:grid-cols-3 lg:gap-24 lg:overflow-visible lg:px-0 lg:pb-0">
       {stories.map((story) => (
+        // v3.1 무보더 · 카드 깊이는 shadow.sm, radius 카드 스케일 lg(DESIGN §7)
         <li
           key={story.id}
-          className="w-full shrink-0 basis-4/5 snap-start overflow-hidden rounded-md border border-line sm:basis-1/2 lg:basis-auto"
+          className="w-full shrink-0 basis-4/5 snap-start overflow-hidden rounded-lg bg-white shadow-sm sm:basis-1/2 lg:basis-auto"
         >
           {story.video_url ? (
             // 촬영분 수급 후 경로: 자막 상시(DESIGN §12)

@@ -1,18 +1,23 @@
-// 셔틀 시뮬레이션 훅 · PATTERNS §4: 라인 좌표 배열을 rAF로 선형 보간, 1루프 ≈ 90초.
-// Marker.setLngLat만 갱신. reduced-motion 시 첫 정류장 정지 위치(rAF 없음).
+// 셔틀 시뮬레이션 훅 · PATTERNS §13(v3.1 스무딩 수술):
+// 목표 좌표는 경로 누적거리 기반 등속 파라미터로 산출(정점 간 lerp · 정점 덜컥임 원인 제거),
+// 표시 좌표는 지수 추종(current += (target-current)*min(1, dt*3))으로 따라간다.
+// 마커 옵션 {pitchAlignment:'map', rotationAlignment:'map'}, 요소 will-change:transform(LoopMap.css),
+// Marker.setLngLat는 rAF당 1회만. reduced-motion 시 첫 정류장 정지(rAF 없음).
 // MVP는 시뮬레이션 이동(DESIGN §11) · PHASE 3 실차 GPS로 교체 지점.
 import { useEffect } from 'react';
 import maplibregl from 'maplibre-gl';
 import { lineColors } from '../../tokens';
 
 const LOOP_MS = 90000; // PATTERNS §4 명세: 1루프 ≈ 90초
+const FOLLOW = 3; // PATTERNS §13 명세: 지수 lerp 계수 dt*3
 
 // 셔틀 마커 엘리먼트 · 라인 컬러 채움 + 캐릭터 미니 아이콘(DESIGN §11).
-// 크기·모양은 tailwind 토큰 클래스만 사용(h-32/w-32/h-20/w-20/rounded-pill/border-2).
+// 크기·모양은 tailwind 토큰 클래스만 사용. shuttle-marker 클래스가 will-change:transform 부여(§13).
 function makeShuttleElement(lineId, characterImg, label) {
   const el = document.createElement('div');
+  // v3.1 무보더 스윕 · 흰 테는 border 대신 ring(box-shadow)으로 표현
   el.className =
-    'flex h-32 w-32 items-center justify-center rounded-pill border-2 border-white';
+    'shuttle-marker flex h-32 w-32 items-center justify-center rounded-pill ring-2 ring-white ring-inset';
   el.style.background = lineColors[lineId]; // tokens.lineColors · HEX 직입력 아님
   el.setAttribute('role', 'img');
   el.setAttribute('aria-label', label);
@@ -24,7 +29,7 @@ function makeShuttleElement(lineId, characterImg, label) {
   return el;
 }
 
-// 경로 누적 길이(평면 근사 · 시각 시뮬 용도라 충분) 기반 선형 보간.
+// 경로 누적 길이(평면 근사 · 시각 시뮬 용도라 충분) 기반 등속 보간.
 function pointAt(coords, cumulative, total, t) {
   const target = t * total;
   let i = 1;
@@ -53,24 +58,41 @@ export default function useShuttleSim(map, paths) {
       }
       const marker = new maplibregl.Marker({
         element: makeShuttleElement(lineId, characterImg, label),
+        // PATTERNS §13 명세 옵션 · 지도 평면 정렬(핏치·베어링 변화 시 미끄러짐 제거)
+        pitchAlignment: 'map',
+        rotationAlignment: 'map',
       })
         .setLngLat(coords[0])
         .addTo(map);
-      return { marker, coords, cumulative, total: cumulative[cumulative.length - 1] };
+      // disp = 표시 좌표(지수 추종 상태), 시작은 첫 정류장
+      return {
+        marker,
+        coords,
+        cumulative,
+        total: cumulative[cumulative.length - 1],
+        disp: { lng: coords[0][0], lat: coords[0][1] },
+      };
     });
 
     if (reduced) {
-      // reduced-motion: 첫 정류장 고정(PATTERNS §4)
+      // reduced-motion: 첫 정류장 고정(PATTERNS §4·DESIGN §11)
       return () => shuttles.forEach(({ marker }) => marker.remove());
     }
 
     let raf = 0;
     const start = performance.now();
+    let prev = start;
     const tick = (now) => {
       raf = requestAnimationFrame(tick); // 선예약 · 일시 예외로 루프가 죽지 않게
+      const dt = (now - prev) / 1000; // 초 단위 프레임 간격
+      prev = now;
       const t = ((now - start) % LOOP_MS) / LOOP_MS;
-      shuttles.forEach(({ marker, coords, cumulative, total }) => {
-        marker.setLngLat(pointAt(coords, cumulative, total, t));
+      const k = Math.min(1, dt * FOLLOW); // PATTERNS §13 지수 lerp 계수
+      shuttles.forEach((s) => {
+        const [lng, lat] = pointAt(s.coords, s.cumulative, s.total, t); // 등속 target
+        s.disp.lng += (lng - s.disp.lng) * k;
+        s.disp.lat += (lat - s.disp.lat) * k;
+        s.marker.setLngLat([s.disp.lng, s.disp.lat]); // rAF당 1회(§13)
       });
     };
     raf = requestAnimationFrame(tick);

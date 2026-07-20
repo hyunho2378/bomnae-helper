@@ -7,3 +7,13 @@
   border-radius:50%;animation:bh-pulse 1.8s infinite}
 @keyframes bh-pulse{from{opacity:1;inset:-4px}to{opacity:0;inset:-12px}}
 @media(prefers-reduced-motion:reduce){.stop-marker.active::after{animation:none;opacity:.5}}
+
+/* v3.1 셔틀 스무딩(PATTERNS §13) · 마커 요소 will-change:transform */
+.shuttle-marker{will-change:transform}
+
+/* v3.1 StopPopup(PATTERNS §13) · white 카드. 값 근거(tokens):
+   background #fff = colors.bg / border-radius 16px = radius.lg /
+   box-shadow = shadow.lg / padding 16px = spacing[4]. */
+.stop-popup .maplibregl-popup-content{background:#fff;border-radius:16px;
+  box-shadow:0 16px 48px rgba(20,23,46,0.18);padding:16px}
+.stop-popup .maplibregl-popup-tip{border-top-color:#fff;border-bottom-color:#fff}

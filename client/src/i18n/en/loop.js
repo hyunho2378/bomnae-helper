@@ -1,5 +1,5 @@
 // loop 네임스페이스(EN) · 존 C(LOOP) 소유. loop/booking/ticket.
-// ko·th와 키 완전 동형. 줄표 금지. 존 A가 기존 키를 이관한 베이스라인이며 C가 확장한다.
+// ko·th와 키 완전 동형. 줄표 금지. v3.1: 3스텝 키 제거, preview(오버레이)·edit(단일 확인 페이지) 추가.
 export default {
   loop: {
     title: "Live line map",
@@ -10,6 +10,11 @@ export default {
     map: {
       label: "Chuncheon live line map",
       loading: "Loading the map",
+    },
+    preview: {
+      label: "Line preview",
+      preorderLine: "Every stop is pre-ordered ahead. It's ready when you step off.",
+      cta: "Book and see details",
     },
     detail: {
       routeEyebrow: "The route",
@@ -39,21 +44,16 @@ export default {
     adults: "Adults",
     children: "Children",
     total: "Total",
-    stepLabel: "Step",
-    steps: {
-      departure: "Departure",
-      party: "Party",
-      summary: "Summary",
-    },
-    dateLabel: "Date",
-    timeLabel: "Time",
+    edit: "Edit",
     confirmCta: "Confirm reservation",
     summary: {
       line: "Line",
       departure: "Departure",
       meeting: "Meeting point",
       party: "Travelers",
+      riders: "Fellow riders",
       host: "Host",
+      preorder: "Pre-order",
       preorderNote: "Every stop is pre-ordered ahead. It's ready when you step off.",
     },
     success: {

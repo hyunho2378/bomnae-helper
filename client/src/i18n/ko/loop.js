@@ -1,4 +1,5 @@
 // loop 네임스페이스(KR) · 존 C(LOOP) 소유. en·th와 키 완전 동형. 줄표 금지.
+// v3.1: 3스텝 키 제거, preview(오버레이)·edit(단일 확인 페이지) 추가.
 export default {
   loop: {
     title: "라이브 라인 맵",
@@ -9,6 +10,11 @@ export default {
     map: {
       label: "춘천 라이브 라인 맵",
       loading: "지도를 불러오는 중",
+    },
+    preview: {
+      label: "라인 미리보기",
+      preorderLine: "모든 정류장에 선주문을 넣어 둡니다. 내리면 바로 준비되어 있어요.",
+      cta: "예약하고 자세히 보기",
     },
     detail: {
       routeEyebrow: "노선",
@@ -38,21 +44,16 @@ export default {
     adults: "성인",
     children: "어린이",
     total: "합계",
-    stepLabel: "단계",
-    steps: {
-      departure: "출발",
-      party: "인원",
-      summary: "요약",
-    },
-    dateLabel: "날짜",
-    timeLabel: "회차",
+    edit: "수정",
     confirmCta: "예약 확정하기",
     summary: {
       line: "라인",
       departure: "출발 회차",
       meeting: "미팅포인트",
       party: "인원",
+      riders: "동승",
       host: "호스트",
+      preorder: "선주문",
       preorderNote: "모든 정류장에 선주문을 넣어 둡니다. 내리면 바로 준비되어 있어요.",
     },
     success: {

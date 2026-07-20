@@ -148,9 +148,9 @@ export default function Ticket() {
               <span className="font-display text-small font-semibold uppercase tracking-eyebrow text-white">
                 Bomnae Helper
               </span>
-              {/* 라인명 EN/KR 겹침(시프트 0) */}
+              {/* 라인명 겹침(시프트 0) · 데이터 필드(th 없음)는 en 폴백: lang!=='ko'(v3.1 규칙) */}
               <span className="grid text-small font-medium text-white">
-                <span aria-hidden={lang !== 'en'} className={`col-start-1 row-start-1 truncate ${lang === 'en' ? '' : 'invisible'}`}>{line.name_en}</span>
+                <span aria-hidden={lang === 'ko'} className={`col-start-1 row-start-1 truncate ${lang !== 'ko' ? '' : 'invisible'}`}>{line.name_en}</span>
                 <span aria-hidden={lang !== 'ko'} className={`col-start-1 row-start-1 truncate ${lang === 'ko' ? '' : 'invisible'}`}>{line.name_ko}</span>
               </span>
             </div>
@@ -173,9 +173,9 @@ export default function Ticket() {
               </TicketRow>
               <TicketRow labelKey="booking.summary.meeting">
                 <span className="flex flex-wrap items-baseline gap-8">
-                  {/* 미팅포인트명 EN/KR 겹침(시프트 0) */}
+                  {/* 미팅포인트명 겹침(시프트 0) · 데이터 필드는 en 폴백: lang!=='ko'(v3.1 규칙) */}
                   <span className="grid">
-                    <span aria-hidden={lang !== 'en'} className={`col-start-1 row-start-1 ${lang === 'en' ? '' : 'invisible'}`}>{meetingPoint.name_en}</span>
+                    <span aria-hidden={lang === 'ko'} className={`col-start-1 row-start-1 ${lang !== 'ko' ? '' : 'invisible'}`}>{meetingPoint.name_en}</span>
                     <span aria-hidden={lang !== 'ko'} className={`col-start-1 row-start-1 ${lang === 'ko' ? '' : 'invisible'}`}>{meetingPoint.name_ko}</span>
                   </span>
                   <Link
@@ -199,13 +199,17 @@ export default function Ticket() {
                 {line.host_name}
               </TicketRow>
             </dl>
-            {/* navy 위 구분선 · line 토큰은 잉크 계열이라 시인 불가, white 사용(DESIGN §7 카드 보더 예외면) */}
-            <div className="flex items-baseline justify-between border-t border-white pt-16">
-              <LangSwap k="booking.total" className="text-small font-medium text-white" />
-              <span className="font-display text-h3 font-bold text-white">
-                {'₩'}
-                {booking.total.toLocaleString('en-US')}
-              </span>
+            {/* navy 위 수평 디바이더 · v3.1 무보더(border 속성 미사용, 면 요소로 표현).
+                line 토큰은 잉크 계열이라 navy 위 시인 불가 · white 사용 */}
+            <div className="flex flex-col gap-16">
+              <div aria-hidden="true" className="h-px w-full bg-white" />
+              <div className="flex items-baseline justify-between">
+                <LangSwap k="booking.total" className="text-small font-medium text-white" />
+                <span className="font-display text-h3 font-bold text-white">
+                  {'₩'}
+                  {booking.total.toLocaleString('en-US')}
+                </span>
+              </div>
             </div>
           </div>
         </article>
@@ -224,12 +228,13 @@ export default function Ticket() {
         {story && (
           <section className="flex flex-col gap-12">
             <LangSwap k="ticket.watch" as="h2" className="text-h3 font-semibold" />
-            <div className="flex items-center gap-16 rounded-md border border-line p-16">
+            {/* v3.1 무보더 · 카드 shadow.sm + radius 카드 스케일 lg(DESIGN §7) */}
+            <div className="flex items-center gap-16 rounded-lg bg-white p-16 shadow-sm">
               <img
                 src={story.thumb}
                 alt=""
                 loading="lazy"
-                className="h-64 w-96 shrink-0 rounded-sm bg-surface object-cover"
+                className="h-64 w-96 shrink-0 rounded-md bg-surface object-cover"
               />
               <div className="flex min-w-0 flex-col gap-4">
                 <p className="truncate text-body font-semibold">
@@ -243,8 +248,8 @@ export default function Ticket() {
           </section>
         )}
 
-        {/* CJM Revisit · 남은 라인이 곧 재방문 이유(IA §2.7) */}
-        <div className="flex flex-col items-center gap-12 rounded-md bg-surface p-24 text-center">
+        {/* CJM Revisit · 남은 라인이 곧 재방문 이유(IA §2.7) · radius 카드 스케일 lg(v3.1) */}
+        <div className="flex flex-col items-center gap-12 rounded-lg bg-surface p-24 text-center">
           <LangSwap k="ticket.linesLeft" as="p" className="text-body font-semibold" />
           <Button variant="ghost" as={Link} to="/loop">
             <LangSwap k="ticket.linesLeftCta" />

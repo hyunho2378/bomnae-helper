@@ -1,5 +1,6 @@
 // loop 네임스페이스(TH) · 존 C(LOOP) 소유. en·ko와 키 완전 동형.
 // 초안: en 기반 번역. 네이티브 검수 대기(PROGRESS 준비물).
+// v3.1: 3스텝 키 제거, preview(오버레이)·edit(단일 확인 페이지) 추가.
 export default {
   loop: {
     title: "แผนที่สายรถแบบสด",
@@ -10,6 +11,11 @@ export default {
     map: {
       label: "แผนที่สายรถชุนชอนแบบสด",
       loading: "กำลังโหลดแผนที่",
+    },
+    preview: {
+      label: "ตัวอย่างสายรถ",
+      preorderLine: "ทุกป้ายถูกสั่งล่วงหน้าแล้ว ลงรถปุ๊บพร้อมปั๊บ",
+      cta: "จองและดูรายละเอียด",
     },
     detail: {
       routeEyebrow: "เส้นทาง",
@@ -39,21 +45,16 @@ export default {
     adults: "ผู้ใหญ่",
     children: "เด็ก",
     total: "ยอดรวม",
-    stepLabel: "ขั้นตอน",
-    steps: {
-      departure: "ออกเดินทาง",
-      party: "ผู้เดินทาง",
-      summary: "สรุป",
-    },
-    dateLabel: "วันที่",
-    timeLabel: "รอบเวลา",
+    edit: "แก้ไข",
     confirmCta: "ยืนยันการจอง",
     summary: {
       line: "สาย",
       departure: "รอบออกเดินทาง",
       meeting: "จุดนัดพบ",
       party: "ผู้เดินทาง",
+      riders: "ผู้ร่วมเดินทาง",
       host: "โฮสต์",
+      preorder: "สั่งล่วงหน้า",
       preorderNote: "ทุกป้ายถูกสั่งล่วงหน้าแล้ว ลงรถปุ๊บพร้อมปั๊บ",
     },
     success: {

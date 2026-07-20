@@ -2,6 +2,8 @@
 // "18k" 축약 + 상태 점), 선택 셀 border primary 2px, 날짜 선택 → 회차 Chip 3개
 // (시각 + 남은 좌석) + StatusBadge, 만석 Chip disabled. 키보드: 화살표 이동 + Enter(roving tabindex).
 // yountravel 검증 패턴 채택(IA §5): 가격 인라인 + 출발확정/출발유력 상태.
+// v3.1 확장(존 C 소유 파일 · 완료 보고 명시): defaultDate/defaultTime(URL 쿼리 복원 시드),
+// onPickDate(날짜만 변경 시 콜백 · StickyBookPanel의 URL 동기용).
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { getDepartures, getLine } from '../../data/api';
 import { useLang } from '../../i18n/LangContext';
@@ -29,12 +31,12 @@ const DOT = {
   closed: 'bg-inkMeta',
 };
 
-export default function DepartureCalendar({ lineId, onPick }) {
+export default function DepartureCalendar({ lineId, onPick, onPickDate, defaultDate, defaultTime }) {
   const { lang, t } = useLang();
   const [line, setLine] = useState(null);
   const [byDate, setByDate] = useState(null); // dateStr → departures[]
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedTime, setSelectedTime] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(defaultDate ?? null); // URL 쿼리 복원(v3.1)
+  const [selectedTime, setSelectedTime] = useState(defaultTime ?? null);
   const [focusIdx, setFocusIdx] = useState(0); // roving tabindex
   const cellRefs = useRef([]);
 
@@ -65,6 +67,7 @@ export default function DepartureCalendar({ lineId, onPick }) {
   const pickDate = (dateStr) => {
     setSelectedDate(dateStr);
     setSelectedTime(null);
+    onPickDate?.(dateStr); // 날짜만 변경 · 회차 초기화 통지(URL 동기, v3.1)
   };
 
   const pickTime = (dep) => {
@@ -130,9 +133,10 @@ export default function DepartureCalendar({ lineId, onPick }) {
                     : 'bg-surface text-inkSec hover:text-ink'
                 }`}
               >
-                {/* 요일 · 언어별 글리프 폭이 달라 겹침 렌더(시프트 0) */}
+                {/* 요일 · 언어별 글리프 폭이 달라 겹침 렌더(시프트 0).
+                    로케일 포맷은 데이터 성격(th 미보유) · en 폴백: lang!=='ko'일 때 en 스팬(v3.1 규칙) */}
                 <span className="grid text-caption font-light">
-                  <span aria-hidden={lang !== 'en'} className={`col-start-1 row-start-1 ${lang === 'en' ? '' : 'invisible'}`}>{d.toLocaleDateString('en-US', { weekday: 'narrow' })}</span>
+                  <span aria-hidden={lang === 'ko'} className={`col-start-1 row-start-1 ${lang !== 'ko' ? '' : 'invisible'}`}>{d.toLocaleDateString('en-US', { weekday: 'narrow' })}</span>
                   <span aria-hidden={lang !== 'ko'} className={`col-start-1 row-start-1 ${lang === 'ko' ? '' : 'invisible'}`}>{d.toLocaleDateString('ko-KR', { weekday: 'narrow' })}</span>
                 </span>
                 <span className="font-display text-body font-medium">{d.getDate()}</span>
