@@ -8,7 +8,7 @@ export default function HowItWorks() {
   return (
     <ol className="grid gap-16 md:grid-cols-3 md:gap-24 xl:gap-32">
       {STEPS.map((step, i) => (
-        <li key={step} className="rounded-md border border-line p-24">
+        <li key={step} className="rounded-lg bg-white p-24 shadow-sm">
           <span aria-hidden="true" className="font-display text-h1 font-bold text-primary">
             {i + 1}
           </span>

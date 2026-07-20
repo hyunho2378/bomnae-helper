@@ -1,17 +1,17 @@
 // 경로 옵션 카드 · COMPONENTS B: props {option, selected, onSelect}.
 // 총 소요·요금·환승 수·첫 탑승 편(도착+60분 버퍼 반영값, data/gateRoutes.js 계산).
-// 큰 숫자(가격·시간)는 Kanit Bold(DESIGN §4). 카드 hover는 DESIGN §7(보더 primary + translateY(-2px)).
-import { useState } from 'react';
+// 큰 숫자(가격·시간)는 Kanit Bold(DESIGN §4). v3.1 카드 hover: shadow-md + translateY(-2px)(§16).
 import { Check } from 'lucide-react';
 import { useLang } from '../../i18n/LangContext';
 import LangSwap from '../../i18n/LangSwap';
 
-// PATTERNS §1 동일 패턴을 데이터 텍스트(en/ko 필드)에 적용 · 전환 시 레이아웃 시프트 0
+// PATTERNS §1 동일 패턴을 데이터 텍스트(en/ko 필드 · th 없음)에 적용 · 시프트 0.
+// v3.1 폴백 규칙: en 스팬은 lang!=='ko'일 때 표시(th는 en 폴백).
 function BiText({ en, ko, className = '' }) {
   const { lang } = useLang();
   return (
     <span className={`grid ${className}`}>
-      <span aria-hidden={lang !== 'en'} className={`col-start-1 row-start-1 ${lang === 'en' ? '' : 'invisible'}`}>
+      <span aria-hidden={lang === 'ko'} className={`col-start-1 row-start-1 ${lang !== 'ko' ? '' : 'invisible'}`}>
         {en}
       </span>
       <span aria-hidden={lang !== 'ko'} className={`col-start-1 row-start-1 ${lang === 'ko' ? '' : 'invisible'}`}>
@@ -31,17 +31,13 @@ const fmtDuration = (min, t) => {
 
 export default function RouteOptionCard({ option, selected, onSelect }) {
   const { t } = useLang();
-  const [lift, setLift] = useState(false);
 
   return (
     <button
       type="button"
       onClick={onSelect}
       aria-pressed={selected}
-      onMouseEnter={() => setLift(true)}
-      onMouseLeave={() => setLift(false)}
-      style={{ transform: lift ? 'translateY(-2px)' : 'none' }} // DESIGN §7 카드 hover 명세값
-      className={`w-full rounded-lg bg-white p-24 text-left shadow-sm transition-all duration-fast hover:shadow-md hover:-translate-y-0.5 ${
+      className={`w-full rounded-lg bg-white p-24 text-left shadow-sm transition-all duration-fast hover:-translate-y-0.5 hover:shadow-md ${
         selected ? 'ring-2 ring-primary' : ''
       }`}
     >

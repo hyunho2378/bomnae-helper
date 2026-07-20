@@ -1,0 +1,19 @@
+/* GateJourney 전용 · PATTERNS §12 기준 블록만.
+   변경점 2가지(전역 충돌 방지): 클래스 .vehicle → .bh-journey-vehicle,
+   keyframes 이름 journey → bh-journey. 값은 §12 그대로. */
+@keyframes bh-journey {
+  from { left: 0%; }
+  to { left: calc(100% - 28px); }
+}
+.bh-journey-vehicle {
+  position: absolute;
+  top: 50%;
+  translate: 0 -50%;
+  animation: bh-journey 8s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bh-journey-vehicle {
+    animation: none;
+    left: calc(50% - 14px);
+  }
+}

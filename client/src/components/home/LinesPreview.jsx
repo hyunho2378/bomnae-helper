@@ -8,9 +8,10 @@ import { getLines } from '../../data/api';
 import LineCard from './LineCard';
 
 function CardSkeleton() {
+  // v3.1 무보더 · 카드 실루엣과 동일 형태(아이콘 배지 원 + 텍스트 라인)
   return (
-    <div className="flex flex-col gap-12 rounded-md border border-line p-24">
-      <Skeleton className="h-96 w-96" />
+    <div className="flex flex-col gap-12 rounded-lg bg-white p-24 shadow-sm">
+      <Skeleton className="h-64 w-64 rounded-pill" />
       <Skeleton className="h-20 w-1/2" />
       <Skeleton className="h-16 w-full" />
       <Skeleton className="h-16 w-2/3" />

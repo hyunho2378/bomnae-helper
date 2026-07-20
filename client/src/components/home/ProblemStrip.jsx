@@ -3,8 +3,9 @@ import LangSwap from '../../i18n/LangSwap';
 import Container from '../layout/Container';
 
 export default function ProblemStrip() {
+  // v3.1: 하단 보더 폐지(§16) + 텍스트 max-w 캡 해제(컨테이너가 폭 결정, DESIGN §13)
   return (
-    <div className="border-b border-line">
+    <div>
       <Container>
         <div className="flex flex-col gap-24 py-64 lg:flex-row lg:items-center lg:gap-80 lg:py-80">
           <LangSwap
@@ -14,7 +15,7 @@ export default function ProblemStrip() {
           <LangSwap
             k="home.problem.text"
             as="p"
-            className="max-w-dialog text-h3 font-normal text-inkSec"
+            className="text-h3 font-normal text-inkSec"
           />
         </div>
       </Container>

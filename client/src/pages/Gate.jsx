@@ -7,6 +7,7 @@ import { useLang } from '../i18n/LangContext';
 import LangSwap from '../i18n/LangSwap';
 import Container from '../components/layout/Container';
 import GateForm from '../components/gate/GateForm';
+import GateJourney from '../components/gate/GateJourney';
 import HandsFreeCard from '../components/gate/HandsFreeCard';
 import RouteOptionCard from '../components/gate/RouteOptionCard';
 import RouteStepList from '../components/gate/RouteStepList';
@@ -46,7 +47,13 @@ export default function Gate() {
           className="text-caption font-medium uppercase tracking-eyebrow text-inkMeta"
         />
         <LangSwap k="gate.title" as="h1" className="mt-8 text-h1 font-bold tracking-display" />
-        <LangSwap k="gate.intro" as="p" className="mt-16 max-w-dialog text-body text-inkSec" />
+        {/* v3.1: 텍스트 max-w 캡 해제(컨테이너가 폭 결정, DESIGN §13) */}
+        <LangSwap k="gate.intro" as="p" className="mt-16 text-body text-inkSec" />
+
+        {/* 헤드 카피 아래 GateJourney(IA §2.2.1) · 결과 옵션 카드 선택과 단일 state 동기 */}
+        <div className="mt-32">
+          <GateJourney mode={selectedId ?? 'rail'} />
+        </div>
 
         <div className="mt-32">
           <GateForm initial={initial} onResult={handleResult} />
