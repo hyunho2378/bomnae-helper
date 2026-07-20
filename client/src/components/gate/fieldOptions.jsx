@@ -50,11 +50,29 @@ function DateText({ date }) {
   );
 }
 
+// 터미널 라벨 · 3언어 겹침 렌더(날짜와 동일 패턴) · 트리거 표시값 전환 시프트 0([BR] 검수 수정)
+function TerminalText({ id }) {
+  const { lang } = useLang();
+  return (
+    <span className="grid">
+      {LANGS.map((code) => (
+        <span
+          key={code}
+          aria-hidden={lang !== code}
+          className={`col-start-1 row-start-1 ${lang === code ? '' : 'invisible'}`}
+        >
+          {GATE_DICTS[code].gate.form.terminals[id]}
+        </span>
+      ))}
+    </span>
+  );
+}
+
 export function buildTerminalOptions(t) {
   return TERMINAL_IDS.map((id) => ({
     id,
     icon: Plane,
-    primary: t(`gate.form.terminals.${id}`),
+    primary: <TerminalText id={id} />,
     secondary: t(`gate.form.terminalCodes.${id}`),
   }));
 }

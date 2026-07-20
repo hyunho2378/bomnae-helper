@@ -22,6 +22,30 @@
 - CC_PROMPT_5_AGENT_SERVER 실행 (전제: .env — Google OAuth ID/Secret + Neon DATABASE_URL)
 - 사용자 결정 대기 항목: PROGRESS "오케스트레이션 결정 사항" 참조
 
+## v3.1 리디자인 (2026-07-21 · 오케스트레이터 + 존 B/C 서브에이전트)
+
+| 커밋 | 내용 |
+|---|---|
+| db9ac4f [B1] | 파운데이션: i18n 3언어(en/ko/th) 네임스페이스 분할(365키 동형), Header(메뉴4·액티브 primary·상시 불투명)·LangMenu·FieldSelect·Footer(primary 4컬럼·법적 새 탭)·GlassDock 개정, 무보더 스윕(§16 4패턴 0), 줄표 스윕(주석·사전 전부, api/data는 주석만 — 승인 조건), 법적 페이지 2종, radius/shadow/blur v3.1 토큰 |
+| 806a331 [B2] | 존 B: HeroCarousel(3장 크로스페이드·도트)·GateJourney·FieldSelect 3종(시간 24h 사전 라벨)·HandsFree 2컬럼+FAQ |
+| 404acba [B3] | 존 C: 3레이어 라인+draw-on·셔틀 lerp 스무딩·StopPopup·글래스 라인 카드(마진 안)·LinePreviewOverlay·StickyBookPanel·Booking 단일 확인 페이지·About 11섹션(BRAND_COPY 이식)·Pilot 삭제 + 라우트 v3.1(/hands-free·/about·리다이렉트 2) |
+| [BR] | 검수: 터미널 라벨 3언어 겹침(트리거 시프트 0), 구 hero.jpg 고아 제거, 매트릭스 10뷰포트×10라우트 100/100 |
+
+### v3.1 검수 판정 기록
+- EN↔KO 시프트: 홈·게이트·핸즈프리 0 / About는 가로 0·본문 높이 캐스케이드만(PATTERNS §1 장문 허용 영역).
+- EN↔TH: :lang(th) Kanit 스택(§18 명세)이 전체 서체 메트릭을 바꿔 폭 변동 발생 — 명세 간 상충의 구조적 결과로 허용 판정.
+- max-w 잔존 4건은 전부 카드·일러스트 폭(텍스트 측정폭 아님): Ticket 카드 2, Booking 성공 래퍼 1, EmptyState 일러스트 1.
+- 데이터 문자열 줄표 9건 잔존(gateRoutes 4·stops 5) — 사용자 조건(문자열 불변) 준수, 실촬영·확정 카피 교체 시 정리 대상.
+- FieldSelect primary는 문자열 기본 + 겹침 렌더 노드 허용(날짜·터미널) — 계약 문서화 예외.
+- StickyBookPanel sticky top은 §15의 top-24를 픽셀 스케일 환산(top-96 = 헤더 72+24)으로 적용.
+
+## 사용자 준비물 (v3.1 추가)
+
+- [ ] 히어로 실사진 3장 교체 (`client/public/images/hero-1..3.jpg` — 현재 무료 스톡)
+- [ ] About Proof 지표 3종 실측값 (`[PLACEHOLDER]`)
+- [ ] 태국어(th) 사전 전체 네이티브 검수 (기계 번역 초안 상태)
+- [ ] 법적 문안 전문가 검토 (LEGAL_COPY 학생 초안 고지)
+
 ## 오케스트레이션 결정 사항 (PHASE 1B·2에서 확정 — 이견 시 되돌릴 것)
 
 - i18n 사전은 공유 파일이라 서브에이전트가 fragment(소유 구역 내 임시 파일)로 납품 → 오케스트레이터가 병합 후 삭제. 최종 162키 en/ko 동형.
