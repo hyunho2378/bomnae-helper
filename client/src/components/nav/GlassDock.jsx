@@ -1,7 +1,7 @@
-// 모바일 리퀴드 글래스 모핑 필(<lg) — DESIGN §6 + PATTERNS §3.
+// 모바일 리퀴드 글래스 모핑 필(<lg) · DESIGN §6 + PATTERNS §3.
 // blur 예산 2/3, 그림자 예산 1/2. 접힘 56px pill / 확장 시 메뉴+언어+로그인.
 // 수축 트리거 4종: 바깥 탭 / 스와이프 다운(Δy>48) / Escape / 라우트 변경.
-// 확장은 grid-rows 높이 전환(spring 320ms) — 변형(transform) 확대 금지 준수.
+// 확장은 grid-rows 높이 전환(spring 320ms) · 변형(transform) 확대 금지 준수.
 import { useEffect, useRef, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { MoreHorizontal } from 'lucide-react';
@@ -10,13 +10,15 @@ import { useLang } from '../../i18n/LangContext';
 import LangSwap from '../../i18n/LangSwap';
 import { spacing } from '../../tokens';
 import { routeKeyFromPath } from '../layout/PageLayout';
-import LangToggle from './LangToggle';
 
 const MENU = [
   { to: '/gate', k: 'nav.gate' },
   { to: '/loop', k: 'nav.loop' },
-  { to: '/pilot', k: 'nav.pilot' },
+  { to: '/hands-free', k: 'nav.handsfree' },
+  { to: '/about', k: 'nav.about' },
 ];
+
+const LANGS = ['en', 'ko', 'th'];
 
 const trapTab = (e, root) => {
   const els = root.querySelectorAll(
@@ -40,7 +42,7 @@ export default function GlassDock() {
   const touchY = useRef(null);
   const { pathname } = useLocation();
   const { user, login, logout } = useAuth();
-  const { t } = useLang();
+  const { lang, setLang, t } = useLang();
   const routeKey = routeKeyFromPath(pathname);
 
   // 수축 트리거: 라우트 변경
@@ -120,8 +122,23 @@ export default function GlassDock() {
                 </NavLink>
               ))}
             </nav>
-            <div className="flex items-center justify-between gap-16 border-t border-line p-8 px-16">
-              <LangToggle />
+            <div className="flex items-center justify-between gap-16 p-8 px-16">
+              {/* v3.1 언어 행 · 각 언어의 자기 표기(전 사전 동일 값, 시프트 0). LangToggle 대체 */}
+              <div role="group" aria-label={t('common.language')} className="flex items-center gap-4">
+                {LANGS.map((code) => (
+                  <button
+                    key={code}
+                    type="button"
+                    aria-pressed={lang === code}
+                    onClick={() => setLang(code)}
+                    className={`inline-flex min-h-44 items-center justify-center rounded-pill px-12 text-caption font-medium transition-colors duration-fast ${
+                      lang === code ? 'bg-primary text-white' : 'text-inkSec'
+                    }`}
+                  >
+                    {t(`common.lang.${code}`)}
+                  </button>
+                ))}
+              </div>
               {user ? (
                 <button
                   type="button"

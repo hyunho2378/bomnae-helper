@@ -1,5 +1,5 @@
-// 라인 카드 3장 그리드(1→2→3열) — IA §2.1.4, COMPONENTS B.
-// 카드 리빌 — PATTERNS §8 그대로: IntersectionObserver 1회 → opacity 0→1 + scale 0.96→1.0
+// 라인 카드 3장 그리드(1→2→3열) · IA §2.1.4, COMPONENTS B.
+// 카드 리빌 · PATTERNS §8 그대로: IntersectionObserver 1회 → opacity 0→1 + scale 0.96→1.0
 // (scale 화이트리스트 2/2), 240ms ease, stagger 60ms(최대 4개 지연), reduced-motion 즉시 표시.
 import { useEffect, useRef, useState } from 'react';
 import { motion } from '../../tokens';
@@ -25,7 +25,7 @@ export default function LinesPreview() {
 
   useEffect(() => {
     let alive = true;
-    // api.js는 전부 async — await 계약(PROGRESS 인수인계 노트)
+    // api.js는 전부 async · await 계약(PROGRESS 인수인계 노트)
     getLines().then((result) => {
       if (alive) setLines(result);
     });
@@ -63,9 +63,9 @@ export default function LinesPreview() {
               key={line.id}
               style={{
                 opacity: revealed ? 1 : 0,
-                // 카드 리빌 0.96→1.0 — scale 화이트리스트 2/2 (PATTERNS §8, DESIGN §10)
+                // 카드 리빌 0.96→1.0 · scale 화이트리스트 2/2 (PATTERNS §8, DESIGN §10)
                 transform: revealed ? 'none' : 'scale(0.96)',
-                // 240ms·60ms stagger(최대 4개) — PATTERNS §8 명세값, easing은 tokens.motion.ease
+                // 240ms·60ms stagger(최대 4개) · PATTERNS §8 명세값, easing은 tokens.motion.ease
                 transition: `opacity 240ms ${motion.ease}, transform 240ms ${motion.ease}`,
                 transitionDelay: `${Math.min(i, 4) * 60}ms`,
               }}

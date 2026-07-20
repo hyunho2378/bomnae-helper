@@ -1,4 +1,4 @@
-// 반복 액션 아이콘 버튼 — DESIGN §7·§8. lucide 단일, aria-label 필수,
+// 반복 액션 아이콘 버튼 · DESIGN §7·§8. lucide 단일, aria-label 필수,
 // 데스크탑 툴팁(title), 44×44 히트영역.
 import { useLang } from '../../i18n/LangContext';
 

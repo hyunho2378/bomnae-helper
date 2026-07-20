@@ -1,5 +1,5 @@
-// Loop — 시그니처 화면(IA §2.4): 풀블리드 LoopMap + LinePanel.
-// 데스크탑 = 좌측 일반 white 패널(글래스 아님 — blur 예산 초과 금지) 360px,
+// Loop · 시그니처 화면(IA §2.4): 풀블리드 LoopMap + LinePanel.
+// 데스크탑 = 좌측 일반 white 패널(글래스 아님 · blur 예산 초과 금지) 360px,
 // 모바일 = 하단 시트형 고정 리스트. 패널↔지도 양방향 선택. Footer 숨김은 셸(PageLayout)이 처리.
 import { useEffect, useState } from 'react';
 import { getLines, getStops } from '../data/api';
@@ -37,7 +37,7 @@ export default function Loop() {
 
   return (
     <div className="relative h-screen">
-      {/* 풀블리드 맵(허용 3곳 중 1 — DESIGN §5). 헤더는 투명 오버레이로 위에 뜬다. */}
+      {/* 풀블리드 맵(허용 3곳 중 1 · DESIGN §5). 헤더는 투명 오버레이로 위에 뜬다. */}
       <div className="absolute inset-0">
         <LoopMap
           focusLineId={focus.lineId}
@@ -46,7 +46,7 @@ export default function Loop() {
         />
       </div>
 
-      {/* 라인 패널 — 지도 대체 접근 경로(키보드 완전 지원).
+      {/* 라인 패널 · 지도 대체 접근 경로(키보드 완전 지원).
           모바일: 하단 시트형 고정 리스트(내부 스크롤, GlassDock 여백 pb-96),
           데스크탑: 좌측 white 패널. 360px는 IA §2.4 명세 고정 폭(브래킷 허용 예외). */}
       <div

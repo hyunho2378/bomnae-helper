@@ -1,4 +1,4 @@
-// 출발 캘린더 — PATTERNS §5 그대로: 날짜 셀(숫자 Kanit 500 + 가격 인라인 caption
+// 출발 캘린더 · PATTERNS §5 그대로: 날짜 셀(숫자 Kanit 500 + 가격 인라인 caption
 // "18k" 축약 + 상태 점), 선택 셀 border primary 2px, 날짜 선택 → 회차 Chip 3개
 // (시각 + 남은 좌석) + StatusBadge, 만석 Chip disabled. 키보드: 화살표 이동 + Enter(roving tabindex).
 // yountravel 검증 패턴 채택(IA §5): 가격 인라인 + 출발확정/출발유력 상태.
@@ -10,12 +10,12 @@ import Chip from '../ui/Chip';
 import Skeleton from '../ui/Skeleton';
 import StatusBadge from '../ui/StatusBadge';
 
-const DAYS = 14; // 오늘부터 2주 그리드 — 회차 시각·가격 DRAFT(IA §4)
+const DAYS = 14; // 오늘부터 2주 그리드 · 회차 시각·가격 DRAFT(IA §4)
 
 const toDateStr = (d) => d.toLocaleDateString('en-CA'); // YYYY-MM-DD
 const isWeekend = (d) => d.getDay() === 0 || d.getDay() === 6;
 
-// 날짜 셀 상태: 회차 중 최선 상태(confirmed > likely > closed) — 셀에는 점, 회차에는 배지
+// 날짜 셀 상태: 회차 중 최선 상태(confirmed > likely > closed) · 셀에는 점, 회차에는 배지
 const dayStatus = (deps) =>
   deps.some((d) => d.status === 'confirmed')
     ? 'confirmed'
@@ -72,7 +72,7 @@ export default function DepartureCalendar({ lineId, onPick }) {
     onPick({ date: dep.date, time: dep.time });
   };
 
-  // roving tabindex — 화살표 이동, Enter/Space 선택(PATTERNS §5)
+  // roving tabindex · 화살표 이동, Enter/Space 선택(PATTERNS §5)
   const onGridKeyDown = (e, i) => {
     const jump = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }[e.key];
     if (jump === undefined) return;
@@ -101,7 +101,7 @@ export default function DepartureCalendar({ lineId, onPick }) {
             const dateStr = toDateStr(d);
             const deps = byDate[dateStr];
             const status = dayStatus(deps);
-            // 가격 인라인 — 주중/주말 차등(₩ 축약 "18k", 가격 DRAFT)
+            // 가격 인라인 · 주중/주말 차등(₩ 축약 "18k", 가격 DRAFT)
             const price = line.price_adult + (isWeekend(d) ? line.price_weekend_delta : 0);
             const selected = selectedDate === dateStr;
             return (
@@ -126,11 +126,11 @@ export default function DepartureCalendar({ lineId, onPick }) {
                 onKeyDown={(e) => onGridKeyDown(e, i)}
                 className={`flex min-h-44 flex-col items-center gap-4 rounded-sm py-8 transition-colors duration-fast ${
                   selected
-                    ? 'border-2 border-primary text-ink' // 선택 셀 border primary 2px(PATTERNS §5)
-                    : 'border border-line text-inkSec hover:border-primary hover:text-ink'
+                    ? 'bg-white text-ink shadow-sm ring-2 ring-inset ring-primary' // 선택 셀 primary 2px 링(v3.1 무보더)
+                    : 'bg-surface text-inkSec hover:text-ink'
                 }`}
               >
-                {/* 요일 — 언어별 글리프 폭이 달라 겹침 렌더(시프트 0) */}
+                {/* 요일 · 언어별 글리프 폭이 달라 겹침 렌더(시프트 0) */}
                 <span className="grid text-caption font-light">
                   <span aria-hidden={lang !== 'en'} className={`col-start-1 row-start-1 ${lang === 'en' ? '' : 'invisible'}`}>{d.toLocaleDateString('en-US', { weekday: 'narrow' })}</span>
                   <span aria-hidden={lang !== 'ko'} className={`col-start-1 row-start-1 ${lang === 'ko' ? '' : 'invisible'}`}>{d.toLocaleDateString('ko-KR', { weekday: 'narrow' })}</span>
@@ -146,7 +146,7 @@ export default function DepartureCalendar({ lineId, onPick }) {
         </div>
       </div>
 
-      {/* 회차 선택 — aria-live: 예약 상태 변경 영역(DESIGN §14) */}
+      {/* 회차 선택 · aria-live: 예약 상태 변경 영역(DESIGN §14) */}
       <div aria-live="polite" className="flex min-h-44 flex-col gap-12">
         {selectedDeps && (
           <ul className="flex flex-wrap gap-12">

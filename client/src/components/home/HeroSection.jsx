@@ -1,4 +1,4 @@
-// 히어로 — IA §2.1.1: 풀블리드(허용 3곳 중 1), display 타이포, 실사진 배경 + scrim,
+// 히어로 · IA §2.1.1: 풀블리드(허용 3곳 중 1), display 타이포, 실사진 배경 + scrim,
 // CTA 2("Find my route" → /gate, "See the lines" → /loop). COMPONENTS B.
 import { Link } from 'react-router-dom';
 import { useLang } from '../../i18n/LangContext';
@@ -11,18 +11,18 @@ export default function HeroSection() {
   return (
     <section
       className="relative flex items-end overflow-hidden"
-      // DESIGN §5 명세값 min-height: clamp(560px,72vh,960px) — 브래킷/인라인 1곳 허용 예외
+      // DESIGN §5 명세값 min-height: clamp(560px,72vh,960px) · 브래킷/인라인 1곳 허용 예외
       style={{ minHeight: 'clamp(560px, 72vh, 960px)' }}
     >
-      {/* PLACEHOLDER — 텍스트 없는 실사진으로 교체(3~4일차 촬영, PROGRESS 준비물). 단색 surface placeholder.
-          LCP 이미지라 lazy 미적용(DESIGN §12 lazy 규칙은 콘텐츠 사진 대상 — 보고서에 명시). */}
+      {/* PLACEHOLDER · 텍스트 없는 실사진으로 교체(3~4일차 촬영, PROGRESS 준비물). 단색 surface placeholder.
+          LCP 이미지라 lazy 미적용(DESIGN §12 lazy 규칙은 콘텐츠 사진 대상 · 보고서에 명시). */}
       <img
         src="/images/hero.jpg"
         alt={t('home.hero.photoAlt')}
         className="absolute inset-0 h-full w-full object-cover"
       />
-      {/* 그라데이션 예산 1/1 — 히어로 스크림(scrim → transparent), DESIGN §10.
-          via-scrim으로 텍스트 존(하단 절반)을 완전 scrim으로 유지 — 단색 placeholder 위에서도
+      {/* 그라데이션 예산 1/1 · 히어로 스크림(scrim → transparent), DESIGN §10.
+          via-scrim으로 텍스트 존(하단 절반)을 완전 scrim으로 유지 · 단색 placeholder 위에서도
           WCAG AA(대형 텍스트 3:1) 확보. 양 끝점은 명세 그대로 scrim → transparent. */}
       <div
         aria-hidden="true"

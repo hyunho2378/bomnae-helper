@@ -1,5 +1,5 @@
 // ============================================================
-// tokens.js — Bomnae Helper 단일 진실(Single Source of Truth)
+// tokens.js · Bomnae Helper 단일 진실(Single Source of Truth)
 // 모든 색·타이포·간격·모션·지도 상수는 이 파일에서만 나온다.
 // 컴포넌트/CSS에 HEX·px 하드코딩 금지. tailwind.config.js가 이 파일을 import한다.
 // 배치 경로: client/src/tokens.js
@@ -7,12 +7,12 @@
 
 export const colors = {
   bg: '#FFFFFF',            // 배경 순백. 웜톤·파스텔·AI색 전면 금지
-  primary: '#009FE3',       // 춘천 공식 블루
-  navy: '#27348B',          // 춘천 공식 네이비 (푸터 풀블리드, 강한 대비면)
-  yellow: '#FFC400',        // 고채도 서포트 — Potato Line
-  spice: '#FF4438',         // 고채도 서포트 — Dakgalbi Line
-  green: '#00B865',         // 고채도 서포트 — 성공/확정 상태
-  magenta: '#F0347C',       // 고채도 서포트 — 포인트(절제 사용)
+  primary: '#009FE3',       // 춘천 공식 블루 · v3.1: 로고·헤더 액티브·푸터·CTA 등 크롬은 이 색 하나로 통일
+  navy: '#27348B',          // v3.1: 크롬에서 퇴출. 티켓 카드 면 전용 액센트로만 잔존
+  yellow: '#FFC400',        // 고채도 서포트 · Potato Line
+  spice: '#FF4438',         // 고채도 서포트 · Dakgalbi Line
+  green: '#00B865',         // 고채도 서포트 · 성공/확정 상태
+  magenta: '#F0347C',       // 고채도 서포트 · 포인트(절제 사용)
   ink: '#14172E',           // 텍스트 primary
   inkSec: '#4E5470',        // 텍스트 secondary
   inkMeta: '#8B90A7',       // 텍스트 meta/caption
@@ -22,7 +22,7 @@ export const colors = {
   surface: '#F5F6FA',       // 중립 면(스켈레톤, 지도 로딩면, 입력 배경)
 };
 
-// 라인 컬러 — 캐릭터 파스텔은 UI 팔레트가 아님(콘텐츠 이미지로만).
+// 라인 컬러 · 캐릭터 파스텔은 UI 팔레트가 아님(콘텐츠 이미지로만).
 // UI에서 라인을 지칭할 때는 반드시 아래 3색만 사용한다.
 export const lineColors = {
   potato: colors.yellow,    // Potato Line: 감자밭 → 소양강댐 → 소울로스터리
@@ -66,25 +66,31 @@ export const breakpoints = {
 export const containers = {
   maxLg: 1200,   // lg~2xl
   max2xl: 1400,  // 2xl~3xl
-  max3xl: 1560,  // 3xl 이상 — 4K에서도 이 캡을 넘지 않는다
+  max3xl: 1560,  // 3xl 이상 · 4K에서도 이 캡을 넘지 않는다
   marginBase: 20, // ~md
   marginMd: 32,   // md~lg
   marginLg: 48,   // lg~
 };
 
-export const radius = { sm: 10, md: 16, lg: 24, pill: 999 };
+// v3.1: G-Local Station 마감 스케일 이식(6~20). 칩/작은 요소 sm, 카드 md~lg, 시트/패널 xl.
+export const radius = { xs: 6, sm: 10, md: 12, lg: 16, xl: 20, pill: 999 };
 
-// 그림자 예산 2곳: GlassDock / BottomSheet(Dialog 공유)
+// v3.1 엘리베이션 체계 · 보더 전면 폐지의 대체재. 깊이는 오직 이 3단 그림자로만 표현한다.
+// 카드 기본 sm, hover·Dock·팝업 md, 시트·다이얼로그·글래스 패널 lg. 임의 그림자 금지.
 export const shadow = {
-  dock: '0 12px 40px rgba(20,23,46,0.16)',
-  sheet: '0 -12px 40px rgba(20,23,46,0.14)',
+  sm: '0 2px 10px rgba(20,23,46,0.07)',
+  md: '0 8px 28px rgba(20,23,46,0.12)',
+  lg: '0 16px 48px rgba(20,23,46,0.18)',
+  dock: '0 12px 40px rgba(20,23,46,0.16)',   // = md급, GlassDock 전용 유지
+  sheet: '0 -12px 40px rgba(20,23,46,0.14)', // = 상향 그림자, Sheet 전용 유지
 };
 
-// blur 예산 3곳: Header(스크롤 시) / GlassDock / BottomSheet·Dialog
-export const blur = { glass: '16px' };
+// v3.1 blur(리퀴드 글래스) 허용 5면: Header / GlassDock / Sheet·Dialog / 지도 위 라인 카드 / LinePreview 오버레이.
+// 중첩 blur 금지(글래스 위 글래스 없음).
+export const blur = { glass: '16px', glassSoft: '10px' };
 
 export const motion = {
-  spring: 'cubic-bezier(0.32, 1.32, 0.5, 1)', // 320ms — Dock 모핑, 스탬프, 시트
+  spring: 'cubic-bezier(0.32, 1.32, 0.5, 1)', // 320ms · Dock 모핑, 스탬프, 시트
   ease: 'cubic-bezier(0.4, 0, 0.2, 1)',       // 일반 전환
   base: '320ms',
   fast: '160ms',
@@ -92,7 +98,7 @@ export const motion = {
 
 export const z = { map: 0, content: 10, header: 40, dock: 50, sheet: 60, dialog: 70 };
 
-// MapLibre 상수 (sloverthon 레포 포팅 — PATTERNS.md §4)
+// MapLibre 상수 (sloverthon 레포 포팅 · PATTERNS.md §4)
 export const map = {
   styleUrl: 'https://tiles.openfreemap.org/styles/liberty',
   center: [127.735, 37.885], // 춘천 전경
@@ -102,7 +108,7 @@ export const map = {
   bearing: -18,
   flyDuration: 1500,
   extrusionMinZoom: 13,
-  // 3D 건물 컬러 램프 — 중립 잉크 톤(라인 컬러가 주인공이 되도록 건물은 침묵)
+  // 3D 건물 컬러 램프 · 중립 잉크 톤(라인 컬러가 주인공이 되도록 건물은 침묵)
   extrusion: { low: '#E8EAF2', mid: '#C3C8DA', high: '#8B90A7' },
 };
 

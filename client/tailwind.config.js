@@ -36,7 +36,7 @@ export default {
       fast: tokens.motion.fast,
       base: tokens.motion.base,
     },
-    backdropBlur: { glass: tokens.blur.glass },
+    backdropBlur: { glass: tokens.blur.glass, glassSoft: tokens.blur.glassSoft },
     // 자간 — DESIGN §4: display/h1 라틴 -0.01~-0.02em, eyebrow +0.08em
     letterSpacing: { display: '-0.02em', eyebrow: '0.08em' },
     // 컨테이너 캡 — tokens.containers(DESIGN §5) + Dialog 560(DESIGN §7)
@@ -55,6 +55,8 @@ export default {
       width: { 44: '44px' },
       minHeight: { 44: '44px' },
       minWidth: { 44: '44px' },
+      // v3.1 무보더 hover 리프트(PATTERNS §16: hover:-translate-y-0.5 = DESIGN §7 명세 2px)
+      translate: { 0.5: '2px' },
     },
   },
   plugins: [],

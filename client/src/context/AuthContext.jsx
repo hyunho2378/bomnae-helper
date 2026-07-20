@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, useState } from 'react';
 
-// PHASE 1 목 구현 — PHASE 3에서 서버 연동으로 내부만 교체(인터페이스 불변, COMPONENTS A1).
+// PHASE 1 목 구현 · PHASE 3에서 서버 연동으로 내부만 교체(인터페이스 불변, COMPONENTS A1).
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {

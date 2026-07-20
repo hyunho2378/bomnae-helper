@@ -1,4 +1,4 @@
-// 영상 + 상시 자막 — PATTERNS §10 기준 구현. 자막은 DOM 텍스트(언어 토글 연동),
+// 영상 + 상시 자막 · PATTERNS §10 기준 구현. 자막은 DOM 텍스트(언어 토글 연동),
 // 17px는 DESIGN §12 명세값. 소스 영상에 자막 굽기 금지.
 import { useLang } from '../../i18n/LangContext';
 

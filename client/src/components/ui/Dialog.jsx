@@ -1,4 +1,4 @@
-// 데스크탑 모달리티 — DESIGN §7: 중앙 Dialog, max-width 560, BottomSheet과 동일 glass 면.
+// 데스크탑 모달리티 · DESIGN §7: 중앙 Dialog, max-width 560, BottomSheet과 동일 glass 면.
 // lg+ 전용. Escape·바깥 탭 닫기 + 닫기 IconButton + 포커스 트랩.
 import { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
@@ -47,7 +47,7 @@ export default function Dialog({ open, onClose, title, children }) {
         aria-modal="true"
         tabIndex={-1}
         onKeyDown={onKeyDown}
-        className="relative w-full max-w-dialog rounded-lg bg-glass p-32 shadow-sheet backdrop-blur-glass"
+        className="relative w-full max-w-dialog rounded-xl bg-glass p-32 shadow-lg backdrop-blur-glass"
       >
         <div className="absolute right-8 top-8">
           <IconButton icon={X} label="common.close" size={20} onClick={onClose} />

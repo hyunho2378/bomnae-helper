@@ -1,14 +1,11 @@
-// EN/KR 세그먼트 토글 — 44px 타깃(COMPONENTS A3). 컨텍스트 색 상속(navy 푸터 대응).
+// DEPRECATED(v3.1) · LangMenu(드롭다운)로 대체됨. 어디서도 사용하지 말 것.
+// 파일은 명세(COMPONENTS 증분 존 A행)에 따라 삭제하지 않고 보존만 한다.
 import { useLang } from '../../i18n/LangContext';
 
 export default function LangToggle() {
   const { lang, setLang, t } = useLang();
   return (
-    <div
-      role="group"
-      aria-label={t('common.language')}
-      className="inline-flex items-center rounded-pill border border-line p-4"
-    >
+    <div role="group" aria-label={t('common.language')} className="inline-flex items-center rounded-pill p-4">
       {['en', 'ko'].map((code) => (
         <button
           key={code}

@@ -1,6 +1,6 @@
-// STUB 확장 — AGENT-2. 기준: IA §2.2, COMPONENTS.md 섹션 B, ROUTES §1(쿼리 ?terminal=&time=&date=).
+// STUB 확장 · AGENT-2. 기준: IA §2.2, COMPONENTS.md 섹션 B, ROUTES §1(쿼리 ?terminal=&time=&date=).
 // 입력(GateForm, 쿼리 프리필) → 옵션 카드 2~3개 → 선택 시 단계별 리스트 → Hands-Free 크로스셀.
-// 결과 영역은 aria-live="polite"(DESIGN §14 — 경로 결과 갱신 알림).
+// 결과 영역은 aria-live="polite"(DESIGN §14 · 경로 결과 갱신 알림).
 import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useLang } from '../i18n/LangContext';
@@ -19,7 +19,7 @@ export default function Gate() {
   const [options, setOptions] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
 
-  // 쿼리 프리필 — 형식이 유효한 값만 전달(그 외 GateForm 기본값)
+  // 쿼리 프리필 · 형식이 유효한 값만 전달(그 외 GateForm 기본값)
   const initial = useMemo(() => {
     const terminal = searchParams.get('terminal');
     const time = searchParams.get('time');

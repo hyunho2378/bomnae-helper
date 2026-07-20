@@ -6,12 +6,16 @@
 |---|---|---|---|
 | `/` | `pages/Home.jsx` | AGENT-2 | |
 | `/gate` | `pages/Gate.jsx` | AGENT-2 | 쿼리 `?terminal=&time=&date=` 지원(Home 미니 입력에서 전달) |
-| `/gate/hands-free` | `pages/HandsFree.jsx` | AGENT-2 | |
+| `/hands-free` | `pages/HandsFree.jsx` | AGENT-2 | v3.1 최상위 승격, 헤더 노출 |
 | `/loop` | `pages/Loop.jsx` | AGENT-3 | 풀블리드 맵 |
 | `/loop/:lineId` | `pages/LineDetail.jsx` | AGENT-3 | lineId ∈ potato \| dakgalbi \| lake, 그 외 404 리다이렉트 |
-| `/loop/:lineId/book` | `pages/Booking.jsx` | AGENT-3 | 쿼리 `?date=&time=` 프리필 |
+| `/loop/:lineId/book` | `pages/Booking.jsx` | AGENT-3 | v3.1 단일 확인 페이지. 쿼리 `?date=&time=&adult=&child=` 필수, 미비 시 상세로 replace |
 | `/ticket/:bookingId` | `pages/Ticket.jsx` | AGENT-3 | |
-| `/pilot` | `pages/Pilot.jsx` | AGENT-3 | |
+| `/about` | `pages/About.jsx` | AGENT-3 | v3.1 브랜드 페이지(Pilot 대체) |
+| `/legal/privacy` | `pages/LegalPrivacy.jsx` | AGENT-1 | 푸터에서 새 탭 진입 |
+| `/legal/terms` | `pages/LegalTerms.jsx` | AGENT-1 | 푸터에서 새 탭 진입 |
+| `/pilot` | redirect | - | `<Navigate to="/about" replace />` |
+| `/gate/hands-free` | redirect | - | `<Navigate to="/hands-free" replace />` |
 | `*` | `pages/NotFound.jsx` | AGENT-3 | |
 
 ## 2. 셸 구조
@@ -25,12 +29,16 @@
           <Route element={<PageLayout />}>   {/* Header + Outlet + GlassDock + Footer */}
             <Route path="/" element={<Home />} />
             <Route path="/gate" element={<Gate />} />
-            <Route path="/gate/hands-free" element={<HandsFree />} />
+            <Route path="/hands-free" element={<HandsFree />} />
             <Route path="/loop" element={<Loop />} />
             <Route path="/loop/:lineId" element={<LineDetail />} />
             <Route path="/loop/:lineId/book" element={<Booking />} />
             <Route path="/ticket/:bookingId" element={<Ticket />} />
-            <Route path="/pilot" element={<Pilot />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/legal/privacy" element={<LegalPrivacy />} />
+            <Route path="/legal/terms" element={<LegalTerms />} />
+            <Route path="/pilot" element={<Navigate to="/about" replace />} />
+            <Route path="/gate/hands-free" element={<Navigate to="/hands-free" replace />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

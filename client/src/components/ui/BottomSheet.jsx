@@ -1,4 +1,4 @@
-// 모바일 모달리티 — DESIGN §7: 위로 슬라이드, blur 예산 3/3, 그림자 예산 2/2,
+// 모바일 모달리티 · DESIGN §7: 위로 슬라이드, blur 예산 3/3, 그림자 예산 2/2,
 // 그랩바, 스와이프 다운(Δy>48)·바깥 탭·Escape 닫기, 포커스 트랩. <lg 전용.
 import { useEffect, useRef, useState } from 'react';
 import LangSwap from '../../i18n/LangSwap';
@@ -63,7 +63,7 @@ export default function BottomSheet({ open, onClose, title, children }) {
             onClose?.();
           }
         }}
-        className={`absolute inset-x-0 bottom-0 rounded-t-lg bg-glass shadow-sheet backdrop-blur-glass transition-transform duration-base ease-spring motion-reduce:transition-none ${
+        className={`absolute inset-x-0 bottom-0 rounded-t-xl bg-glass shadow-sheet backdrop-blur-glass transition-transform duration-base ease-spring motion-reduce:transition-none ${
           shown ? 'translate-y-0' : 'translate-y-full'
         }`}
       >

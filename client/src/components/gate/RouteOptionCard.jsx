@@ -1,4 +1,4 @@
-// 경로 옵션 카드 — COMPONENTS B: props {option, selected, onSelect}.
+// 경로 옵션 카드 · COMPONENTS B: props {option, selected, onSelect}.
 // 총 소요·요금·환승 수·첫 탑승 편(도착+60분 버퍼 반영값, data/gateRoutes.js 계산).
 // 큰 숫자(가격·시간)는 Kanit Bold(DESIGN §4). 카드 hover는 DESIGN §7(보더 primary + translateY(-2px)).
 import { useState } from 'react';
@@ -6,7 +6,7 @@ import { Check } from 'lucide-react';
 import { useLang } from '../../i18n/LangContext';
 import LangSwap from '../../i18n/LangSwap';
 
-// PATTERNS §1 동일 패턴을 데이터 텍스트(en/ko 필드)에 적용 — 전환 시 레이아웃 시프트 0
+// PATTERNS §1 동일 패턴을 데이터 텍스트(en/ko 필드)에 적용 · 전환 시 레이아웃 시프트 0
 function BiText({ en, ko, className = '' }) {
   const { lang } = useLang();
   return (
@@ -41,8 +41,8 @@ export default function RouteOptionCard({ option, selected, onSelect }) {
       onMouseEnter={() => setLift(true)}
       onMouseLeave={() => setLift(false)}
       style={{ transform: lift ? 'translateY(-2px)' : 'none' }} // DESIGN §7 카드 hover 명세값
-      className={`w-full rounded-md border bg-white p-24 text-left transition-all duration-fast hover:border-primary ${
-        selected ? 'border-primary' : 'border-line'
+      className={`w-full rounded-lg bg-white p-24 text-left shadow-sm transition-all duration-fast hover:shadow-md hover:-translate-y-0.5 ${
+        selected ? 'ring-2 ring-primary' : ''
       }`}
     >
       <span className="flex items-start justify-between gap-16">
@@ -74,7 +74,7 @@ export default function RouteOptionCard({ option, selected, onSelect }) {
           <span className="flex items-center gap-8">
             <span className="font-display text-h3 font-bold">{option.first_available}</span>
             {option.next_day && (
-              // 경고성 배지 — yellow + ink 텍스트(DESIGN §2: yellow 위 white 금지)
+              // 경고성 배지 · yellow + ink 텍스트(DESIGN §2: yellow 위 white 금지)
               <LangSwap
                 k="gate.results.nextDay"
                 className="rounded-pill bg-yellow px-8 py-4 text-caption font-medium text-ink"

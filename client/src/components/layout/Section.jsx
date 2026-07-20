@@ -1,4 +1,4 @@
-// 섹션 — eyebrow(caption 500 대문자 자간+) + title(h2 600) (COMPONENTS A3).
+// 섹션 · eyebrow(caption 500 대문자 자간+) + title(h2 600) (COMPONENTS A3).
 import LangSwap from '../../i18n/LangSwap';
 import Container from './Container';
 

@@ -1,18 +1,18 @@
-// 라인 패널 — 라인 3개 리스트 + 정류장 하위 리스트(COMPONENTS C).
+// 라인 패널 · 라인 3개 리스트 + 정류장 하위 리스트(COMPONENTS C).
 // 지도 대체 접근 경로: 키보드만으로 전 정류장 선택 가능(DESIGN §14, IA §2.4).
-// 선택 → LoopMap focus(양방향 — 지도 마커 선택도 이 리스트에 반영).
+// 선택 → LoopMap focus(양방향 · 지도 마커 선택도 이 리스트에 반영).
 import { Link } from 'react-router-dom';
 import { lineColors } from '../../tokens';
 import { useLang } from '../../i18n/LangContext';
 import LangSwap from '../../i18n/LangSwap';
-// 언어별 포맷 문자열 겹침 렌더용(PATTERNS §1) — 시프트 0
+// 언어별 포맷 문자열 겹침 렌더용(PATTERNS §1) · 시프트 0
 import en from '../../i18n/en';
 import ko from '../../i18n/ko';
 
 const fmtDur = (min, dict) =>
   `${Math.floor(min / 60)}${dict.loop.detail.hoursUnit} ${min % 60}${dict.loop.detail.minutesUnit}`;
 
-// 라인 컬러 클래스 — 정적 클래스 매핑(tailwind 스캐너 대응, 토큰 클래스만)
+// 라인 컬러 클래스 · 정적 클래스 매핑(tailwind 스캐너 대응, 토큰 클래스만)
 const DOT = {
   potato: 'bg-yellow',
   dakgalbi: 'bg-spice',
@@ -63,7 +63,7 @@ export default function LinePanel({
                     {name(line)}
                   </span>
                   <span className="flex items-baseline gap-8 text-caption font-medium text-inkMeta">
-                    {/* 소요 — 언어별 포맷 폭이 달라 겹침 렌더(시프트 0) */}
+                    {/* 소요 · 언어별 포맷 폭이 달라 겹침 렌더(시프트 0) */}
                     <span className="grid font-display">
                       <span aria-hidden={lang !== 'en'} className={`col-start-1 row-start-1 ${lang === 'en' ? '' : 'invisible'}`}>{fmtDur(line.duration_min, en)}</span>
                       <span aria-hidden={lang !== 'ko'} className={`col-start-1 row-start-1 ${lang === 'ko' ? '' : 'invisible'}`}>{fmtDur(line.duration_min, ko)}</span>
@@ -77,7 +77,7 @@ export default function LinePanel({
                 </span>
               </button>
 
-              {/* 정류장 하위 리스트 — 항상 노출(키보드 대체 경로: 탭 이동만으로 도달) */}
+              {/* 정류장 하위 리스트 · 항상 노출(키보드 대체 경로: 탭 이동만으로 도달) */}
               <ul className="flex flex-col border-t border-line py-4">
                 {(stopsByLine[line.id] ?? []).map((stop) => {
                   const stopActive = focusStopId === stop.id;
@@ -100,7 +100,7 @@ export default function LinePanel({
                           }`}
                         />
                         <span className="min-w-0 flex-1 truncate">{name(stop)}</span>
-                        {/* 체류 — 언어별 단위 폭이 달라 겹침 렌더(시프트 0) */}
+                        {/* 체류 · 언어별 단위 폭이 달라 겹침 렌더(시프트 0) */}
                         <span className="grid shrink-0 font-display text-caption font-medium text-inkMeta">
                           <span aria-hidden={lang !== 'en'} className={`col-start-1 row-start-1 ${lang === 'en' ? '' : 'invisible'}`}>{stop.stay_min}{en.loop.detail.minutesUnit}</span>
                           <span aria-hidden={lang !== 'ko'} className={`col-start-1 row-start-1 ${lang === 'ko' ? '' : 'invisible'}`}>{stop.stay_min}{ko.loop.detail.minutesUnit}</span>

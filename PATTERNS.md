@@ -157,3 +157,69 @@ async function shareTicket(cardBlob, text) {
 </div>
 ```
 - 자막은 항상 DOM 텍스트(언어 토글 연동). 소스 영상에 자막 굽기 금지.
+
+---
+
+# v3.1 신규 패턴
+
+## §11 FieldSelect (Skyscanner식 커스텀 셀렉트)
+동작: 닫힘 = surface면 버튼(라벨 caption + 값/플레이스홀더). 클릭·Enter → 아래 옵션 카드(white, radius lg, shadow md, 최대 높이 320 스크롤). 옵션 행 = lucide 아이콘(inkMeta) + primary 텍스트(주) + secondary(inkMeta, 코드·부가). hover/active 행 bg surface. 선택 → 닫힘 + onChange. 접근성: 트리거 `aria-haspopup="listbox"` `aria-expanded`, 리스트 `role="listbox"`, 행 `role="option" aria-selected`, ↑↓ 이동·Enter 선택·Escape 닫기·바깥 클릭 닫기. 열림 애니메이션: opacity+translateY(4px→0) 160ms(브젯 내 transition, scale 아님).
+시간 옵션 데이터: `{ id:'0930', primary: t('gate.time.0930') }` 식으로 **라벨 전부 사전 경유** — 네이티브 time input 미사용이 오전/오후 누수의 유일한 완치다.
+
+## §12 GateJourney (공항→춘천 주행 인터랙션)
+구조: 좌 `Plane` 원형 배지(surface bg, shadow sm) + 트랙(높이 2px, colors.line, 위에 primary 진행선 없음) + 우 `Building2` 배지. 트랙 위에 절대배치 vehicle 래퍼.
+```css
+@keyframes journey { from { left: 0% } to { left: calc(100% - 28px) } }
+.vehicle { position:absolute; top:50%; translate:0 -50%; animation: journey 8s linear infinite; }
+@media (prefers-reduced-motion: reduce){ .vehicle { animation:none; left:calc(50% - 14px);} }
+```
+vehicle 내부 아이콘은 모드 상태로 `TrainFront`/`Bus` 스왑(28px, primary). 모드 카드 선택 ↔ Journey 아이콘 동기(단일 state). transform 아닌 left 애니메이션은 GPU 비용이 있으나 요소 1개·8s linear라 허용, 단 `will-change:left` 금지하고 그대로 둔다(과최적화 불필요). 데스크탑 트랙 폭 = 콘텐츠 폭, 모바일 100%.
+
+## §13 지도 v3.1 (3레이어·draw-on·셔틀 스무딩)
+레이어 추가 순서(라인별): glow → casing → main. 예:
+```js
+map.addSource(`line-${id}`, { type:'geojson', lineMetrics:true, data: geojson });
+const w = (a,b)=>['interpolate',['linear'],['zoom'],11.5,a,15,b];
+map.addLayer({ id:`${id}-glow`, type:'line', source:`line-${id}`,
+  paint:{ 'line-color':color, 'line-opacity':0.22, 'line-width':w(12,18) },
+  layout:{ 'line-cap':'round','line-join':'round' } }, labelLayerId);
+map.addLayer({ id:`${id}-casing`, ... 'line-color':'#FFFFFF','line-width':w(7,10) ...
+map.addLayer({ id:`${id}-main`, ... 'line-color':color,'line-width':w(4.5,7) ...
+```
+draw-on: rAF로 p를 0→1 이징(720ms, ease). 매 프레임:
+```js
+map.setPaintProperty(`${id}-main`,'line-gradient',
+ ['step',['line-progress'], color, Math.max(p,0.001), 'rgba(0,0,0,0)']);
+```
+casing·glow도 동일 step 적용(색만 각자). 완료 시 gradient 제거하고 단색 복귀. reduced-motion: 즉시 단색.
+셔틀 스무딩: 목표 좌표는 누적거리 기반 등속 파라미터 t로 산출(정점 간 lerp), 표시 좌표는 지수 추종:
+```js
+disp.lng += (target.lng - disp.lng) * Math.min(1, dt*3);
+disp.lat += (target.lat - disp.lat) * Math.min(1, dt*3);
+marker.setLngLat(disp);
+```
+마커 옵션 `{ pitchAlignment:'map', rotationAlignment:'map' }`, 엘리먼트 `will-change:transform`. setLngLat는 rAF당 1회.
+StopPopup: `new maplibregl.Popup({ closeButton:false, offset:18, className:'stop-popup' })` — .stop-popup .maplibregl-popup-content을 tokens로 스타일(white, radius lg, shadow lg, 패딩 16). 내용: 이름(h3)+한 줄+체류시간 chip+View line 텍스트버튼. 열릴 때 이전 팝업 remove.
+
+## §14 LinePreviewOverlay (지도 위 글래스 미리보기)
+트리거: 라인 카드 "View line". 라우팅 없음. 구조: `position:fixed inset:0 z-sheet` 래퍼 → scrim div(bg scrim, opacity 0→1 160ms, 클릭 닫기) + 패널: 데스크탑 우측 `width:420px; height:calc(100% - 헤더); top:헤더;` translateX(24px→0)+opacity spring 320ms, bg glass + blur(글래스 허용면), radius 좌측만 xl, shadow lg. 모바일: BottomSheet 재사용(전고 84%).
+내용 순서 고정: 아이콘 배지+라인명(Kanit)+소요·가격 / 정류장 수직 미니 노선도(번호 원+이름+체류) / 선주문 한 줄 / CTA "Book and see details"(→ `/loop/:lineId`). **금지: StoryClips·DepartureCalendar·호스트·Reserve seats·좌석 문구.** 포커스 트랩+Escape. 글래스 위 텍스트는 ink 선명색만(HIG Materials).
+
+## §15 StickyBookPanel (G-Local aside 이식)
+```jsx
+<div className="lg:grid lg:grid-cols-[1fr_380px] lg:gap-12">
+  <div>{/* 좌: hero, stops, stories */}</div>
+  <aside className="mt-8 lg:mt-0 lg:sticky lg:top-24 h-fit">{/* 패널 */}</aside>
+</div>
+```
+패널(white, radius xl, shadow md, p-24): 가격 h2 Kanit Bold + 기준 caption → DepartureCalendar(기존 §5 재사용, 폭 100%) → 회차 Chip 행 → Adult/Child Stepper 2행 → 디바이더 → 소계 행들 → 합계(semibold, primary) → CTA full. 상태는 URL 쿼리와 동기(뒤로가기 보존). 모바일(<lg): aside 숨김, 하단 고정 바(합계+CTA, safe-area 패딩) → 탭 시 BottomSheet에 패널 렌더.
+sticky 유의: 부모 체인 `overflow` 설정 시 sticky 죽는다 — 그리드 부모까지 overflow 지정 금지.
+
+## §16 무보더·엘리베이션 스윕 절차
+1) `grep -rn "border" client/src` 전수 → 각 히트를 (a) 카드류: border 클래스 삭제+`shadow-sm` (b) 폼: border 삭제+focus 링 (c) 리스트 내부 디바이더: `border-b`→유지 가능하나 가급적 `<hr>`/divide-y with colors.line (d) 액센트 보더(border-l-2 등): 무조건 삭제. 2) hover에 `hover:shadow-md hover:-translate-y-0.5` 통일. 3) 완료 grep: `border-l-\|border-t-2\|border-2\|border-primary` 0건.
+
+## §17 푸터·법적 페이지
+푸터 링크는 `<a href="/legal/privacy" target="_blank" rel="noopener">`(내부지만 새 탭 의도라 a 태그 허용 — ROUTES §4의 유일 예외). 법적 페이지: 컨테이너 안 최상단 h1 + "Last updated: 2026-07-21" caption + 섹션 h2/본문 small~body, 리스트는 문단 나열(불릿 최소). 카피는 LEGAL_COPY.md 전문 — 임의 축약·창작 금지.
+
+## §18 LangMenu·태국어
+언어 상태: `lang ∈ 'en'|'ko'|'th'` Context. 폰트 스택: th일 때 body도 Kanit 우선(`'Kanit','Pretendard Variable',sans-serif`) — Kanit이 태국 문자 네이티브. 사전 병합: `import common from './common'` … `export default {...common,...gate,...}` 언어별 index. 키 동형 검사 스크립트는 3개 언어 교차로 확장.

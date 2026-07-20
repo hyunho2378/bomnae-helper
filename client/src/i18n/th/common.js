@@ -1,0 +1,76 @@
+// common 네임스페이스(TH) · 존 A 전용. en·ko와 키 완전 동형.
+// 초안: en 기반 번역. 네이티브 검수 대기(PROGRESS 준비물). Kanit이 태국 문자를 네이티브 커버한다.
+export default {
+  meta: {
+    title: {
+      home: "หน้าแรก",
+      gate: "Gate",
+      handsfree: "Hands-Free",
+      loop: "Loop",
+      lineDetail: "สาย",
+      booking: "จองที่นั่ง",
+      ticket: "ตั๋ว",
+      pilot: "เที่ยวนำร่อง",
+      about: "เกี่ยวกับเรา",
+      legalPrivacy: "นโยบายความเป็นส่วนตัว",
+      legalTerms: "ข้อกำหนดการใช้งาน",
+      notFound: "ไม่พบหน้า",
+    },
+  },
+  nav: {
+    home: "หน้าแรก",
+    gate: "Gate",
+    loop: "Loop",
+    handsfree: "Hands-Free",
+    about: "เกี่ยวกับเรา",
+    login: "เข้าสู่ระบบ",
+    logout: "ออกจากระบบ",
+    menu: "เมนู",
+  },
+  status: {
+    confirmed: "ยืนยันออกเดินทาง",
+    likely: "มีแนวโน้มออกเดินทาง",
+    closed: "เต็มแล้ว",
+  },
+  common: {
+    close: "ปิด",
+    back: "ย้อนกลับ",
+    next: "ถัดไป",
+    confirm: "ยืนยัน",
+    loading: "กำลังโหลด",
+    increase: "เพิ่ม",
+    decrease: "ลด",
+    share: "แชร์",
+    download: "ดาวน์โหลด",
+    language: "ภาษา",
+    lang: {
+      en: "English",
+      ko: "한국어",
+      th: "ไทย",
+    },
+    loginGate: {
+      title: "ลงชื่อเข้าใช้เพื่อยืนยัน",
+      google: "ดำเนินการต่อด้วย Google",
+    },
+    notFound: {
+      title: "ไม่มีป้ายหยุดนี้อยู่จริง",
+      body: "หน้าที่คุณกำลังหาอาจถูกย้าย หรือไม่เคยเปิดให้บริการ",
+      cta: "กลับหน้าแรก",
+    },
+    footer: {
+      tagline: "เชื่อมทุกช่วงที่ขาดหายของทริปชุนชอน ตั้งแต่ประตูสนามบินถึงป้ายท้องถิ่นสุดท้าย",
+      explore: "สำรวจ",
+      contact: "ติดต่อ",
+      team: "ทีม",
+      teamName: "Team 5 · STATION C Glocal Solverthon Chuncheon",
+      copyright: "© 2026 Bomnae Helper · Team 5",
+      privacy: "นโยบายความเป็นส่วนตัว",
+      terms: "ข้อกำหนดการใช้งาน",
+    },
+    currency: "₩",
+    units: {
+      h: "ชม.",
+      m: "นาที",
+    },
+  },
+};

@@ -1,4 +1,4 @@
-// STUB 확장 — AGENT-2. 기준: IA §2.3, COMPONENTS.md 섹션 B.
+// STUB 확장 · AGENT-2. 기준: IA §2.3, COMPONENTS.md 섹션 B.
 // 폼(Stepper 수하물 / 터미널·날짜 / 숙소 주소 / 이메일) → 개당 요금 합계(DRAFT)
 // → 확정 버튼에서만 LoginGate(Guest-first, ROUTES §3) → createHandsFree → 접수 코드 화면.
 import { useState } from 'react';
@@ -13,7 +13,7 @@ import LoginGate from '../components/ui/LoginGate';
 import Stepper from '../components/ui/Stepper';
 import { createHandsFree } from '../data/api';
 
-const PRICE_PER_BAG = 25000; // DRAFT — 5일차 BM 검토 확정(IA §4)
+const PRICE_PER_BAG = 25000; // DRAFT · 5일차 BM 검토 확정(IA §4)
 const TERMINALS = ['t1', 't2', 'gmp']; // gateRoutes planGate 키와 동일 계약
 
 const localToday = () => {
@@ -47,7 +47,7 @@ export default function HandsFree() {
 
   const submitOrder = async () => {
     setSubmitting(true);
-    // api.js는 전부 async — await 계약(PROGRESS 인수인계 노트)
+    // api.js는 전부 async · await 계약(PROGRESS 인수인계 노트)
     const result = await createHandsFree({ terminal, date, bags, address, email, total });
     setOrder(result);
     setSubmitting(false);
@@ -64,7 +64,7 @@ export default function HandsFree() {
     <div className="pb-64 pt-48 lg:pt-128">
       <Container>
         <div className="mx-auto w-full max-w-dialog">
-          {/* 접수 상태 변경 알림 영역 — DESIGN §14 aria-live polite */}
+          {/* 접수 상태 변경 알림 영역 · DESIGN §14 aria-live polite */}
           <div aria-live="polite">
             {order ? (
               <div className="flex flex-col items-center gap-16 rounded-md border border-line p-32 text-center">
@@ -89,7 +89,7 @@ export default function HandsFree() {
                   className="text-caption font-medium uppercase tracking-eyebrow text-inkMeta"
                 />
                 <LangSwap k="handsfree.title" as="h1" className="mt-8 text-h1 font-bold tracking-display" />
-                {/* 기존 수하물 딜리버리 사업자 제휴 — 춘천 구간 예약 레이어(정직 표기, IA §2.3) */}
+                {/* 기존 수하물 딜리버리 사업자 제휴 · 춘천 구간 예약 레이어(정직 표기, IA §2.3) */}
                 <LangSwap k="handsfree.intro" as="p" className="mt-16 text-body text-inkSec" />
 
                 <form noValidate onSubmit={confirm} className="mt-32 flex flex-col gap-24">
@@ -102,7 +102,7 @@ export default function HandsFree() {
                     <select
                       value={terminal}
                       onChange={(e) => setTerminal(e.target.value)}
-                      className="h-48 rounded-sm border border-line bg-surface px-16 text-body focus:border-primary"
+                      className="h-48 rounded-md bg-surface px-16 text-body focus:ring-2 focus:ring-primary"
                     >
                       {TERMINALS.map((id) => (
                         <option key={id} value={id}>
@@ -123,8 +123,8 @@ export default function HandsFree() {
                       }}
                       aria-invalid={Boolean(errors.date)}
                       aria-describedby={errors.date ? 'handsfree-date-error' : undefined}
-                      className={`h-48 rounded-sm border bg-surface px-16 text-body focus:border-primary ${
-                        errors.date ? 'border-spice' : 'border-line'
+                      className={`h-48 rounded-md bg-surface px-16 text-body focus:ring-2 focus:ring-primary ${
+                        errors.date ? 'ring-2 ring-spice' : ''
                       }`}
                     />
                     {errors.date && (
@@ -145,8 +145,8 @@ export default function HandsFree() {
                       }}
                       aria-invalid={Boolean(errors.address)}
                       aria-describedby={errors.address ? 'handsfree-address-error' : undefined}
-                      className={`h-48 rounded-sm border bg-surface px-16 text-body focus:border-primary ${
-                        errors.address ? 'border-spice' : 'border-line'
+                      className={`h-48 rounded-md bg-surface px-16 text-body focus:ring-2 focus:ring-primary ${
+                        errors.address ? 'ring-2 ring-spice' : ''
                       }`}
                     />
                     {errors.address && (
@@ -167,8 +167,8 @@ export default function HandsFree() {
                       }}
                       aria-invalid={Boolean(errors.email)}
                       aria-describedby={errors.email ? 'handsfree-email-error' : undefined}
-                      className={`h-48 rounded-sm border bg-surface px-16 text-body focus:border-primary ${
-                        errors.email ? 'border-spice' : 'border-line'
+                      className={`h-48 rounded-md bg-surface px-16 text-body focus:ring-2 focus:ring-primary ${
+                        errors.email ? 'ring-2 ring-spice' : ''
                       }`}
                     />
                     {errors.email && (

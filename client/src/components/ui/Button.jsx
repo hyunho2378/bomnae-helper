@@ -1,4 +1,4 @@
-// CTA 버튼 — DESIGN §7. SemiBold, pill, 높이 48(모바일)/44(데스크탑),
+// CTA 버튼 · DESIGN §7. SemiBold, pill, 높이 48(모바일)/44(데스크탑),
 // hover 시 navy 전환 160ms. focus-visible은 index.css 전역 스타일.
 const VARIANTS = {
   primary: 'bg-primary text-white hover:bg-navy',

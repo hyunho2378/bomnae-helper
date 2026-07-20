@@ -1,4 +1,4 @@
-// Gate 진입 미니 입력 — IA §2.1.3: 터미널·시간 미니 입력, 제출 시 /gate로 쿼리 전달
+// Gate 진입 미니 입력 · IA §2.1.3: 터미널·시간 미니 입력, 제출 시 /gate로 쿼리 전달
 // (ROUTES §1 쿼리 계약 ?terminal=&time=&date=; 미니 입력이라 날짜는 오늘 로컬 날짜로 채운다).
 // 폼 규칙: DESIGN §7(입력 surface/보더 line/focus primary), 에러 인라인(PATTERNS §6).
 import { useState } from 'react';
@@ -38,7 +38,7 @@ export default function GateEntryCard() {
           <select
             value={terminal}
             onChange={(e) => setTerminal(e.target.value)}
-            className="h-48 rounded-sm border border-line bg-surface px-16 text-body focus:border-primary"
+            className="h-48 rounded-md bg-surface px-16 text-body focus:ring-2 focus:ring-primary"
           >
             {TERMINALS.map((id) => (
               <option key={id} value={id}>
@@ -58,8 +58,8 @@ export default function GateEntryCard() {
             }}
             aria-invalid={error}
             aria-describedby={error ? 'gate-entry-time-error' : undefined}
-            className={`h-48 rounded-sm border bg-surface px-16 text-body focus:border-primary ${
-              error ? 'border-spice' : 'border-line'
+            className={`h-48 rounded-md bg-surface px-16 text-body focus:ring-2 focus:ring-primary ${
+              error ? 'ring-2 ring-spice' : ''
             }`}
           />
         </label>

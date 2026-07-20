@@ -1,4 +1,4 @@
-// How it works — IA §2.1.5: 3단계(Reserve a seat → We pre-order ahead → Arrive, it's ready).
+// How it works · IA §2.1.5: 3단계(Reserve a seat → We pre-order ahead → Arrive, it's ready).
 // 선주문 대행이 핵심 차별점임을 step2 카피에서 명시. 번호는 실제 순서이므로 숫자 마커 허용(COMPONENTS B).
 import LangSwap from '../../i18n/LangSwap';
 

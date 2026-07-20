@@ -1,4 +1,4 @@
-// 인원 스테퍼 — COMPONENTS A4. IconButton(-,+) + 숫자 Kanit 600.
+// 인원 스테퍼 · COMPONENTS A4. IconButton(-,+) + 숫자 Kanit 600.
 // 경계값은 클램프로 처리(IconButton 계약에 disabled 없음).
 import { Minus, Plus } from 'lucide-react';
 import LangSwap from '../../i18n/LangSwap';

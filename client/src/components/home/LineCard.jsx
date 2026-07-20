@@ -1,21 +1,21 @@
-// 라인 카드 — COMPONENTS B: props `line`. 라인 컬러 상단 스트라이프 4px, 캐릭터 이미지,
-// 정류장 3, 소요·가격. hover 보더 primary + translateY(-2px) — DESIGN §7 명세값 2px는
+// 라인 카드 · COMPONENTS B: props `line`. 라인 컬러 상단 스트라이프 4px, 캐릭터 이미지,
+// 정류장 3, 소요·가격. hover 보더 primary + translateY(-2px) · DESIGN §7 명세값 2px는
 // spacing 토큰에 없어 JS hover 상태 + 인라인 transform으로 구현(scale 아님).
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Clock } from 'lucide-react';
 import { useLang } from '../../i18n/LangContext';
 import LangSwap from '../../i18n/LangSwap';
-// 언어별 소요 포맷 겹침 렌더용(PATTERNS §1) — 시프트 0
+// 언어별 소요 포맷 겹침 렌더용(PATTERNS §1) · 시프트 0
 import en from '../../i18n/en';
 import ko from '../../i18n/ko';
 import Skeleton from '../ui/Skeleton';
 import { getStops } from '../../data/api';
 
-// 라인 식별 3색만 사용(DESIGN §3) — tokens 생성 클래스 매핑
+// 라인 식별 3색만 사용(DESIGN §3) · tokens 생성 클래스 매핑
 const STRIPE = { potato: 'bg-yellow', dakgalbi: 'bg-spice', lake: 'bg-primary' };
 
-// PATTERNS §1 동일 패턴을 데이터 텍스트(en/ko 필드)에 적용 — 전환 시 레이아웃 시프트 0
+// PATTERNS §1 동일 패턴을 데이터 텍스트(en/ko 필드)에 적용 · 전환 시 레이아웃 시프트 0
 function BiText({ en, ko, className = '' }) {
   const { lang } = useLang();
   return (
@@ -43,7 +43,7 @@ export default function LineCard({ line }) {
 
   useEffect(() => {
     let alive = true;
-    // api.js는 전부 async — await 계약(PROGRESS 인수인계 노트)
+    // api.js는 전부 async · await 계약(PROGRESS 인수인계 노트)
     getStops(line.id).then((result) => {
       if (alive) setStops(result);
     });
@@ -58,11 +58,11 @@ export default function LineCard({ line }) {
       onMouseEnter={() => setLift(true)}
       onMouseLeave={() => setLift(false)}
       style={{ transform: lift ? 'translateY(-2px)' : 'none' }} // DESIGN §7 카드 hover 명세값
-      className="block overflow-hidden rounded-md border border-line bg-white transition-all duration-fast hover:border-primary"
+      className="block overflow-hidden rounded-lg bg-white shadow-sm transition-all duration-fast hover:shadow-md"
     >
       <div aria-hidden="true" className={`h-4 ${STRIPE[line.color_token]}`} />
       <div className="flex flex-col gap-16 p-24">
-        {/* PLACEHOLDER — 봄내크루 배경 제거본 에셋 대기(PROGRESS 준비물). 콘텐츠 이미지로만(DESIGN §1). */}
+        {/* PLACEHOLDER · 봄내크루 배경 제거본 에셋 대기(PROGRESS 준비물). 콘텐츠 이미지로만(DESIGN §1). */}
         <img
           src={line.character_img}
           alt={lang === 'ko' ? line.name_ko : line.name_en}
@@ -92,7 +92,7 @@ export default function LineCard({ line }) {
             />
           </span>
           <span className="flex items-baseline gap-8">
-            {/* 가격 DRAFT — 5일차 BM 검토 확정(IA §4), 값은 data/lines.js */}
+            {/* 가격 DRAFT · 5일차 BM 검토 확정(IA §4), 값은 data/lines.js */}
             <span className="font-display text-h3 font-bold">
               {t('common.currency')}
               {line.price_adult.toLocaleString('en-US')}

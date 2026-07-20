@@ -1,0 +1,76 @@
+// common 네임스페이스(EN) · 존 A 전용. meta/nav/common/status.
+// ko·th와 키 완전 동형. 줄표 금지(DESIGN §13).
+export default {
+  meta: {
+    title: {
+      home: "Home",
+      gate: "Gate",
+      handsfree: "Hands-Free",
+      loop: "Loop",
+      lineDetail: "Line",
+      booking: "Reserve seats",
+      ticket: "Ticket",
+      pilot: "Pilot",
+      about: "About",
+      legalPrivacy: "Privacy Policy",
+      legalTerms: "Terms of Service",
+      notFound: "Not found",
+    },
+  },
+  nav: {
+    home: "Home",
+    gate: "Gate",
+    loop: "Loop",
+    handsfree: "Hands-Free",
+    about: "About",
+    login: "Sign in",
+    logout: "Sign out",
+    menu: "Menu",
+  },
+  status: {
+    confirmed: "Confirmed",
+    likely: "Likely to run",
+    closed: "Closed",
+  },
+  common: {
+    close: "Close",
+    back: "Back",
+    next: "Next",
+    confirm: "Confirm",
+    loading: "Loading",
+    increase: "Increase",
+    decrease: "Decrease",
+    share: "Share",
+    download: "Download",
+    language: "Language",
+    lang: {
+      en: "English",
+      ko: "한국어",
+      th: "ไทย",
+    },
+    loginGate: {
+      title: "Sign in to confirm",
+      google: "Continue with Google",
+    },
+    notFound: {
+      title: "This stop doesn't exist.",
+      body: "The page you are looking for has moved or never ran.",
+      cta: "Back to Home",
+    },
+    footer: {
+      tagline: "The missing links of a Chuncheon trip, from the airport gate to the last local stop.",
+      explore: "Explore",
+      contact: "Contact",
+      team: "Team",
+      teamName: "Team 5 · STATION C Glocal Solverthon Chuncheon",
+      copyright: "© 2026 Bomnae Helper · Team 5",
+      privacy: "Privacy Policy",
+      terms: "Terms of Service",
+    },
+    currency: "₩",
+    units: {
+      h: "h",
+      m: "m",
+    },
+  },
+};

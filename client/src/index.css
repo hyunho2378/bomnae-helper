@@ -13,6 +13,11 @@
     outline-offset: 2px;
   }
 
+  /* v3.1 태국어 폰트 스택(PATTERNS §18) · Kanit이 태국 문자를 네이티브 커버 */
+  :lang(th) body {
+    @apply font-display;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

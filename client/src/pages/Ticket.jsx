@@ -1,11 +1,11 @@
-// 티켓 — IA §2.7: navy 면 티켓 카드(라인 컬러 스트라이프, 예약 코드 6자 Kanit Bold,
+// 티켓 · IA §2.7: navy 면 티켓 카드(라인 컬러 스트라이프, 예약 코드 6자 Kanit Bold,
 // 미팅포인트, 인원, 호스트, 차내 클립 1개, "2 lines left") + 공유(PATTERNS §7).
-// 미존재 bookingId는 EmptyState 렌더(라우트 이동 아님 — ROUTES §3).
+// 미존재 bookingId는 EmptyState 렌더(라우트 이동 아님 · ROUTES §3).
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Share2 } from 'lucide-react';
 import { getBooking, getLine, getMeetingPoints, getStops } from '../data/api';
-// stories 데이터 — api.js에 접근자가 없어 직접 import(질문 목록 보고, 완료 보고 §5)
+// stories 데이터 · api.js에 접근자가 없어 직접 import(질문 목록 보고, 완료 보고 §5)
 import stories from '../data/stories';
 import { colors, fonts, lineColors } from '../tokens';
 import Container from '../components/layout/Container';
@@ -22,7 +22,7 @@ const STRIPE = {
   lake: 'bg-primary',
 };
 
-// 티켓 카드 → PNG — DOM 캡처 라이브러리 금지, canvas 직접 렌더(PATTERNS §7).
+// 티켓 카드 → PNG · DOM 캡처 라이브러리 금지, canvas 직접 렌더(PATTERNS §7).
 // 색은 전부 tokens(colors/lineColors)에서만. 숫자는 캔버스 드로잉 좌표(레이아웃 아님).
 function drawTicketPng(line, booking) {
   const canvas = document.createElement('canvas');
@@ -39,13 +39,13 @@ function drawTicketPng(line, booking) {
   ctx.font = `500 44px ${fonts.display}`;
   ctx.fillText(line.name_en, 80, 220);
   ctx.font = `700 180px ${fonts.display}`;
-  ctx.fillText(booking.code, 80, 420); // 예약 코드 6자 — Kanit Bold 큰 숫자
+  ctx.fillText(booking.code, 80, 420); // 예약 코드 6자 · Kanit Bold 큰 숫자
   ctx.font = `300 44px ${fonts.display}`;
   ctx.fillText(`${booking.date} · ${booking.time}`, 80, 520);
   return new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
 }
 
-// PATTERNS §7 기준 구현 그대로 — navigator.share 실패/미지원 시 다운로드 폴백
+// PATTERNS §7 기준 구현 그대로 · navigator.share 실패/미지원 시 다운로드 폴백
 async function shareTicket(cardBlob, text) {
   const file = new File([cardBlob], 'bomnae-ticket.png', { type: 'image/png' });
   if (navigator.canShare?.({ files: [file] })) {
@@ -120,11 +120,11 @@ export default function Ticket() {
     );
   }
 
-  // 미존재 예약 — EmptyState 렌더(404 라우트 이동 아님, ROUTES §3)
+  // 미존재 예약 · EmptyState 렌더(404 라우트 이동 아님, ROUTES §3)
   if (!booking) {
     return (
       <Container>
-        {/* PLACEHOLDER — unDraw 단색(빈결과) SVG 저장 대기(PROGRESS 준비물) */}
+        {/* PLACEHOLDER · unDraw 단색(빈결과) SVG 저장 대기(PROGRESS 준비물) */}
         <EmptyState
           illustration="empty.svg"
           titleKey="ticket.notFound.title"
@@ -140,7 +140,7 @@ export default function Ticket() {
       <div className="mx-auto flex w-full max-w-dialog flex-col gap-32 py-64 lg:pt-96">
         <LangSwap k="ticket.title" as="h1" className="text-h2 font-semibold" />
 
-        {/* navy 티켓 카드 — 강대비 면(DESIGN §2) */}
+        {/* navy 티켓 카드 · 강대비 면(DESIGN §2) */}
         <article className="overflow-hidden rounded-lg bg-navy">
           <div aria-hidden="true" className={`h-8 ${STRIPE[line.id]}`} />
           <div className="flex flex-col gap-24 p-24 lg:p-32">
@@ -160,7 +160,7 @@ export default function Ticket() {
                 as="p"
                 className="text-caption font-medium uppercase tracking-eyebrow text-white"
               />
-              {/* 예약 코드 6자 — Kanit Bold 큰 숫자(IA §2.7) */}
+              {/* 예약 코드 6자 · Kanit Bold 큰 숫자(IA §2.7) */}
               <p className="font-display text-h1 font-bold tracking-display text-white">
                 {booking.code}
               </p>
@@ -195,11 +195,11 @@ export default function Ticket() {
                 </span>
               </TicketRow>
               <TicketRow labelKey="booking.summary.host">
-                {/* 호스트 이름 PLACEHOLDER — 확정 전(lines.js) */}
+                {/* 호스트 이름 PLACEHOLDER · 확정 전(lines.js) */}
                 {line.host_name}
               </TicketRow>
             </dl>
-            {/* navy 위 구분선 — line 토큰은 잉크 계열이라 시인 불가, white 사용(DESIGN §7 카드 보더 예외면) */}
+            {/* navy 위 구분선 · line 토큰은 잉크 계열이라 시인 불가, white 사용(DESIGN §7 카드 보더 예외면) */}
             <div className="flex items-baseline justify-between border-t border-white pt-16">
               <LangSwap k="booking.total" className="text-small font-medium text-white" />
               <span className="font-display text-h3 font-bold text-white">
@@ -220,7 +220,7 @@ export default function Ticket() {
           <Share2 size={16} aria-hidden="true" />
         </Button>
 
-        {/* 차내 클립 1개 — "What you'll watch on board"(IA §2.7) */}
+        {/* 차내 클립 1개 · "What you'll watch on board"(IA §2.7) */}
         {story && (
           <section className="flex flex-col gap-12">
             <LangSwap k="ticket.watch" as="h2" className="text-h3 font-semibold" />
@@ -243,7 +243,7 @@ export default function Ticket() {
           </section>
         )}
 
-        {/* CJM Revisit — 남은 라인이 곧 재방문 이유(IA §2.7) */}
+        {/* CJM Revisit · 남은 라인이 곧 재방문 이유(IA §2.7) */}
         <div className="flex flex-col items-center gap-12 rounded-md bg-surface p-24 text-center">
           <LangSwap k="ticket.linesLeft" as="p" className="text-body font-semibold" />
           <Button variant="ghost" as={Link} to="/loop">

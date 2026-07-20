@@ -95,9 +95,10 @@ Fluid 스케일 (tokens.typeScale): display `clamp(44px,6vw,104px)` / h1 `clamp(
 ## 6. 내비게이션
 
 **데스크탑 (lg+) — Header**
-- 상단 고정. 로고 + 메뉴(Gate / Loop / Pilot) + LangToggle + 로그인 아이콘.
-- 초기 높이 72px 투명 → 스크롤 시 glass(blur 예산 1/3) + 높이 56px로 수축. 전환 320ms spring.
-- 현재 라우트 메뉴는 Medium 500 + primary 언더라인 2px.
+- 상단 고정. 로고(primary 단색) + 메뉴(Gate / Loop / Hands-Free / About) + LangMenu + 로그인 아이콘.
+- 메뉴 라벨 기본 **SemiBold 600 / ink** (v3.1: 500은 너무 얇아 한 단계 상향). 현재 라우트는 **라벨 자체가 primary 컬러** — 언더라인·바·인디케이터 일절 금지. hover는 inkSec→ink 160ms.
+- 초기 높이 72px → 스크롤 시 glass + 56px 수축은 유지하되, **초기 상태도 투명 금지**: 항상 `rgba(255,255,255,0.92)` 이상의 면을 가진다. 지도·사진 위에서 헤더가 사라지는 사고(v3.0 Loop) 재발 방지 — 라우트 무관 동일 규칙.
+- **LangMenu**: 토글이 아니라 드롭다운. lucide `Globe` 아이콘 IconButton(44×44) → 클릭 시 메뉴 카드(radius md, shadow md)에 `English / 한국어 / ไทย` 세로 나열, 각 항목은 해당 언어의 자기 표기. 현재 언어는 primary 라벨 + `Check` 아이콘. 국기·이모지 금지. 키보드 순회 + Escape 닫기.
 
 **모바일 (<lg) — GlassDock**
 - 중앙 하단 **리퀴드 글래스 모핑 필**(blur 예산 2/3, 그림자 예산 1/2).
@@ -106,15 +107,17 @@ Fluid 스케일 (tokens.typeScale): display `clamp(44px,6vw,104px)` / h1 `clamp(
 - 수축 트리거: 바깥 탭 / 스와이프 다운 / 라우트 변경. 확장 중 포커스 트랩 + Escape 닫기.
 - **탭바·햄버거 금지.** 터치 타깃 최소 44×44px (HIG).
 
-**푸터** — navy 풀블리드 웹 푸터. 라인 3색 스트라이프 1px 상단 보더. 팀/대회 크레딧, 언어, 법적 고지 자리.
+**푸터 (v3.1 전면 개정)** — **primary #009FE3 풀블리드**, 텍스트 white(메타는 white 72%). navy·검정 금지, 상단 스트라이프 보더 폐지. G-Local 구조 이식: 4컬럼 그리드(브랜드 한 문장+로고 / Explore 링크 / Contact: `official@bomnaehelper.ac.kr` / Team 5 · STATION C Glocal Solverthon Chuncheon). 최하단 바: 좌측 `© 2026 Bomnae Helper · Team 5`, **우측 Privacy Policy · Terms of Service** — 각각 `/legal/privacy` `/legal/terms`를 **새 탭**(`target="_blank" rel="noopener"`)으로. **언어 토글 없음**(헤더 LangMenu가 유일한 언어 진입점), "Prototype for demonstration…" 문구 삭제(해당 고지는 Terms 본문 안으로 이동).
 
 ## 7. 컴포넌트 스타일 규칙
 
 - **버튼(CTA)**: SemiBold 600, radius pill, 높이 48(모바일)/44(데스크탑), primary 배경 + white 텍스트. 텍스트 버튼은 흐름 전진 CTA만("Find my route", "Reserve seats"). hover: 배경 navy 전환 160ms. focus-visible: 2px primary 아웃라인 offset 2px.
 - **IconButton**: 반복 액션 전부(공유, 닫기, 언어, +/-). lucide 단일, aria-label 필수, 데스크탑 툴팁. 44×44 히트영역.
-- **카드**: bg white, border line, radius md(16). hover(데스크탑): border primary + translateY(-2px), 160ms. **scale 금지.**
+- **카드 (v3.1 무보더 원칙)**: bg white 단색 + `shadow.sm`, radius lg(16). **모든 보더 폐지** — 특히 좌측·상단 1~2px 액센트 보더는 어디에도 금지. 깊이는 tokens.shadow 3단으로만: 기본 sm, hover는 `shadow.md + translateY(-2px)` 160ms. 배경이 white인 면 위 카드가 안 떠 보이면 카드 bg를 surface로 바꾸지 말고 섹션 배경을 surface로 깔아 대비를 만든다. **scale 금지.**
+- **구분선**: 카드·박스 외곽선은 0. 리스트 항목 사이 등 내부 구획이 꼭 필요할 때만 `colors.line` 1px 수평 디바이더 허용.
 - **칩/배지**: Medium 500, caption 12px, pill. 상태 배지 색: 출발확정 green / 출발유력 yellow(+ink 텍스트) / 마감 inkMeta.
-- **폼**: 입력 배경 surface, border line, focus 시 border primary. 라벨 small 14 Medium. 에러는 인라인(spice 텍스트 + 필드 border spice) — 팝업 금지. 에러 문구는 무엇이 잘못됐고 어떻게 고치는지(사과·모호함 금지).
+- **폼 (v3.1)**: 입력은 보더 없이 **surface 배경 단색면**, radius md. focus 시 `box-shadow: 0 0 0 2px primary`(링) — border 속성 미사용. 라벨 small 14 Medium. 에러는 인라인(spice 텍스트 + 필드 링 spice) — 팝업 금지. 문구는 무엇이 잘못됐고 어떻게 고치는지(사과·모호함 금지).
+- **FieldSelect (v3.1 — 네이티브 select·time input 전면 금지)**: 터미널·시간·인원 등 모든 선택은 Skyscanner식 커스텀 필드. 닫힘 상태 = 라벨(caption inkMeta) + 값 또는 플레이스홀더("Airport", "Time"). 클릭 → 필드 아래 옵션 카드(radius lg, shadow md)에 lucide 아이콘 + 주 텍스트 + 보조 텍스트(코드·설명) 리스트. 키보드 ↑↓·Enter·Escape, `role="listbox"`. **네이티브 time input의 OS 로케일(오전/오후) 누수 사고를 원천 차단** — 시간 옵션 라벨도 사전 키로 언어 전환.
 - **모달리티 (HIG Modality 근거)**: 모바일 = BottomSheet(위로 슬라이드, blur 예산 3/3, 그림자 예산 2/2, 그랩바, 스와이프 다운 닫기), 데스크탑 = 중앙 Dialog(max-width 560px, 동일 glass 면). 모달은 예약 확인·로그인 게이트 등 완결 과업에만.
 - **EmptyState**: unDraw 일러스트(프라이머리 단색 재컬러) + 한 문장 + 행동 CTA. 위치 제한: 빈 검색 결과, 404/500, 로그인 게이트.
 
@@ -135,11 +138,11 @@ Fluid 스케일 (tokens.typeScale): display `clamp(44px,6vw,104px)` / h1 `clamp(
 
 ## 10. 모션 · 효과 예산
 
-| 예산 | 허용 위치 |
+| 예산 (v3.1) | 허용 위치 |
 |---|---|
-| blur 3곳 | Header(스크롤) / GlassDock / BottomSheet·Dialog |
-| 그림자 2곳 | GlassDock / BottomSheet·Dialog |
-| 그라데이션 1곳 | 히어로 스크림(scrim → transparent) |
+| blur(리퀴드 글래스) 5면 | Header / GlassDock / BottomSheet·Dialog / 지도 위 라인 카드(Loop) / LinePreview 오버레이 패널. **중첩 blur 금지, 글래스 위 텍스트는 선명색만(HIG Materials)** |
+| 그림자 | 개수 제한 대신 **체계 제한**: tokens.shadow 3단(sm/md/lg)+dock/sheet 외 임의 그림자 금지. 무보더 원칙의 유일한 깊이 수단 |
+| 그라데이션 1곳 | 히어로 스크림(scrim → transparent). 지도 라인 글로우는 그라데이션이 아니라 저불투명 두꺼운 스트로크로 해결 |
 | scale 화이트리스트 2곳 | 예약 성공 스탬프 드롭 1.4→1.0 / 카드 리빌 0.96→1.0 |
 
 - 스프링: `cubic-bezier(0.32,1.32,0.5,1)` 320ms. 일반 전환 160ms ease.
@@ -153,9 +156,10 @@ Fluid 스케일 (tokens.typeScale): display `clamp(44px,6vw,104px)` / h1 `clamp(
 - **MapLibre GL + openfreemap liberty 타일만.** 구글·네이버맵 임베드 금지.
 - 기본 카메라: tokens.map — center [127.735,37.885], zoom 11.5, pitch 58, bearing -18. 정류장 포커스 시 flyTo(zoom 15, pitch 63, 1500ms).
 - 3D 건물: fill-extrusion, minzoom 13, 컬러 램프는 tokens.map.extrusion(중립 잉크 톤) — 건물은 침묵, 라인이 주인공.
-- 라인 3개는 GeoJSON line 레이어, `lineColors` 스트로크, 폭 zoom 보간(11.5:3px → 15:7px), 흰색 케이싱 라인 아래 깔기.
-- 정류장 마커: 커스텀 HTML 마커(라인 컬러 링 + 흰 코어). active 상태는 **scale이 아니라** 사이즈 스텝(22→28px) + 펄스 링으로.
-- 셔틀 마커: 라인 컬러 채움 + 캐릭터 미니 아이콘 이미지. MVP는 시뮬레이션 이동(PATTERNS.md §4).
+- **라인 3레이어 (v3.1 생동감)**: 아래부터 ①글로우 — 라인 컬러 22% 불투명, 폭 12→18px ②케이싱 — 흰색, 폭 7→10px ③본선 — lineColors, 폭 4.5→7px(zoom 11.5→15 보간). `line-cap/join: round`. 이 3겹이 "얇고 밋밋한 줄" 문제의 해답이다 — 그라데이션·scale 없이 두께 위계로만.
+- **draw-on 등장**: 소스 `lineMetrics: true` + `line-gradient` progress를 rAF로 0→1 이징(720ms, ease). 페이지 진입·라인 선택 시 선이 그려지듯 나타난다. reduced-motion이면 즉시 완성 상태.
+- 정류장 마커: 커스텀 HTML 마커(라인 컬러 링 + 흰 코어). active는 **scale이 아니라** 사이즈 스텝(22→28px) + 펄스 링. 클릭 시 **StopPopup**: 마커 위로 글래스가 아닌 white 카드(radius lg, shadow lg) — 정류장명·한 줄 소개·체류시간·"View line" 텍스트 버튼. 동시에 1개만, 지도 탭·Escape로 닫기.
+- **셔틀 스무딩 (v3.1 자글거림 수술)**: 위치는 매 프레임 새 값 대입이 아니라 **지수 lerp**(current += (target−current)×min(1, dt×3))로 따라가고, 마커 요소는 `will-change: transform` + translate3d, `pitchAlignment:'map'`. 진행은 경로 누적거리 기반 보간(정점 간 등속) — 정점마다 덜컥거리는 원인 제거. reduced-motion 시 정지.
 - 지도 컨트롤은 우하단, attribution compact 유지(오픈데이터 크레딧 의무).
 
 ## 12. 미디어
@@ -166,7 +170,9 @@ Fluid 스케일 (tokens.typeScale): display `clamp(44px,6vw,104px)` / h1 `clamp(
 
 ## 13. 이중언어 (EN 기본 / KR 토글)
 
-- 사전: `src/i18n/en.js` + `src/i18n/ko.js` — **키 완전 동형.** UI 하드코딩 문자열 0.
+- **v3.1 다국어**: 사전은 네임스페이스 분할 — `src/i18n/{en,ko,th}/{common,gate,loop,brand,legal}.js`를 각 언어 index가 병합. 3개 언어 **키 완전 동형.** UI 하드코딩 문자열 0. 태국어 글리프는 **Kanit이 네이티브 커버**(Kanit은 태국어 서체다) — th일 때 display·body 모두 Kanit 우선 스택. th 초안은 en 기반 기계 번역 허용하되 PROGRESS 준비물에 "네이티브 검수" 등재.
+- **카피 표기 규칙 (v3.1)**: **줄표(—, –) 전면 금지** — 사전·하드카피·주석 노출 문자열 전부. 문장은 마침표·쉼표·접속사로 자연스럽게 잇는다. 하이픈(-)은 복합어(Hands-Free)에만.
+- **본문 측정폭 해제 (v3.1)**: 텍스트 블록에 `max-w-*` 개별 캡 금지. 줄바꿈은 오직 컨테이너 폭이 결정한다 — 우측이 비는데 강제 개행되는 현상의 원인 제거. `<br>` 수동 개행도 히어로 디스플레이 타이포 외 금지.
 - 전 인터랙티브 라벨은 **LangSwap 패턴**(PATTERNS.md §1): 같은 grid 셀에 두 언어 겹침 + invisible → 전환 시 레이아웃 시프트 0. **EN 기준 폭 설계.**
 - 언어 상태는 in-memory Context (localStorage 금지). 기본 EN.
 - 카피 원칙: 시스템 구조가 아니라 사용자가 인식하는 행동으로 명명("Reserve seats", "Send my bags"). 버튼 라벨은 플로우 끝까지 동일 어휘 유지.

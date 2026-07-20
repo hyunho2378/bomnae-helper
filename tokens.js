@@ -7,8 +7,8 @@
 
 export const colors = {
   bg: '#FFFFFF',            // 배경 순백. 웜톤·파스텔·AI색 전면 금지
-  primary: '#009FE3',       // 춘천 공식 블루
-  navy: '#27348B',          // 춘천 공식 네이비 (푸터 풀블리드, 강한 대비면)
+  primary: '#009FE3',       // 춘천 공식 블루 — v3.1: 로고·헤더 액티브·푸터·CTA 등 크롬은 이 색 하나로 통일
+  navy: '#27348B',          // v3.1: 크롬에서 퇴출. 티켓 카드 면 전용 액센트로만 잔존
   yellow: '#FFC400',        // 고채도 서포트 — Potato Line
   spice: '#FF4438',         // 고채도 서포트 — Dakgalbi Line
   green: '#00B865',         // 고채도 서포트 — 성공/확정 상태
@@ -72,16 +72,22 @@ export const containers = {
   marginLg: 48,   // lg~
 };
 
-export const radius = { sm: 10, md: 16, lg: 24, pill: 999 };
+// v3.1: G-Local Station 마감 스케일 이식(6~20). 칩/작은 요소 sm, 카드 md~lg, 시트/패널 xl.
+export const radius = { xs: 6, sm: 10, md: 12, lg: 16, xl: 20, pill: 999 };
 
-// 그림자 예산 2곳: GlassDock / BottomSheet(Dialog 공유)
+// v3.1 엘리베이션 체계 — 보더 전면 폐지의 대체재. 깊이는 오직 이 3단 그림자로만 표현한다.
+// 카드 기본 sm, hover·Dock·팝업 md, 시트·다이얼로그·글래스 패널 lg. 임의 그림자 금지.
 export const shadow = {
-  dock: '0 12px 40px rgba(20,23,46,0.16)',
-  sheet: '0 -12px 40px rgba(20,23,46,0.14)',
+  sm: '0 2px 10px rgba(20,23,46,0.07)',
+  md: '0 8px 28px rgba(20,23,46,0.12)',
+  lg: '0 16px 48px rgba(20,23,46,0.18)',
+  dock: '0 12px 40px rgba(20,23,46,0.16)',   // = md급, GlassDock 전용 유지
+  sheet: '0 -12px 40px rgba(20,23,46,0.14)', // = 상향 그림자, Sheet 전용 유지
 };
 
-// blur 예산 3곳: Header(스크롤 시) / GlassDock / BottomSheet·Dialog
-export const blur = { glass: '16px' };
+// v3.1 blur(리퀴드 글래스) 허용 5면: Header / GlassDock / Sheet·Dialog / 지도 위 라인 카드 / LinePreview 오버레이.
+// 중첩 blur 금지(글래스 위 글래스 없음).
+export const blur = { glass: '16px', glassSoft: '10px' };
 
 export const motion = {
   spring: 'cubic-bezier(0.32, 1.32, 0.5, 1)', // 320ms — Dock 모핑, 스탬프, 시트

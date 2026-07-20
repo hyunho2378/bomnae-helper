@@ -1,14 +1,14 @@
-// 데이터 접근 단일 창구 — 모든 페이지는 이 파일만 호출한다 (COMPONENTS A2).
+// 데이터 접근 단일 창구 · 모든 페이지는 이 파일만 호출한다 (COMPONENTS A2).
 // PHASE 3에서 내부만 fetch로 교체(페이지 코드 diff 0이 완료 조건)하므로 전부 async.
 import lines from './lines';
 import stops, { meetingPoints } from './stops';
 import { getDepartures as calcDepartures } from './departures';
 
-// in-memory 저장소 — 웹스토리지 금지(DESIGN §15). PHASE 3에서 서버로 이관.
+// in-memory 저장소 · 웹스토리지 금지(DESIGN §15). PHASE 3에서 서버로 이관.
 const bookings = new Map();
 const handsfreeOrders = new Map();
 
-// 6자 코드 — 혼동 문자(I/L/O/0/1) 제외
+// 6자 코드 · 혼동 문자(I/L/O/0/1) 제외
 const CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 const makeCode = () =>
   Array.from({ length: 6 }, () => CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)]).join('');

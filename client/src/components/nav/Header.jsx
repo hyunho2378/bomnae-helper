@@ -1,5 +1,6 @@
-// 데스크탑 헤더(lg+) — DESIGN §6 + PATTERNS §2: 초기 72px 투명 → 스크롤 시
-// glass(blur 예산 1/3) + 56px 수축, 320ms spring. rAF 스로틀, reduced-motion 즉시.
+// 데스크탑 헤더(lg+) · DESIGN §6 v3.1: 메뉴 4(Gate/Loop/Hands-Free/About), 라벨 600,
+// 액티브 = primary 컬러 텍스트(언더라인·인디케이터 금지), 항상 불투명면(투명 금지),
+// 스크롤 시 glass + 56px 수축(PATTERNS §2, rAF 스로틀). 로고는 primary 단색.
 import { useEffect, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { User } from 'lucide-react';
@@ -7,12 +8,13 @@ import { useAuth } from '../../context/AuthContext';
 import { useLang } from '../../i18n/LangContext';
 import LangSwap from '../../i18n/LangSwap';
 import IconButton from '../ui/IconButton';
-import LangToggle from './LangToggle';
+import LangMenu from './LangMenu';
 
 const MENU = [
   { to: '/gate', k: 'nav.gate' },
   { to: '/loop', k: 'nav.loop' },
-  { to: '/pilot', k: 'nav.pilot' },
+  { to: '/hands-free', k: 'nav.handsfree' },
+  { to: '/about', k: 'nav.about' },
 ];
 
 export default function Header() {
@@ -40,11 +42,15 @@ export default function Header() {
   return (
     <header
       className={`fixed inset-x-0 top-0 z-header hidden transition-all duration-base ease-spring motion-reduce:transition-none lg:block ${
-        scrolled ? 'h-56 border-b border-line bg-glass backdrop-blur-glass' : 'h-72 bg-transparent'
+        scrolled ? 'h-56 bg-glass shadow-sm backdrop-blur-glass' : 'h-72 bg-white'
       }`}
     >
       <div className="mx-auto flex h-full w-full max-w-lg items-center justify-between px-48 2xl:max-w-2xl 3xl:max-w-3xl">
-        <Link to="/" aria-label={t('nav.home')} className="font-display text-h3 font-bold tracking-display">
+        <Link
+          to="/"
+          aria-label={t('nav.home')}
+          className="font-display text-h3 font-bold tracking-display text-primary"
+        >
           Bomnae Helper
         </Link>
         <nav className="flex items-center gap-24">
@@ -53,8 +59,8 @@ export default function Header() {
               key={to}
               to={to}
               className={({ isActive }) =>
-                `flex min-h-44 items-center border-b-2 text-small font-medium transition-colors duration-fast ${
-                  isActive ? 'border-primary text-ink' : 'border-transparent text-inkSec hover:text-ink'
+                `flex min-h-44 items-center text-small font-semibold transition-colors duration-fast ${
+                  isActive ? 'text-primary' : 'text-inkSec hover:text-ink'
                 }`
               }
             >
@@ -62,8 +68,8 @@ export default function Header() {
             </NavLink>
           ))}
         </nav>
-        <div className="flex items-center gap-16">
-          <LangToggle />
+        <div className="flex items-center gap-8">
+          <LangMenu />
           {user ? (
             <button
               type="button"

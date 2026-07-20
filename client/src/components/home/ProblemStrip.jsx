@@ -1,4 +1,4 @@
-// 문제 선언 스트립 — IA §2.1.2: 팀 리서치 근거 한 문장, 숫자 "4 / 5" Kanit Bold display.
+// 문제 선언 스트립 · IA §2.1.2: 팀 리서치 근거 한 문장, 숫자 "4 / 5" Kanit Bold display.
 import LangSwap from '../../i18n/LangSwap';
 import Container from '../layout/Container';
 

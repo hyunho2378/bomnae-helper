@@ -1,4 +1,4 @@
-// STUB 확장 — AGENT-2. 기준: IA §2.1 (7섹션 순서 고정), COMPONENTS.md 섹션 B.
+// STUB 확장 · AGENT-2. 기준: IA §2.1 (7섹션 순서 고정), COMPONENTS.md 섹션 B.
 // 1 Hero → 2 Problem strip → 3 Gate entry → 4 Lines preview → 5 How it works
 // → 6 Pilot proof strip → 7 Footer(셸이 렌더).
 import Section from '../components/layout/Section';

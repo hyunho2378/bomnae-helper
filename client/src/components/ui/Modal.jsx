@@ -1,4 +1,4 @@
-// Sheet/Dialog 자동 분기 래퍼 — 페이지는 Modal만 사용한다 (COMPONENTS A4).
+// Sheet/Dialog 자동 분기 래퍼 · 페이지는 Modal만 사용한다 (COMPONENTS A4).
 // 분기 기준은 tokens.breakpoints.lg. 라우트 변경 시 자동 닫기 (ROUTES §4).
 import { useEffect, useRef, useSyncExternalStore } from 'react';
 import { useLocation } from 'react-router-dom';

@@ -1,4 +1,4 @@
-// 스토리 클립 — IA §2.5 블록 3: 차내에서 보게 될 사장님 스토리 미리보기.
+// 스토리 클립 · IA §2.5 블록 3: 차내에서 보게 될 사장님 스토리 미리보기.
 // 영상 있으면 VideoPlayer(자막 상시), 없으면 썸네일 + 요약 카드(CC_PROMPT_3 §3).
 // 모바일 가로 스크롤 / lg 3열(COMPONENTS C).
 import { useLang } from '../../i18n/LangContext';
@@ -33,7 +33,7 @@ export default function StoryClips({ stories }) {
             <h3 className="text-body font-semibold">
               {lang === 'ko' ? story.title_ko : story.title_en}
             </h3>
-            {/* 요약 — 데이터 본문(시프트 허용 영역) */}
+            {/* 요약 · 데이터 본문(시프트 허용 영역) */}
             <p className="line-clamp-2 text-small font-light text-inkSec">
               {lang === 'ko' ? story.summary_ko : story.summary_en}
             </p>

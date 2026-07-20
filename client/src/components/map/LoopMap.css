@@ -1,5 +1,5 @@
-/* PATTERNS §4 정류장 마커 기준 구현 그대로 — scale 금지 버전(사이즈 스텝 22→28 + 펄스 링).
-   px 값은 PATTERNS §4 명세값(이 파일 한정 허용 — 오케스트레이션 지침). */
+/* PATTERNS §4 정류장 마커 기준 구현 그대로 · scale 금지 버전(사이즈 스텝 22→28 + 펄스 링).
+   px 값은 PATTERNS §4 명세값(이 파일 한정 허용 · 오케스트레이션 지침). */
 .stop-marker{width:22px;height:22px;border-radius:50%;background:#fff;
   border:4px solid var(--line-color);cursor:pointer;padding:0;transition:width 160ms,height 160ms,border-width 160ms}
 .stop-marker.active{width:28px;height:28px;border-width:6px;position:relative}

@@ -1,5 +1,5 @@
-// 예약 — IA §2.6: 3스텝(출발 프리필 → 인원 → 요약) + 확정에서만 LoginGate(Guest-first, ROUTES §3).
-// 게스트 진행 상태는 in-memory BookingContext(웹스토리지 금지 — DESIGN §15). 성공 시 SuccessStamp → /ticket/:id.
+// 예약 · IA §2.6: 3스텝(출발 프리필 → 인원 → 요약) + 확정에서만 LoginGate(Guest-first, ROUTES §3).
+// 게스트 진행 상태는 in-memory BookingContext(웹스토리지 금지 · DESIGN §15). 성공 시 SuccessStamp → /ticket/:id.
 import { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
@@ -20,7 +20,7 @@ import LangSwap from '../i18n/LangSwap';
 
 const VALID = ['potato', 'dakgalbi', 'lake'];
 const STEP_KEYS = ['booking.steps.departure', 'booking.steps.party', 'booking.steps.summary'];
-const DAYS = 7; // Step 1 날짜 선택 폭 — 회차·가격 DRAFT(IA §4)
+const DAYS = 7; // Step 1 날짜 선택 폭 · 회차·가격 DRAFT(IA §4)
 
 const toDateStr = (d) => d.toLocaleDateString('en-CA');
 const isWeekendStr = (dateStr) => {
@@ -52,7 +52,7 @@ export default function Booking() {
     );
   }, []);
 
-  // 진입 시 초안 초기화 — 캘린더 쿼리(?date=&time=) 프리필(ROUTES §1)
+  // 진입 시 초안 초기화 · 캘린더 쿼리(?date=&time=) 프리필(ROUTES §1)
   useEffect(() => {
     if (!valid) return;
     setDraft((d) => ({
@@ -62,7 +62,7 @@ export default function Booking() {
       time: params.get('time') ?? d.time,
     }));
     // 쿼리 프리필은 진입 시 1회만 반영(의존성 고의 축소)
-  }, [lineId, valid]); // eslint 미사용 프로젝트 — params는 마운트 시점 값만 사용
+  }, [lineId, valid]); // eslint 미사용 프로젝트 · params는 마운트 시점 값만 사용
 
 
   useEffect(() => {
@@ -72,7 +72,7 @@ export default function Booking() {
       const [lineData, points] = await Promise.all([getLine(lineId), getMeetingPoints()]);
       if (!alive) return;
       setLine(lineData);
-      setMeetingPoint(points[0]); // 미팅포인트 고정(IA §5) — MVP 첫 포인트
+      setMeetingPoint(points[0]); // 미팅포인트 고정(IA §5) · MVP 첫 포인트
     })();
     return () => {
       alive = false;
@@ -97,7 +97,7 @@ export default function Booking() {
   const departure = departures?.find((d) => d.time === draft.time) ?? null;
   const seatsLeft = departure ? departure.capacity - departure.booked_count : 0;
 
-  // 합계 — 주말 차등은 좌석당 가산(가격 전부 DRAFT, 5일차 BM 검토 확정 — IA §4)
+  // 합계 · 주말 차등은 좌석당 가산(가격 전부 DRAFT, 5일차 BM 검토 확정 · IA §4)
   const delta = draft.date && isWeekendStr(draft.date) ? (line?.price_weekend_delta ?? 0) : 0;
   const total = line
     ? draft.adults * (line.price_adult + delta) + draft.children * (line.price_child + delta)
@@ -119,7 +119,7 @@ export default function Booking() {
     setDone(booking);
   };
 
-  // 확정 — 미로그인 시에만 LoginGate(액션 레벨 가드, ROUTES §3)
+  // 확정 · 미로그인 시에만 LoginGate(액션 레벨 가드, ROUTES §3)
   const onConfirm = () => {
     if (user) submit();
     else setGateOpen(true);
@@ -136,7 +136,7 @@ export default function Booking() {
     );
   }
 
-  // 예약 성공 — 스탬프 드롭(scale 화이트리스트 1/2) 후 티켓 이동
+  // 예약 성공 · 스탬프 드롭(scale 화이트리스트 1/2) 후 티켓 이동
   if (done) {
     return (
       <Container>
@@ -163,7 +163,7 @@ export default function Booking() {
       <div className="mx-auto flex w-full max-w-dialog flex-col gap-32 py-64 lg:pt-96">
         <div className="flex flex-col gap-8">
           <LangSwap k="booking.title" as="h1" className="text-h2 font-semibold" />
-          {/* 스텝 인디케이터 — 실제 순서라 숫자 마커 허용(COMPONENTS B HowItWorks 준용) */}
+          {/* 스텝 인디케이터 · 실제 순서라 숫자 마커 허용(COMPONENTS B HowItWorks 준용) */}
           <p className="flex flex-wrap items-baseline gap-8 text-small text-inkSec">
             <LangSwap k="booking.stepLabel" className="font-medium" />
             <span className="font-display font-semibold">{step}</span>
@@ -273,7 +273,7 @@ export default function Booking() {
           ) : (
             <Button disabled={submitting} onClick={onConfirm}>
               <LangSwap k="booking.confirmCta" />
-              {/* 제출 중 — 라벨 유지 + 우측 스피너(PATTERNS §6), reduced-motion 정지 */}
+              {/* 제출 중 · 라벨 유지 + 우측 스피너(PATTERNS §6), reduced-motion 정지 */}
               {submitting && (
                 <Loader2
                   size={16}

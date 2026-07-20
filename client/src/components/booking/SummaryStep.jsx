@@ -1,7 +1,7 @@
-// 예약 Step 3 — 요약(IA §2.6): 라인·회차·미팅포인트·동승 인원·호스트·선주문 안내·합계.
+// 예약 Step 3 · 요약(IA §2.6): 라인·회차·미팅포인트·동승 인원·호스트·선주문 안내·합계.
 import { useLang } from '../../i18n/LangContext';
 import LangSwap from '../../i18n/LangSwap';
-// 숫자 삽입 문장 겹침 렌더용(PATTERNS §1) — 시프트 0
+// 숫자 삽입 문장 겹침 렌더용(PATTERNS §1) · 시프트 0
 import en from '../../i18n/en';
 import ko from '../../i18n/ko';
 
@@ -47,7 +47,7 @@ export default function SummaryStep({ line, draft, departure, meetingPoint, tota
           </span>
         </Row>
         <Row labelKey="booking.summary.meeting">
-          {/* 미팅포인트 고정(IA §5) — MVP는 첫 번째 포인트, PLACEHOLDER 좌표(stops.js). EN/KR 겹침(시프트 0) */}
+          {/* 미팅포인트 고정(IA §5) · MVP는 첫 번째 포인트, PLACEHOLDER 좌표(stops.js). EN/KR 겹침(시프트 0) */}
           <span className="grid">
             <span aria-hidden={lang !== 'en'} className={`col-start-1 row-start-1 ${lang === 'en' ? '' : 'invisible'}`}>{meetingPoint.name_en}</span>
             <span aria-hidden={lang !== 'ko'} className={`col-start-1 row-start-1 ${lang === 'ko' ? '' : 'invisible'}`}>{meetingPoint.name_ko}</span>
@@ -62,12 +62,12 @@ export default function SummaryStep({ line, draft, departure, meetingPoint, tota
           </span>
         </Row>
         <Row labelKey="booking.summary.host">
-          {/* 호스트 이름 PLACEHOLDER — 확정 전(lines.js) */}
+          {/* 호스트 이름 PLACEHOLDER · 확정 전(lines.js) */}
           <span className="font-semibold">{line.host_name}</span>
         </Row>
       </dl>
 
-      {/* 동승 인원 — 좌석 = 매칭(IA §2.5·2.6). 숫자 삽입 문장은 언어별 완성 문장 겹침(시프트 0) */}
+      {/* 동승 인원 · 좌석 = 매칭(IA §2.5·2.6). 숫자 삽입 문장은 언어별 완성 문장 겹침(시프트 0) */}
       <p className="grid text-body">
         <span aria-hidden={lang !== 'en'} className={`col-start-1 row-start-1 ${lang === 'en' ? '' : 'invisible'}`}>
           {en.loop.detail.ridersPre} <span className="font-display font-semibold">{departure.booked_count}</span> {en.loop.detail.ridersPost}
@@ -77,7 +77,7 @@ export default function SummaryStep({ line, draft, departure, meetingPoint, tota
         </span>
       </p>
 
-      {/* 선주문 안내 — 핵심 차별점(IA §2.1 How it works) */}
+      {/* 선주문 안내 · 핵심 차별점(IA §2.1 How it works) */}
       <LangSwap
         k="booking.summary.preorderNote"
         as="p"

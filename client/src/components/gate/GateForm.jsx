@@ -1,4 +1,4 @@
-// Gate 플래너 폼 — COMPONENTS B: terminal/date/time, 제출 → planGate 호출 결과 상위로.
+// Gate 플래너 폼 · COMPONENTS B: terminal/date/time, 제출 → planGate 호출 결과 상위로.
 // 쿼리 프리필(initial)이 완전하면 마운트 1회 자동 실행(Home 미니 입력 → 결과 즉시 노출).
 // 폼 규칙: DESIGN §7, 에러 인라인(PATTERNS §6). terminal 키 t1|t2|gmp(gateRoutes 계약).
 import { useEffect, useRef, useState } from 'react';
@@ -57,7 +57,7 @@ export default function GateForm({ initial, onResult }) {
           <select
             value={terminal}
             onChange={(e) => setTerminal(e.target.value)}
-            className="h-48 rounded-sm border border-line bg-surface px-16 text-body focus:border-primary"
+            className="h-48 rounded-md bg-surface px-16 text-body focus:ring-2 focus:ring-primary"
           >
             {TERMINALS.map((id) => (
               <option key={id} value={id}>
@@ -72,7 +72,7 @@ export default function GateForm({ initial, onResult }) {
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="h-48 rounded-sm border border-line bg-surface px-16 text-body focus:border-primary"
+            className="h-48 rounded-md bg-surface px-16 text-body focus:ring-2 focus:ring-primary"
           />
         </label>
         <label className="flex flex-1 flex-col gap-8">
@@ -86,8 +86,8 @@ export default function GateForm({ initial, onResult }) {
             }}
             aria-invalid={error}
             aria-describedby={error ? 'gate-form-time-error' : undefined}
-            className={`h-48 rounded-sm border bg-surface px-16 text-body focus:border-primary ${
-              error ? 'border-spice' : 'border-line'
+            className={`h-48 rounded-md bg-surface px-16 text-body focus:ring-2 focus:ring-primary ${
+              error ? 'ring-2 ring-spice' : ''
             }`}
           />
         </label>
