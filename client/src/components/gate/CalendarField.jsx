@@ -131,7 +131,7 @@ export default function CalendarField({ label, value, placeholder, onChange }) {
               <DateText date={parseDate(value)} />
             </span>
           ) : (
-            <LangSwap k={placeholder} className="text-body font-regular text-inkSec" />
+            <LangSwap k={placeholder} className="text-body font-medium text-inkSec" />
           )}
           <ChevronDown size={16} aria-hidden="true" className="shrink-0 text-inkMeta" />
         </span>

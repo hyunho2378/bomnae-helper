@@ -5,7 +5,7 @@ export default {
   brand: {
     hero: {
       title: "We move you to the story.",
-      sub: "Bomnae Helper runs the missing links of a Chuncheon trip: from the airport gate to the last local stop, with your hands free.",
+      sub: "Global Tourism System runs the missing links of a Chuncheon trip: from the airport gate to the last local stop, with your hands free.",
     },
     before: {
       title: "Before you even get here",

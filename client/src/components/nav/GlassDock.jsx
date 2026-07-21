@@ -9,6 +9,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useLang } from '../../i18n/LangContext';
 import LangSwap from '../../i18n/LangSwap';
 import { spacing } from '../../tokens';
+import LogoMark from '../../assets/logo-mark.svg?react';
 import { routeKeyFromPath } from '../layout/PageLayout';
 
 const MENU = [
@@ -174,7 +175,8 @@ export default function GlassDock() {
           onClick={() => setOpen((v) => !v)}
           className="flex h-56 w-full items-center justify-center gap-12 px-20"
         >
-          <span className="font-display text-h3 font-bold">Bomnae</span>
+          {/* 컴팩트 브랜드 자리 · 풀네임은 375px 초과라 심볼로 대체(사용자 결정) */}
+          <LogoMark className="h-20 w-20 shrink-0 text-primary" aria-hidden="true" />
           <LangSwap k={`meta.title.${routeKey}`} className="text-small font-medium text-inkSec" />
           <MoreHorizontal size={20} className="text-inkMeta" aria-hidden="true" />
         </button>

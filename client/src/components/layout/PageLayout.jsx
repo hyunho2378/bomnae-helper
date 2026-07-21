@@ -27,9 +27,9 @@ export default function PageLayout() {
   const routeKey = routeKeyFromPath(pathname);
   const hideFooter = pathname === '/loop';
 
-  // 페이지 title · "Bomnae Helper · {meta.title.*}" (ROUTES §4)
+  // 페이지 title · "Global Tourism System · {meta.title.*}" (ROUTES §4)
   useEffect(() => {
-    document.title = `Bomnae Helper · ${t(`meta.title.${routeKey}`)}`;
+    document.title = `Global Tourism System · ${t(`meta.title.${routeKey}`)}`;
   }, [routeKey, t]);
 
   // 라우트 변경 시 스크롤 top 복원 (ROUTES §4)

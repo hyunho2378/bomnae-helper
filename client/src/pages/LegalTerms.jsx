@@ -21,7 +21,7 @@ export default function LegalTerms() {
           {SECTIONS.map((s) => (
             <section key={s}>
               <LangSwap k={`legal.terms.${s}h`} as="h2" className="text-h3 font-semibold" />
-              <p className="mt-8 text-small font-regular text-inkSec">{t(`legal.terms.${s}`)}</p>
+              <p className="mt-8 text-small font-medium text-inkSec">{t(`legal.terms.${s}`)}</p>
             </section>
           ))}
         </div>

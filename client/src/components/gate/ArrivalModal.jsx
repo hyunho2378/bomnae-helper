@@ -33,7 +33,7 @@ export default function ArrivalModal() {
           className="font-display text-caption font-semibold uppercase tracking-eyebrow text-primary"
         />
         <LangSwap k="gate.arrival.modal.title" as="h2" className="text-h2 font-bold" />
-        <LangSwap k="gate.arrival.modal.body" as="p" className="text-body font-regular text-inkSec" />
+        <LangSwap k="gate.arrival.modal.body" as="p" className="text-body font-medium text-inkSec" />
         <div className="flex flex-wrap items-center gap-12">
           <Button onClick={continueJourney}>
             <LangSwap k="gate.arrival.modal.continue" />

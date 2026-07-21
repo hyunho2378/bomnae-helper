@@ -22,7 +22,7 @@ export default function LegalPrivacy() {
           {SECTIONS.map((s) => (
             <section key={s}>
               <LangSwap k={`legal.privacy.${s}h`} as="h2" className="text-h3 font-semibold" />
-              <p className="mt-8 text-small font-regular text-inkSec">{t(`legal.privacy.${s}`)}</p>
+              <p className="mt-8 text-small font-medium text-inkSec">{t(`legal.privacy.${s}`)}</p>
             </section>
           ))}
         </div>

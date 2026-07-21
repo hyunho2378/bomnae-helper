@@ -4,7 +4,8 @@
 
 @layer base {
   body {
-    @apply bg-bg font-body text-ink;
+    /* v3.2.1: 본문 기본 웨이트 400→500 상향(DESIGN §16.2) · 클래스 미지정 요소까지 일괄 적용 */
+    @apply bg-bg font-body font-medium text-ink;
     -webkit-font-smoothing: antialiased;
   }
 

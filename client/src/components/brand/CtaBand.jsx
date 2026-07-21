@@ -15,7 +15,7 @@ export default function CtaBand() {
             as="h2"
             className="font-display text-h2 font-bold tracking-display"
           />
-          <LangSwap k="brand.cta.sub" as="p" className="text-body font-regular text-inkSec" />
+          <LangSwap k="brand.cta.sub" as="p" className="text-body font-medium text-inkSec" />
           <Button as={Link} to="/loop" size="lg">
             <LangSwap k="brand.cta.button" />
           </Button>

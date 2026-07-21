@@ -86,7 +86,7 @@ export default function LineHero({ line, stopsCount }) {
                 </span>
                 <LangSwap
                   k="loop.detail.priceUnit"
-                  className="text-small font-regular text-inkSec"
+                  className="text-small font-medium text-inkSec"
                 />
               </dd>
             </div>

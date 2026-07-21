@@ -98,7 +98,7 @@ function PreviewContent({ line, stops, onClose }) {
               {'₩'}
               {line.price_adult.toLocaleString('en-US')}
             </span>
-            <LangSwap k="loop.detail.priceUnit" className="font-regular" />
+            <LangSwap k="loop.detail.priceUnit" className="font-medium" />
           </span>
         </div>
       </div>
@@ -127,7 +127,7 @@ function PreviewContent({ line, stops, onClose }) {
       </ol>
 
       {/* 3 · 선주문 한 줄 */}
-      <LangSwap k="loop.preview.preorderLine" as="p" className="text-small font-regular text-inkSec" />
+      <LangSwap k="loop.preview.preorderLine" as="p" className="text-small font-medium text-inkSec" />
 
       {/* 4 · CTA 단 하나 → /loop/:lineId (§14) · grid 래핑 = full 폭(Button 계약에 className 없음) */}
       <div className="grid">

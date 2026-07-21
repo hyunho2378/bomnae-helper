@@ -31,7 +31,7 @@ export default function LocalStories() {
               <div className="flex flex-col gap-8 p-24">
                 <LangSwap k={`${key}.title`} as="h3" className="text-h3 font-semibold" />
                 {/* 본문 장문 · t() 직접 렌더 허용 영역(PATTERNS §1) */}
-                <p className="text-small font-regular text-inkSec">{t(`${key}.body`)}</p>
+                <p className="text-small font-medium text-inkSec">{t(`${key}.body`)}</p>
               </div>
             </li>
           );

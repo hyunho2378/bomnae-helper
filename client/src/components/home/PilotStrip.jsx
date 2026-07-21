@@ -27,7 +27,7 @@ export default function PilotStrip() {
           className="aspect-video h-full w-full bg-surface object-cover"
         />
         <div className="flex flex-col justify-center gap-16 p-24 lg:p-48">
-          <LangSwap k="home.proof.body" as="p" className="text-body font-normal" />
+          <LangSwap k="home.proof.body" as="p" className="text-body font-medium" />
           <span className="inline-flex min-h-44 items-center gap-8 font-semibold">
             <LangSwap k="home.proof.cta" />
             <ArrowRight size={20} aria-hidden="true" />

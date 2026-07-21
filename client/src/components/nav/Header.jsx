@@ -10,6 +10,7 @@ import { useLang } from '../../i18n/LangContext';
 import LangSwap from '../../i18n/LangSwap';
 import IconButton from '../ui/IconButton';
 import LangMenu from './LangMenu';
+import LogoMark from '../../assets/logo-mark.svg?react';
 
 const MENU = [
   { to: '/about', k: 'nav.about' },
@@ -47,12 +48,14 @@ export default function Header() {
       }`}
     >
       <div className="mx-auto flex h-full w-full max-w-lg items-center justify-between px-16 md:px-24 lg:px-40 2xl:max-w-2xl 3xl:max-w-3xl">
-        <Link
-          to="/"
-          aria-label={t('nav.home')}
-          className="font-display text-logo font-bold tracking-display text-primary"
-        >
-          Bomnae Helper
+        <Link to="/" aria-label={t('nav.home')} className="flex items-center gap-8">
+          <LogoMark className="h-24 w-24 shrink-0 text-primary" aria-hidden="true" />
+          {/* 모바일은 심볼만 — 워드마크 22px가 375px 폭 초과(사용자 결정) */}
+          {/* 이니셜 G·T·S만 primary, 나머지 ink(사용자 결정) */}
+          <span className="hidden whitespace-nowrap font-display text-logo font-semibold tracking-display text-ink lg:inline">
+            <span className="text-primary">G</span>lobal <span className="text-primary">T</span>ourism{' '}
+            <span className="text-primary">S</span>ystem
+          </span>
         </Link>
         {/* 데스크탑 전용 메뉴 · 모바일 내비는 GlassDock 단일 소유(§16.4) */}
         <nav className="hidden items-center gap-32 lg:flex">

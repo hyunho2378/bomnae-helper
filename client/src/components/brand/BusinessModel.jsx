@@ -21,7 +21,7 @@ export default function BusinessModel() {
   return (
     <Section id="business-model" title="brand.bm.title">
       <div className="flex flex-col gap-24">
-        <LangSwap k="brand.bm.oneLiner" as="p" className="text-h3 font-regular text-inkSec" />
+        <LangSwap k="brand.bm.oneLiner" as="p" className="text-h3 font-medium text-inkSec" />
         <ul className="grid grid-cols-1 gap-16 sm:grid-cols-2 lg:grid-cols-3 lg:gap-24">
           {BLOCKS.map((b) => (
             <li key={b} className="flex flex-col gap-8 rounded-lg bg-white p-24 shadow-sm">
@@ -31,7 +31,7 @@ export default function BusinessModel() {
                 className="text-caption font-medium uppercase tracking-eyebrow text-inkMeta"
               />
               {/* 요약 문구 · t() 직접 렌더 허용 영역(PATTERNS §1) */}
-              <p className="text-small font-normal">{t(`brand.bm.blocks.${b}.body`)}</p>
+              <p className="text-small font-medium">{t(`brand.bm.blocks.${b}.body`)}</p>
             </li>
           ))}
         </ul>

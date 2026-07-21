@@ -35,7 +35,7 @@ function drawTicketPng(line, booking) {
   ctx.fillRect(0, 0, 1200, 24); // 라인 컬러 스트라이프
   ctx.fillStyle = colors.bg; // navy 위 흰 텍스트(토큰 bg=순백)
   ctx.font = `600 40px ${fonts.display}`;
-  ctx.fillText('BOMNAE HELPER', 80, 140);
+  ctx.fillText('GLOBAL TOURISM SYSTEM', 80, 140);
   ctx.font = `500 44px ${fonts.display}`;
   ctx.fillText(line.name_en, 80, 220);
   ctx.font = `700 180px ${fonts.display}`;
@@ -148,7 +148,7 @@ export default function Ticket() {
           <div className="flex flex-col gap-24 p-24 lg:p-32">
             <div className="flex items-baseline justify-between gap-16">
               <span className="font-display text-small font-semibold uppercase tracking-eyebrow text-white">
-                Bomnae Helper
+                Global Tourism System
               </span>
               {/* 라인명 겹침(시프트 0) · 데이터 필드(th 없음)는 en 폴백: lang!=='ko'(v3.1 규칙) */}
               <span className="grid text-small font-medium text-white">
@@ -190,9 +190,9 @@ export default function Ticket() {
               </TicketRow>
               <TicketRow labelKey="booking.summary.party">
                 <span className="flex items-baseline gap-8">
-                  <LangSwap k="booking.adults" className="text-caption font-regular" />
+                  <LangSwap k="booking.adults" className="text-caption font-medium" />
                   <span className="font-display">{booking.adults}</span>
-                  <LangSwap k="booking.children" className="text-caption font-regular" />
+                  <LangSwap k="booking.children" className="text-caption font-medium" />
                   <span className="font-display">{booking.children}</span>
                 </span>
               </TicketRow>
@@ -246,7 +246,7 @@ export default function Ticket() {
                 <p className="truncate text-body font-semibold">
                   {lang === 'ko' ? story.title_ko : story.title_en}
                 </p>
-                <p className="line-clamp-2 text-small font-regular text-inkSec">
+                <p className="line-clamp-2 text-small font-medium text-inkSec">
                   {lang === 'ko' ? story.summary_ko : story.summary_en}
                 </p>
               </div>

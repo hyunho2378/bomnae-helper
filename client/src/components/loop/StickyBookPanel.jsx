@@ -73,7 +73,7 @@ export default function StickyBookPanel({ line, date, time, departure, adults, c
           {time ? ` · ${time}` : ''}
         </p>
         {!time && (
-          <LangSwap k="loop.detail.pickTime" as="p" className="text-small font-regular text-inkSec" />
+          <LangSwap k="loop.detail.pickTime" as="p" className="text-small font-medium text-inkSec" />
         )}
       </div>
 

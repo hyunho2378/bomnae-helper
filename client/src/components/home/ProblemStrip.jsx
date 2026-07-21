@@ -15,7 +15,7 @@ export default function ProblemStrip() {
           <LangSwap
             k="home.problem.text"
             as="p"
-            className="text-h3 font-normal text-inkSec"
+            className="text-h3 font-medium text-inkSec"
           />
         </div>
       </Container>

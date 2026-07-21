@@ -12,7 +12,7 @@ export default function ArrivalExplainModal() {
   return (
     <Modal open={status === 'explaining'} onClose={declineExplain} title="gate.arrival.explain.title">
       <div className="flex flex-col gap-16">
-        <LangSwap k="gate.arrival.explain.body" as="p" className="text-body font-regular text-inkSec" />
+        <LangSwap k="gate.arrival.explain.body" as="p" className="text-body font-medium text-inkSec" />
         <div className="flex flex-wrap items-center gap-12">
           <Button onClick={allow}>
             <LangSwap k="gate.arrival.explain.allow" />

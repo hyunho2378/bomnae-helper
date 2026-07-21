@@ -110,7 +110,7 @@ export default function LinePanel({ line, stops, focusStopId, onSelectStop, onVi
                       aria-pressed={active}
                       onClick={() => onSelectStop(stop)}
                       className={`flex min-h-44 w-full items-center gap-8 rounded-sm px-8 text-left text-small transition-colors duration-fast ${
-                        active ? 'font-semibold text-ink' : 'font-regular text-inkSec hover:text-ink'
+                        active ? 'font-semibold text-ink' : 'font-medium text-inkSec hover:text-ink'
                       }`}
                     >
                       <span
@@ -179,7 +179,7 @@ export default function LinePanel({ line, stops, focusStopId, onSelectStop, onVi
 function StopPreorder({ stop }) {
   const { lang } = useLang();
   return (
-    <span className="line-clamp-2 text-caption font-regular text-inkSec">
+    <span className="line-clamp-2 text-caption font-medium text-inkSec">
       {lang === 'ko' ? stop.preorder_ko : stop.preorder_en}
     </span>
   );

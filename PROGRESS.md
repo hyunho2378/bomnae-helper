@@ -91,6 +91,8 @@
 - [ ] 라인 가격·회차 확정 (5일차 BM 검토)
 - [ ] 서비스명 영문 표기 최종 확정 (Bomnae Helper 유지 여부)
 - [ ] unDraw 일러스트 3종(login/404/빈결과) primary 단색 재컬러 SVG → `client/public/images/illustrations/` (현재 img 경로만 참조 중)
+- [ ] og-image.png (1200x630) 제작·배치 (`client/public/og-image.png` — index.html og:image가 이미 참조 중), 배치 후 카카오 캐시 초기화 도구로 갱신
+- [ ] apple-touch-icon.png (180x180, 흰 배경 위 logo.svg 중앙 배치) 제작·배치 후 index.html 주석 해제
 
 ## 사고 이력 / 교훈
 

@@ -84,7 +84,7 @@ export default function FieldSelect({ label, value, placeholder, options, onChan
           {selected ? (
             <span className="text-body font-medium text-ink">{selected.primary}</span>
           ) : (
-            <LangSwap k={placeholder} className="text-body font-regular text-inkSec" />
+            <LangSwap k={placeholder} className="text-body font-medium text-inkSec" />
           )}
           <ChevronDown size={16} aria-hidden="true" className="shrink-0 text-inkMeta" />
         </span>
@@ -116,7 +116,7 @@ export default function FieldSelect({ label, value, placeholder, options, onChan
                   <span className="flex min-w-0 flex-1 items-baseline justify-between gap-12">
                     <span className="truncate text-body font-medium text-ink">{option.primary}</span>
                     {option.secondary && (
-                      <span className="shrink-0 text-caption font-regular text-inkMeta">
+                      <span className="shrink-0 text-caption font-medium text-inkMeta">
                         {option.secondary}
                       </span>
                     )}

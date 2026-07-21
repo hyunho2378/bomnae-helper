@@ -19,7 +19,7 @@ export default function ArrivalCard() {
       {view === 'off' && (
         <>
           <LangSwap k="gate.arrival.card.offTitle" as="h3" className="text-h3 font-semibold" />
-          <LangSwap k="gate.arrival.card.offDesc" as="p" className="text-body font-regular text-inkSec" />
+          <LangSwap k="gate.arrival.card.offDesc" as="p" className="text-body font-medium text-inkSec" />
           <div className="flex flex-wrap items-center gap-12">
             <Button onClick={openExplain}>
               <LangSwap k="gate.arrival.card.enable" />

@@ -9,7 +9,7 @@ export function AuthProvider({ children }) {
   const value = useMemo(
     () => ({
       user,
-      login: () => setUser({ name: 'Bomnae Guest', email: 'guest@bomnae.example' }),
+      login: () => setUser({ name: 'Guest', email: 'guest@bomnae.example' }),
       logout: () => setUser(null),
     }),
     [user],

@@ -52,7 +52,7 @@ export default function StopStrip({ lineId, stops }) {
           >
             <div className="flex flex-wrap items-baseline gap-x-12 gap-y-4">
               <h3 className="font-display text-h3 font-semibold">{stop.name_en}</h3>
-              <span className="text-small font-regular text-inkSec">{stop.name_ko}</span>
+              <span className="text-small font-medium text-inkSec">{stop.name_ko}</span>
               {/* 체류 시간 · 사전 유래 단위는 3언어 겹침 렌더(시프트 0 · §18) */}
               <span className="grid font-display text-caption font-medium text-inkMeta">
                 {LANGS.map((code) => (

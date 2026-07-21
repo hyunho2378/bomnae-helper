@@ -162,7 +162,7 @@ export default function Booking() {
           <SuccessStamp line={line}>
             <div className="flex flex-col items-center gap-16">
               <LangSwap k="booking.success.title" as="h1" className="text-h2 font-semibold" />
-              <LangSwap k="booking.success.sub" as="p" className="text-small font-regular text-inkSec" />
+              <LangSwap k="booking.success.sub" as="p" className="text-small font-medium text-inkSec" />
               <Button as={Link} to={`/ticket/${done.id}`}>
                 <LangSwap k="booking.success.viewTicket" />
               </Button>
@@ -230,7 +230,7 @@ export default function Booking() {
             </Row>
             <Row labelKey="booking.summary.preorder">
               {/* 선주문 안내 · 핵심 차별점(IA §2.1 How it works) */}
-              <LangSwap k="booking.summary.preorderNote" className="text-small font-regular text-inkSec" />
+              <LangSwap k="booking.summary.preorderNote" className="text-small font-medium text-inkSec" />
             </Row>
           </dl>
 

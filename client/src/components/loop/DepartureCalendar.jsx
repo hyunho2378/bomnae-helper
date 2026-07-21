@@ -214,7 +214,7 @@ export default function DepartureCalendar({
                     <span className="flex items-center gap-12">
                       <DictSwap
                         make={(d) => `${left} ${d.loop.detail.seatsLeft}`}
-                        className="font-display text-small font-regular text-inkSec"
+                        className="font-display text-small font-medium text-inkSec"
                       />
                       <StatusBadge status={dep.status} />
                     </span>

@@ -13,7 +13,7 @@ export default function HowItWorks() {
             {i + 1}
           </span>
           <LangSwap k={`home.how.${step}.title`} as="h3" className="mt-16 text-h3 font-medium" />
-          <LangSwap k={`home.how.${step}.body`} as="p" className="mt-8 text-small font-normal text-inkSec" />
+          <LangSwap k={`home.how.${step}.body`} as="p" className="mt-8 text-small font-medium text-inkSec" />
         </li>
       ))}
     </ol>
