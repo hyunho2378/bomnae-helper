@@ -156,6 +156,48 @@ export default {
         footnote: "We use your current location to help you move and explore in the city.",
       },
     },
+    // v4 존 B4(IA §9.2) 양방향 플래너 · ko·th와 키 완전 동형 · 줄표 금지
+    planner: {
+      title: "Getting to and from Chuncheon",
+      intro: "Pick where you start and where you arrive, and we show curated ways between your city and Chuncheon. Flip the direction for the way back.",
+      dir: {
+        label: "Direction",
+        to: "To Chuncheon",
+        from: "From Chuncheon",
+      },
+      form: {
+        to: "To",
+        date: "Travel date",
+        time: "Departure time",
+        fromPh: "Origin",
+        toPh: "Destination",
+      },
+      // 위치 사용 사전 설명 모달 · §21 동의 패턴의 플래너 목적 카피
+      locate: {
+        title: "Use your location to plan this route",
+        body: "We read your current location once to match the nearest station, terminal, or airport in our list. Location is used only to plan this route.",
+        allow: "Allow location use",
+        later: "Maybe next time",
+        footnote: "Your location is not stored. You can pick a hub from the list anytime.",
+      },
+      results: {
+        // §9.2.4 PLACEHOLDER 마킹 · 초안 추정값 고지
+        draftNote: "Times are draft estimates and will be verified with operators.",
+        totalApprox: "About {min} min",
+        legMin: "About {min} min",
+        varies: "Travel time varies",
+        toPlace: "To {place}",
+      },
+      routeKind: {
+        rail: "Rail",
+        bus: "Bus",
+        mixed: "Rail + Bus",
+      },
+      empty: {
+        title: "No curated route for this pair yet",
+        body: "We have not verified this combination yet. Try the other Chuncheon stop or another hub while we expand the list.",
+      },
+    },
   },
   handsfree: {
     title: "Send your bags ahead",

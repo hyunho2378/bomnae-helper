@@ -1,7 +1,9 @@
-// Getting Here(/gate) · AGENT-2 + v3.2 존 B2. 기준: IA §2.2 + §8.2, COMPONENTS v3.2 존 B2 행.
-// 입력(GateForm: 현재 위치 1옵션 + CalendarField) → 옵션 카드 → 단계별 리스트.
-// v3.2 §8.2.3: Hands-Free 크로스셀 카드 삭제(헤더 진입 일원화).
-// v3.2 §8.2.4: 도착 감지 상태 카드(ArrivalCard)가 플래너 결과 아래 위치.
+// Getting Here(/gate) · v4 존 B4: 양방향 위치 기반 플래너(IA §9.2).
+// 입력(GateForm: 방향 토글 + 허브/춘천 2점 + CalendarField + 시간 FieldSelect)
+// → 경로 옵션 카드(data/gts/hubs.js routeTemplates 조회 전용 · §29)
+// → RouteTimeline(§28 세로 타임라인). 구 수평 주행 인터랙션(§12)은 §28 명시 삭제로 제거됨.
+// 해당 조합 템플릿이 없으면 EmptyState(빈 검색 결과 · DESIGN §7 위치 허용).
+// 도착 감지 상태 카드(§8.5)는 결과 하단 위치 유지(IA §9.2.6).
 // ArrivalProvider는 App.jsx 전역 배선 전까지 이 페이지가 로컬로 감싼다
 // (전역 배선 후 자동 패스스루 · context/ArrivalContext.jsx 헤더 주석 참조).
 // 결과 영역은 aria-live="polite"(DESIGN §14 · 경로 결과 갱신 알림).
@@ -10,11 +12,10 @@ import { useSearchParams } from 'react-router-dom';
 import { useLang } from '../i18n/LangContext';
 import LangSwap from '../i18n/LangSwap';
 import Container from '../components/layout/Container';
+import EmptyState from '../components/ui/EmptyState';
 import ArrivalCard from '../components/gate/ArrivalCard';
 import GateForm from '../components/gate/GateForm';
-import GateJourney from '../components/gate/GateJourney';
 import RouteOptionCard from '../components/gate/RouteOptionCard';
-import RouteStepList from '../components/gate/RouteStepList';
 import { ArrivalProvider } from '../context/ArrivalContext';
 
 const TERMINALS = ['t1', 't2', 'gmp'];
@@ -23,9 +24,8 @@ export default function Gate() {
   const [searchParams] = useSearchParams();
   const { t } = useLang();
   const [options, setOptions] = useState(null);
-  const [selectedId, setSelectedId] = useState(null);
 
-  // 쿼리 프리필 · 형식이 유효한 값만 전달(그 외 GateForm 기본값)
+  // 쿼리 프리필(GateEntryCard 계약 생존 · terminal은 GateForm이 허브로 매핑) · 형식 유효값만 전달
   const initial = useMemo(() => {
     const terminal = searchParams.get('terminal');
     const time = searchParams.get('time');
@@ -37,12 +37,6 @@ export default function Gate() {
     };
   }, [searchParams]);
 
-  const handleResult = (nextOptions) => {
-    setOptions(nextOptions);
-    setSelectedId(null);
-  };
-  const selected = options?.find((option) => option.id === selectedId);
-
   return (
     <ArrivalProvider>
       {/* v3.2 모바일 상단 헤더 80px 신설 → 모바일 상단 패딩 pt-96(lg 기존 유지) */}
@@ -53,50 +47,40 @@ export default function Gate() {
             as="p"
             className="text-caption font-medium uppercase tracking-eyebrow text-inkMeta"
           />
-          <LangSwap k="gate.title" as="h1" className="mt-8 text-h1 font-bold tracking-display" />
+          <LangSwap k="gate.planner.title" as="h1" className="mt-8 text-h1 font-bold tracking-display" />
           {/* v3.1: 텍스트 max-w 캡 해제(컨테이너가 폭 결정, DESIGN §13) */}
-          <LangSwap k="gate.intro" as="p" className="mt-16 text-body text-inkSec" />
-
-          {/* 헤드 카피 아래 GateJourney(IA §2.2.1) · 결과 옵션 카드 선택과 단일 state 동기 */}
-          <div className="mt-32">
-            <GateJourney mode={selectedId ?? 'rail'} />
-          </div>
+          <LangSwap k="gate.planner.intro" as="p" className="mt-16 text-body text-inkSec" />
 
           <div className="mt-32">
-            <GateForm initial={initial} onResult={handleResult} />
+            <GateForm initial={initial} onResult={setOptions} />
           </div>
 
           <div aria-live="polite" className="mt-48">
-            {options && (
-              <>
-                {/* v3.2 §16.2: h2 = 700 */}
-                <LangSwap k="gate.results.heading" as="h2" className="text-h2 font-bold" />
-                {/* 첫 탑승 편 = 도착시각 + 입국수속 버퍼 60분 반영(IA §2.2, data/gateRoutes.js) */}
-                <p className="mt-8 text-small text-inkSec">{t('gate.results.buffer')}</p>
-                <div className="mt-24 grid gap-16 md:grid-cols-2 md:gap-24">
-                  {options.map((option) => (
-                    <RouteOptionCard
-                      key={option.id}
-                      option={option}
-                      selected={option.id === selectedId}
-                      onSelect={() => setSelectedId(option.id)}
-                    />
-                  ))}
-                </div>
-                {selected && (
-                  <div className="mt-48">
-                    {/* v3.2 §16.2: h3 = 600 */}
-                    <LangSwap k="gate.results.stepsHeading" as="h3" className="text-h3 font-semibold" />
-                    <div className="mt-24">
-                      <RouteStepList legs={selected.legs} />
-                    </div>
+            {options &&
+              (options.length === 0 ? (
+                // 조합 템플릿 없음 · §29 계약(지어내지 않는다) → 빈 상태
+                // PLACEHOLDER · unDraw 단색(빈 경로) SVG 저장 대기(PROGRESS 준비물)
+                <EmptyState
+                  illustration="empty-route.svg"
+                  titleKey="gate.planner.empty.title"
+                  bodyKey="gate.planner.empty.body"
+                />
+              ) : (
+                <>
+                  {/* v3.2 §16.2: h2 = 700 */}
+                  <LangSwap k="gate.results.heading" as="h2" className="text-h2 font-bold" />
+                  {/* §9.2.4 PLACEHOLDER 마킹 · 초안 추정값 고지 */}
+                  <p className="mt-8 text-small text-inkSec">{t('gate.planner.results.draftNote')}</p>
+                  <div className="mt-24 flex flex-col gap-24">
+                    {options.map((option) => (
+                      <RouteOptionCard key={option.id} option={option} />
+                    ))}
                   </div>
-                )}
-              </>
-            )}
+                </>
+              ))}
           </div>
 
-          {/* 도착 감지 상태 카드 · 플래너 결과 아래, 주 기능 방해 없는 위치(IA §8.2.4) */}
+          {/* 도착 감지 상태 카드 · 결과 하단, 주 기능 방해 없는 위치(IA §9.2.6) */}
           <div className="mt-48">
             <ArrivalCard />
           </div>

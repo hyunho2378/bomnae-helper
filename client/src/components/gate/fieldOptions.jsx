@@ -1,12 +1,13 @@
 // FieldSelect 옵션 빌더 · 존 B 공용(GateForm / GateEntryCard / HandsFree / CalendarField 사용).
 // v3.1: 네이티브 select·date·time input 전면 제거의 데이터 소스.
-// v3.2 §8.2: 날짜 리스트 옵션(buildDateOptions) 폐지 → CalendarField(§19)로 대체,
-//   출발지 옵션(buildFromOptions) 신설: 현재 위치 1옵션 + 공항 3개 병존, 최근접 공항 매칭.
+// v4 존 B4(IA §9.2): 공항 전용 출발지 옵션(buildFromOptions·최근접 공항 매칭) 폐지 →
+//   허브·춘천 2점 옵션(buildOriginOptions/buildDestOptions, data/gts/hubs.js 소비)으로 교체.
+//   허브 명칭은 데이터({en,ko}) 겹침 렌더(PlaceText · th는 en 폴백, RouteOptionCard BiText 선례).
 // 시간 라벨은 전부 사전 키(gate.time.*, 30분 간격 24h) 경유 · OS 오전/오후 누수 차단(PATTERNS §11).
 // 날짜·터미널 라벨은 언어별 겹침 렌더(PATTERNS §1 동일 패턴)로 전환 시 레이아웃 시프트 0(존 B 명세).
-import { LocateFixed, Plane } from 'lucide-react';
+import { Bus, LocateFixed, Plane, TrainFront } from 'lucide-react';
 import { useLang } from '../../i18n/LangContext';
-import { haversineKm } from '../../context/ArrivalContext';
+import { chuncheonPoints, hubs } from '../../data/gts/hubs';
 // 자기 네임스페이스(gate) 3언어 파일만 참조 · 타 네임스페이스 참조 없음
 import enGate from '../../i18n/en/gate';
 import koGate from '../../i18n/ko/gate';
@@ -15,7 +16,7 @@ import thGate from '../../i18n/th/gate';
 const GATE_DICTS = { en: enGate, ko: koGate, th: thGate };
 const LANGS = ['en', 'ko', 'th'];
 
-export const TERMINAL_IDS = ['t1', 't2', 'gmp']; // gateRoutes planGate 키와 동일 계약
+export const TERMINAL_IDS = ['t1', 't2', 'gmp']; // GateEntryCard 쿼리(?terminal=) 계약과 동일
 
 // 30분 간격 48개 · id '0000'~'2330'
 export const TIME_IDS = Array.from({ length: 48 }, (_, i) => {
@@ -103,25 +104,73 @@ function CurrentLocationText() {
   );
 }
 
-// 공항 좌표 · 최근접 공항 매칭용(공개 시설 근사 좌표 · DRAFT)
-const AIRPORT_COORDS = {
-  t1: { lng: 126.4505, lat: 37.4482 },
-  t2: { lng: 126.4407, lat: 37.467 },
-  gmp: { lng: 126.791, lat: 37.5583 },
-};
+export const CURRENT_LOCATION_ID = 'current';
 
-// geolocation 성공 시 가장 가까운 공항 id 반환(IA §8.2.1 자동 매칭)
-export function nearestAirport(coords) {
-  return TERMINAL_IDS.reduce((best, id) =>
-    haversineKm(coords, AIRPORT_COORDS[id]) < haversineKm(coords, AIRPORT_COORDS[best]) ? id : best,
+// 구 GateEntryCard 쿼리(terminal=t1|t2|gmp) → 허브 id 매핑(쿼리 계약 생존 · ROUTES §1)
+export const terminalToHub = (terminal) => (terminal === 'gmp' ? 'gmp' : 'icn');
+
+// 데이터 명칭({en,ko}) 겹침 렌더 · th는 en 폴백(RouteOptionCard BiText 선례) · 시프트 0
+export function PlaceText({ name }) {
+  const { lang } = useLang();
+  return (
+    <span className="grid">
+      {LANGS.map((code) => (
+        <span
+          key={code}
+          aria-hidden={lang !== code}
+          className={`col-start-1 row-start-1 ${lang === code ? '' : 'invisible'}`}
+        >
+          {name[code] ?? name.en}
+        </span>
+      ))}
+    </span>
   );
 }
 
-// 출발지 옵션 · v3.2 §8.2.1: 첫 항목 = 현재 위치 사용(LocateFixed) + 공항 3개 병존
-export const CURRENT_LOCATION_ID = 'current';
-export function buildFromOptions(t) {
-  return [
-    { id: CURRENT_LOCATION_ID, icon: LocateFixed, primary: <CurrentLocationText /> },
-    ...buildTerminalOptions(t),
-  ];
+// 보간 라벨 3언어 겹침 렌더 · {var} 치환 값이 명칭 객체({en,ko})면 언어별 해석(th는 en 폴백)
+const pickPath = (dict, key) => key.split('.').reduce((o, part) => o?.[part], dict);
+export function PlannerSwap({ k, vars = {} }) {
+  const { lang } = useLang();
+  return (
+    <span className="grid">
+      {LANGS.map((code) => {
+        let text = pickPath(GATE_DICTS[code], k) ?? k;
+        Object.entries(vars).forEach(([name, val]) => {
+          text = text.replace(`{${name}}`, typeof val === 'object' ? (val[code] ?? val.en) : val);
+        });
+        return (
+          <span
+            key={code}
+            aria-hidden={lang !== code}
+            className={`col-start-1 row-start-1 ${lang === code ? '' : 'invisible'}`}
+          >
+            {text}
+          </span>
+        );
+      })}
+    </span>
+  );
 }
+
+// 허브·춘천 지점 옵션 · v4 §9.2(데이터는 hubs.js 소비 전용) · kind별 lucide 아이콘
+const KIND_ICONS = { airport: Plane, rail: TrainFront, bus: Bus };
+const placeOption = (place) => ({
+  id: place.id,
+  icon: KIND_ICONS[place.kind],
+  primary: <PlaceText name={place.name} />,
+});
+const currentOption = {
+  id: CURRENT_LOCATION_ID,
+  icon: LocateFixed,
+  primary: <CurrentLocationText />,
+};
+
+// 출발지: To Chuncheon = 현재 위치 1옵션 + 허브 6 / From Chuncheon = 춘천 2점 + 현재 위치(IA §9.2.3 순서)
+export const buildOriginOptions = (direction) =>
+  direction === 'to'
+    ? [currentOption, ...hubs.map(placeOption)]
+    : [...chuncheonPoints.map(placeOption), currentOption];
+
+// 도착지: To Chuncheon = 춘천역·터미널 2택 고정 / From Chuncheon = 허브 목록
+export const buildDestOptions = (direction) =>
+  (direction === 'to' ? chuncheonPoints : hubs).map(placeOption);

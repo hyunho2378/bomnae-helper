@@ -1,84 +1,64 @@
-// 경로 옵션 카드 · COMPONENTS B: props {option, selected, onSelect}.
-// 총 소요·요금·환승 수·첫 탑승 편(도착+60분 버퍼 반영값, data/gateRoutes.js 계산).
-// 큰 숫자(가격·시간)는 Kanit Bold(DESIGN §4). v3.1 카드 hover: shadow-md + translateY(-2px)(§16).
-import { Check } from 'lucide-react';
-import { useLang } from '../../i18n/LangContext';
+// 경로 옵션 카드 · v4 존 B4: props {option}(planRoutes lookupRoutes 조회 결과 전용 · §29).
+// 구 계약({option, selected, onSelect} · 요금·환승·첫 탑승 편)은 v4에서 폐지:
+// 시각·요금 표기 금지, "약 N분"(durMin 합) + 배차 카피(headwayNote 사전 키)만.
+// 선택 상태 없음 · 타임라인 전부 펼침(§16.10 다크패턴 금지: 정보를 클릭 뒤에 숨기지 않는다).
+// 진입 연출 = 카드 리빌 0.96→1.0(PATTERNS §8 · scale 화이트리스트)만 · 주행 애니메이션 금지(§28).
+import { useEffect, useRef, useState } from 'react';
 import LangSwap from '../../i18n/LangSwap';
+import { motion } from '../../tokens';
+import RouteTimeline from './RouteTimeline';
+import { PlannerSwap } from './fieldOptions';
 
-// PATTERNS §1 동일 패턴을 데이터 텍스트(en/ko 필드 · th 없음)에 적용 · 시프트 0.
-// v3.1 폴백 규칙: en 스팬은 lang!=='ko'일 때 표시(th는 en 폴백).
-function BiText({ en, ko, className = '' }) {
-  const { lang } = useLang();
+export default function RouteOptionCard({ option }) {
+  const [revealed, setRevealed] = useState(false);
+  const cardRef = useRef(null);
+
+  useEffect(() => {
+    // reduced-motion: 관찰 없이 즉시 표시(PATTERNS §8)
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setRevealed(true);
+      return undefined;
+    }
+    const node = cardRef.current;
+    if (!node) return undefined;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setRevealed(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.2 },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <span className={`grid ${className}`}>
-      <span aria-hidden={lang === 'ko'} className={`col-start-1 row-start-1 ${lang !== 'ko' ? '' : 'invisible'}`}>
-        {en}
-      </span>
-      <span aria-hidden={lang !== 'ko'} className={`col-start-1 row-start-1 ${lang === 'ko' ? '' : 'invisible'}`}>
-        {ko}
-      </span>
-    </span>
-  );
-}
-
-const fmtDuration = (min, t) => {
-  const h = Math.floor(min / 60);
-  const m = min % 60;
-  return [h ? `${h}${t('common.units.h')}` : null, m ? `${m}${t('common.units.m')}` : null]
-    .filter(Boolean)
-    .join(' ');
-};
-
-export default function RouteOptionCard({ option, selected, onSelect }) {
-  const { t } = useLang();
-
-  return (
-    <button
-      type="button"
-      onClick={onSelect}
-      aria-pressed={selected}
-      className={`w-full rounded-lg bg-white p-24 text-left shadow-sm transition-all duration-fast hover:-translate-y-0.5 hover:shadow-md ${
-        selected ? 'ring-2 ring-primary' : ''
-      }`}
+    <article
+      ref={cardRef}
+      style={{
+        opacity: revealed ? 1 : 0,
+        // 카드 리빌 0.96→1.0 · scale 화이트리스트(PATTERNS §8, DESIGN §10) · 240ms 명세값
+        transform: revealed ? 'none' : 'scale(0.96)',
+        transition: `opacity 240ms ${motion.ease}, transform 240ms ${motion.ease}`,
+      }}
+      className="rounded-lg bg-white p-24 shadow-sm"
     >
-      <span className="flex items-start justify-between gap-16">
-        <BiText en={option.name_en} ko={option.name_ko} className="text-h3 font-medium" />
-        {selected && <Check size={20} aria-hidden="true" className="shrink-0 text-primary" />}
-      </span>
-      <span className="mt-16 grid grid-cols-2 gap-x-16 gap-y-12">
-        <span className="flex flex-col gap-4">
-          <LangSwap k="gate.results.duration" className="text-caption font-medium uppercase tracking-eyebrow text-inkMeta" />
-          <span className="font-display text-h3 font-bold">{fmtDuration(option.total_duration_min, t)}</span>
+      <div className="flex flex-wrap items-start justify-between gap-16">
+        <div className="flex flex-col gap-4">
+          <LangSwap k={`gate.planner.routeKind.${option.kind}`} as="h3" className="text-h3 font-semibold" />
+          {/* 배차 카피 = hubs.js headwayNote 사전 키 그대로(구체 시각·횟수 생성 금지 · §29) */}
+          <LangSwap k={option.headwayNote} as="p" className="text-small text-inkSec" />
+        </div>
+        {/* 총 소요 "약 N분" = 템플릿 durMin 합(§29) · 큰 숫자 Kanit Bold(DESIGN §4) */}
+        <span className="font-display text-h3 font-bold">
+          <PlannerSwap k="gate.planner.results.totalApprox" vars={{ min: String(option.totalMin) }} />
         </span>
-        <span className="flex flex-col gap-4">
-          <LangSwap k="gate.results.fare" className="text-caption font-medium uppercase tracking-eyebrow text-inkMeta" />
-          <span className="font-display text-h3 font-bold">
-            {t('common.currency')}
-            {option.fare.toLocaleString('en-US')}
-          </span>
-        </span>
-        <span className="flex flex-col gap-4">
-          <LangSwap k="gate.results.transfers" className="text-caption font-medium uppercase tracking-eyebrow text-inkMeta" />
-          {option.transfers === 0 ? (
-            <LangSwap k="gate.results.direct" className="font-display text-h3 font-bold" />
-          ) : (
-            <span className="font-display text-h3 font-bold">{option.transfers}</span>
-          )}
-        </span>
-        <span className="flex flex-col gap-4">
-          <LangSwap k="gate.results.firstAvailable" className="text-caption font-medium uppercase tracking-eyebrow text-inkMeta" />
-          <span className="flex items-center gap-8">
-            <span className="font-display text-h3 font-bold">{option.first_available}</span>
-            {option.next_day && (
-              // 경고성 배지 · yellow + ink 텍스트(DESIGN §2: yellow 위 white 금지)
-              <LangSwap
-                k="gate.results.nextDay"
-                className="rounded-pill bg-yellow px-8 py-4 text-caption font-medium text-ink"
-              />
-            )}
-          </span>
-        </span>
-      </span>
-    </button>
+      </div>
+      <div className="mt-24">
+        <RouteTimeline origin={option.origin} dest={option.dest} legs={option.legs} />
+      </div>
+    </article>
   );
 }
