@@ -1,114 +1,69 @@
-// Gate 플래너 폼 · v4 존 B4(IA §9.2 양방향 위치 기반 플래너).
-// 방향 토글 2탭(Chip 재사용): 탭 전환은 출발·도착 필드의 역할만 반전 · DOM 구조·요소 수·순서 불변.
-// To Chuncheon: 출발 = 현재 위치 + 허브 6(hubs.js) / 도착 = 춘천역·터미널 2택 고정.
-// From Chuncheon: 출발 = 춘천 2점 + 현재 위치 / 도착 = 허브 목록. 날짜 CalendarField + 시간 FieldSelect 유지.
-// 현재 위치: §21 동의 패턴 재사용(사전 설명 모달 → 허용 시에만 geolocation 1회 · 브라우저 권한 직행 금지),
-// 거부·실패 시 이전 확정 값으로 조용히 복귀(에러 톤 금지 · v3.2 폴백 규칙 유지).
+// Gate 플래너 폼 · v4.2 존 B5(IA §10.3): 칩 토글 폐지 · 방향은 부모 섹션이 prop으로 고정
+// (수직 2섹션의 한쪽 · To/From 각자 독립 상태 · 필드 문법 동일).
+// 필드: 출발/도착 FieldSelect + CalendarField + TimeWheel(§38 · 30분 스텝 FieldSelect 시간 폐지,
+// 디폴트 = Asia/Seoul 현재 시각). 제출 시 결과와 함께 출발 시각(departHHMM)을 올린다(§39 계산용).
+// 현재 위치(§39·§21): 사전 설명 모달 → 허용 시에만 geolocation 1회(브라우저 권한 직행 금지),
+// 거부·실패 시 이전 확정 값으로 조용히 복귀(에러 톤 금지). 좌표는 최근접 매칭에만 사용, 노출 금지.
+// 주소명 라벨(§39): KAKAO_REST_KEY 존재 시 서버 프록시 /api/geo/label?lat&lng(카카오 Local
+// coord2address · 브라우저 직호출 금지, 키 노출 방지) 경유가 명세이나 현재 키 부재 →
+// "현재 위치" 고정 라벨(gate.form.currentLocation)만 사용(프록시 연동 시 이 주석이 명세다).
 // 결과는 planRoutes.lookupRoutes(hubs.js 조회 전용 · §29)만 호출 · 폼은 경로를 계산하지 않는다.
-// 시간은 결과 계산에 쓰이지 않으므로(시각표 생성 금지) 필수 검증 없음.
-import { useEffect, useRef, useState } from 'react';
-import { useLang } from '../../i18n/LangContext';
+import { useRef, useState } from 'react';
 import LangSwap from '../../i18n/LangSwap';
 import Button from '../ui/Button';
-import Chip from '../ui/Chip';
 import FieldSelect from '../ui/FieldSelect';
 import Modal from '../ui/Modal';
 import CalendarField from './CalendarField';
+import TimeWheel from './TimeWheel';
 import {
   CURRENT_LOCATION_ID,
-  TERMINAL_IDS,
-  TIME_IDS,
   buildDestOptions,
   buildOriginOptions,
-  buildTimeOptions,
-  hhmmToTimeId,
+  kstNowParts,
   localDateId,
-  terminalToHub,
 } from './fieldOptions';
 import { DEFAULT_HUB_ID, DEFAULT_POINT_ID, lookupRoutes } from './planRoutes';
 
 // 1회 측위 옵션 · PATTERNS §21 watch 옵션과 동일 계열(고정밀 불필요)
 const LOCATE_OPTIONS = { enableHighAccuracy: false, maximumAge: 30000, timeout: 20000 };
 
-export default function GateForm({ initial, onResult }) {
-  const { t } = useLang();
-  const todayStr = localDateId(new Date());
-  const initialHub = TERMINAL_IDS.includes(initial?.terminal)
-    ? terminalToHub(initial.terminal)
-    : DEFAULT_HUB_ID;
+const pad2 = (n) => String(n).padStart(2, '0');
 
-  const [direction, setDirection] = useState('to');
-  // hubId = 허브 측 값 / pointId = 춘천 측 값 · 방향과 무관하게 역할 고정(토글 시 자동 반전)
-  const [hubId, setHubId] = useState(initialHub);
+export default function GateForm({ direction, onResult }) {
+  // hubId = 허브 측 값 / pointId = 춘천 측 값 · 방향은 prop 고정이라 역할이 바뀌지 않는다
+  const [hubId, setHubId] = useState(DEFAULT_HUB_ID);
   const [pointId, setPointId] = useState(DEFAULT_POINT_ID);
-  // 쿼리 날짜는 오늘 이후 형식 유효값만 채택(캘린더 과거 비활성과 동일 규칙), 그 외 오늘
-  const [date, setDate] = useState(
-    /^\d{4}-\d{2}-\d{2}$/.test(initial?.date ?? '') && initial.date >= todayStr
-      ? initial.date
-      : todayStr,
-  );
-  // 쿼리 시각은 30분 간격 id로 변환되는 값만 채택(GateEntryCard가 같은 옵션을 쓰므로 항상 일치)
-  const initialTimeId = initial?.time ? hhmmToTimeId(initial.time) : null;
-  const [timeId, setTimeId] = useState(TIME_IDS.includes(initialTimeId) ? initialTimeId : null);
+  const [date, setDate] = useState(() => localDateId(new Date()));
+  // §38 디폴트 = 한국 표준시 현재 시각 · 분 1단위
+  const [time, setTime] = useState(kstNowParts);
   const [locateOpen, setLocateOpen] = useState(false);
 
-  // 'current' 선택이 확정 전이거나 방향 반전으로 무효화될 때 복귀할 마지막 확정 값
-  const lastHub = useRef(initialHub);
+  // 'current' 선택이 확정 전이거나 측위 실패 시 복귀할 마지막 확정 값
+  const lastHub = useRef(DEFAULT_HUB_ID);
   const lastPoint = useRef(DEFAULT_POINT_ID);
   const coords = useRef(null); // 측위 성공 좌표 · 최근접 매칭에만 사용, 노출 금지
   const consented = useRef(false); // 사전 설명 모달 허용 1회 후 세션 내 재표시 생략
   const locating = useRef(false); // 측위 대기 중 수동 조작이 이기도록 응답 무시 플래그
   const hasResults = useRef(false);
-  const autoRan = useRef(false);
 
   const run = (next = {}) => {
-    const d = next.direction ?? direction;
     const h = next.hubId ?? hubId;
     const p = next.pointId ?? pointId;
     // 측위 미완의 'current'는 마지막 확정 값으로 계산(제출을 막지 않는다 · v3.2 규칙 유지)
     const effHub = h === CURRENT_LOCATION_ID && !coords.current ? lastHub.current : h;
     const effPoint = p === CURRENT_LOCATION_ID && !coords.current ? lastPoint.current : p;
     hasResults.current = true;
-    onResult(lookupRoutes({ direction: d, hubId: effHub, pointId: effPoint, coords: coords.current }));
+    onResult({
+      options: lookupRoutes({ direction, hubId: effHub, pointId: effPoint, coords: coords.current }),
+      // §39 레그 시각 계산 기점 · TimeWheel 선택 값(디폴트 KST 현재)
+      departHHMM: `${pad2(time.h)}:${pad2(time.m)}`,
+    });
   };
-
-  // 쿼리 프리필(GateEntryCard 경유)이면 결과를 바로 계산(마운트 1회)
-  useEffect(() => {
-    if (autoRan.current) return;
-    autoRan.current = true;
-    if (TERMINAL_IDS.includes(initial?.terminal)) run();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // 방향 토글 · hubId/pointId가 역할을 자동 반전(구조·값 유지). 'current'는 출발지 전용이므로
-  // 반전으로 도착 측이 되면 마지막 확정 값으로 치환. 결과가 떠 있으면 즉시 역방향 재조회
-  // (동일 템플릿 역조회라 카드 수 동일 · 레이아웃 이동 없음).
-  const switchDirection = (next) => {
-    if (next === direction) return;
-    let h = hubId;
-    let p = pointId;
-    if (next === 'from' && h === CURRENT_LOCATION_ID) {
-      locating.current = false;
-      h = lastHub.current;
-      setHubId(h);
-    }
-    if (next === 'to' && p === CURRENT_LOCATION_ID) {
-      locating.current = false;
-      p = lastPoint.current;
-      setPointId(p);
-    }
-    setDirection(next);
-    if (hasResults.current) run({ direction: next, hubId: h, pointId: p });
-  };
-
-  const originValue = direction === 'to' ? hubId : pointId;
-  const destValue = direction === 'to' ? pointId : hubId;
 
   // 측위 시작 · 반드시 동의 흐름(requestCurrent → 모달 allow) 뒤에서만 호출된다
   const startLocate = () => {
-    const side = direction; // 응답 시점의 방향 변경 대비 캡처
     locating.current = true;
-    (side === 'to' ? setHubId : setPointId)(CURRENT_LOCATION_ID);
+    (direction === 'to' ? setHubId : setPointId)(CURRENT_LOCATION_ID);
     navigator.geolocation.getCurrentPosition(
       (position) => {
         if (!locating.current) return;
@@ -116,14 +71,14 @@ export default function GateForm({ initial, onResult }) {
         coords.current = { lng: position.coords.longitude, lat: position.coords.latitude };
         // 결과가 떠 있으면 현재 위치 기반으로 재조회(최근접 승차 지점 + varies 첫 레그 · §29)
         if (hasResults.current) {
-          run(side === 'to' ? { hubId: CURRENT_LOCATION_ID } : { pointId: CURRENT_LOCATION_ID });
+          run(direction === 'to' ? { hubId: CURRENT_LOCATION_ID } : { pointId: CURRENT_LOCATION_ID });
         }
       },
       () => {
         if (!locating.current) return;
         locating.current = false;
         // 거부·실패 시 이전 확정 값으로 조용히 복귀(에러 톤 금지 · 수동 선택 자연 폴백)
-        if (side === 'to') setHubId(lastHub.current);
+        if (direction === 'to') setHubId(lastHub.current);
         else setPointId(lastPoint.current);
       },
       LOCATE_OPTIONS,
@@ -176,20 +131,13 @@ export default function GateForm({ initial, onResult }) {
     run();
   };
 
+  const originValue = direction === 'to' ? hubId : pointId;
+  const destValue = direction === 'to' ? pointId : hubId;
+
   return (
     <>
       <form noValidate onSubmit={submit} className="rounded-lg bg-white p-24 shadow-sm">
-        {/* 방향 토글 2탭 · Chip 재사용 · 전환 시 아래 필드 골격 불변(IA §9.2.1) */}
-        <div role="group" aria-label={t('gate.planner.dir.label')} className="flex flex-wrap gap-8">
-          <Chip active={direction === 'to'} onClick={() => switchDirection('to')}>
-            <LangSwap k="gate.planner.dir.to" />
-          </Chip>
-          <Chip active={direction === 'from'} onClick={() => switchDirection('from')}>
-            <LangSwap k="gate.planner.dir.from" />
-          </Chip>
-        </div>
-
-        <div className="mt-16 grid gap-16 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-16 md:grid-cols-2 xl:grid-cols-3">
           <FieldSelect
             label="gate.form.from"
             value={originValue}
@@ -210,13 +158,11 @@ export default function GateForm({ initial, onResult }) {
             placeholder="gate.form.placeholders.date"
             onChange={setDate}
           />
-          <FieldSelect
-            label="gate.planner.form.time"
-            value={timeId}
-            placeholder="gate.form.placeholders.time"
-            options={buildTimeOptions(t)}
-            onChange={setTimeId}
-          />
+        </div>
+
+        {/* §38 TimeWheel · 30분 스텝 FieldSelect 시간 폐지 · 디폴트 = KST 현재 시각 */}
+        <div className="mt-16">
+          <TimeWheel value={time} onChange={setTime} />
         </div>
 
         <div className="mt-24">

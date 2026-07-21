@@ -3,6 +3,8 @@
 // §29가 명시한 "현재 위치 → 하버사인 최근접 승차 지점 매핑 + 첫 레그 부착"만 수행한다.
 // 구체 출발 시각(HH:MM)·요금·편명 생성 전면 금지 · 배차는 headwayNote 사전 키 그대로 전달.
 // From Chuncheon은 동일 템플릿 역방향 조회(legs reverse) · §29.
+// v4.2 존 B5 확장(§39): computeLegTimes = 사용자 선택 출발 시각 T 기점 누적 합산
+// (durMin + 환승 버퍼 10분)일 뿐 시간표 생성이 아니다 · 표기는 "예상" 라벨 필수.
 import { chuncheonPoints, hubs, routeTemplates } from '../../data/gts/hubs';
 import { haversineKm } from '../../context/ArrivalContext';
 import { CURRENT_LOCATION_ID } from './fieldOptions';
@@ -35,6 +37,37 @@ const routeKind = (legs) => {
   if (hasBus && hasRail) return 'mixed';
   return hasBus ? 'bus' : 'rail';
 };
+
+// §39 레그 시각 계산 · 누적 = 출발 + Σ(durMin + 환승 버퍼) · 시간표 조회가 아니라 durMin 합산.
+export const TRANSFER_BUFFER_MIN = 10; // PLACEHOLDER — verify · §39 환승 대기 기본치
+
+// 분 → { hhmm, dayOffset } · 자정 넘김은 dayOffset(+1일 표기 · etaNextDay 키)으로 전달
+const stamp = (totalMin) => ({
+  hhmm: `${String(Math.floor(totalMin / 60) % 24).padStart(2, '0')}:${String(totalMin % 60).padStart(2, '0')}`,
+  dayOffset: Math.floor(totalMin / 1440),
+});
+
+// computeLegTimes(departHHMM, legs) → { legs: [{ departAt, arriveAt }], arrival }
+// durMin null(현재 위치 varies 레그)을 만나면 그 레그부터 시각 미계산(null · "varies" 카피 유지 §39).
+export function computeLegTimes(departHHMM, legs) {
+  const [h, m] = departHHMM.split(':').map(Number);
+  let cursor = h * 60 + m;
+  let known = true;
+  const legTimes = legs.map((leg, i) => {
+    if (!known || leg.durMin == null) {
+      known = false;
+      return { departAt: null, arriveAt: null };
+    }
+    if (i > 0) cursor += TRANSFER_BUFFER_MIN; // 레그 사이 환승 버퍼(첫 레그 제외)
+    const departAt = stamp(cursor);
+    cursor += leg.durMin;
+    return { departAt, arriveAt: stamp(cursor) };
+  });
+  return {
+    legs: legTimes,
+    arrival: known && legTimes.length ? legTimes[legTimes.length - 1].arriveAt : null,
+  };
+}
 
 // 조회 전용 엔진 · hubId/pointId는 'current' 가능(현재 위치 출발 · coords 필수 계약,
 // GateForm이 coords 없는 'current'를 마지막 확정 값으로 치환한 뒤 호출한다).

@@ -1,9 +1,9 @@
-// FieldSelect 옵션 빌더 · 존 B 공용(GateForm / GateEntryCard / HandsFree / CalendarField 사용).
+// FieldSelect 옵션 빌더 · 존 B 공용(GateForm / HandsFree / CalendarField 사용).
 // v3.1: 네이티브 select·date·time input 전면 제거의 데이터 소스.
-// v4 존 B4(IA §9.2): 공항 전용 출발지 옵션(buildFromOptions·최근접 공항 매칭) 폐지 →
-//   허브·춘천 2점 옵션(buildOriginOptions/buildDestOptions, data/gts/hubs.js 소비)으로 교체.
+// v4 존 B4(IA §9.2): 허브·춘천 2점 옵션(buildOriginOptions/buildDestOptions, data/gts/hubs.js 소비).
 //   허브 명칭은 데이터({en,ko}) 겹침 렌더(PlaceText · th는 en 폴백, RouteOptionCard BiText 선례).
-// 시간 라벨은 전부 사전 키(gate.time.*, 30분 간격 24h) 경유 · OS 오전/오후 누수 차단(PATTERNS §11).
+// v4.2 존 B5(IA §10.3): 30분 스텝 시간 옵션(TIME_IDS·buildTimeOptions)·쿼리 시각 변환 헬퍼 폐지
+//   (TimeWheel §38 대체 · 홈 미니 폼 GateEntryCard 삭제로 쿼리 계약 소멸) + kstNowParts(§38) 신설.
 // 날짜·터미널 라벨은 언어별 겹침 렌더(PATTERNS §1 동일 패턴)로 전환 시 레이아웃 시프트 0(존 B 명세).
 import { Bus, LocateFixed, Plane, TrainFront } from 'lucide-react';
 import { useLang } from '../../i18n/LangContext';
@@ -16,16 +16,25 @@ import thGate from '../../i18n/th/gate';
 const GATE_DICTS = { en: enGate, ko: koGate, th: thGate };
 const LANGS = ['en', 'ko', 'th'];
 
-export const TERMINAL_IDS = ['t1', 't2', 'gmp']; // GateEntryCard 쿼리(?terminal=) 계약과 동일
+export const TERMINAL_IDS = ['t1', 't2', 'gmp']; // buildTerminalOptions(HandsFree) 데이터 소스
 
-// 30분 간격 48개 · id '0000'~'2330'
-export const TIME_IDS = Array.from({ length: 48 }, (_, i) => {
-  const h = String(Math.floor(i / 2)).padStart(2, '0');
-  return `${h}${i % 2 ? '30' : '00'}`;
+// §38 디폴트 = Asia/Seoul 현재 시각 · 명세의 toLocaleString 기반을 formatToParts로 견고화
+// (hourCycle h23 명시 · 자정 "24" 표기 편차 차단). TimeWheel 디폴트·KoreaClock 틱이 공유한다.
+const KST_FMT = new Intl.DateTimeFormat('en-GB', {
+  timeZone: 'Asia/Seoul',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  hourCycle: 'h23',
 });
-
-export const timeIdToHHMM = (id) => `${id.slice(0, 2)}:${id.slice(2)}`;
-export const hhmmToTimeId = (hhmm) => hhmm.replace(':', '');
+export const kstNowParts = () => {
+  const parts = Object.fromEntries(
+    KST_FMT.formatToParts(new Date())
+      .filter((part) => part.type !== 'literal')
+      .map((part) => [part.type, Number(part.value)]),
+  );
+  return { h: parts.hour, m: parts.minute, s: parts.second };
+};
 
 export const localDateId = (d) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -82,10 +91,6 @@ export function buildTerminalOptions(t) {
   }));
 }
 
-export function buildTimeOptions(t) {
-  return TIME_IDS.map((id) => ({ id, primary: t(`gate.time.${id}`) }));
-}
-
 // 현재 위치 라벨 · 3언어 겹침 렌더(터미널·날짜와 동일 패턴) · 시프트 0
 function CurrentLocationText() {
   const { lang } = useLang();
@@ -105,9 +110,6 @@ function CurrentLocationText() {
 }
 
 export const CURRENT_LOCATION_ID = 'current';
-
-// 구 GateEntryCard 쿼리(terminal=t1|t2|gmp) → 허브 id 매핑(쿼리 계약 생존 · ROUTES §1)
-export const terminalToHub = (terminal) => (terminal === 'gmp' ? 'gmp' : 'icn');
 
 // 데이터 명칭({en,ko}) 겹침 렌더 · th는 en 폴백(RouteOptionCard BiText 선례) · 시프트 0
 export function PlaceText({ name }) {

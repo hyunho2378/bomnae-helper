@@ -1,15 +1,16 @@
 // gate 네임스페이스(EN) · 존 B(GATE) 소유. home/gate/handsfree.
 // ko·th와 키 완전 동형. 줄표 금지. 존 A가 기존 키를 이관한 베이스라인이며 B가 확장한다.
-// v3.1: 히어로 캐러셀 슬라이드/도트, proof 스트립, FieldSelect 플레이스홀더,
-// 시간 라벨(gate.time.* · 30분 간격 24h, OS 오전/오후 누수 차단), 날짜 포맷 파트(gate.dates.*),
-// HandsFree 독립 페이지(단계·설명·FAQ) 키 추가.
+// v4.2 존 B5(IA §10.2·§10.3): 히어로 카피 교체(BRAND_COPY §12 그대로) + CTA 페어(ctaGate/ctaBuild),
+// 스탯 스트립·라인 섹션·미니 폼 키 삭제, 서비스 진입 카드·리뷰 스트립 키 신설,
+// How it works 3스텝 §10.2 문안 재작성, 플래너: 시계(§38)·휠 라벨·레그 시각(§39)·데모 도착(§40) 키 신설,
+// 30분 스텝 시간 라벨(gate.time.*)·dir.label·form.time·placeholders.time·errors.time 삭제(TimeWheel 대체).
 export default {
   home: {
     hero: {
-      title: "You can't visit what you can't reach.",
-      sub: "Airport to Chuncheon, and everywhere inside it.",
-      ctaGate: "Find my route",
-      ctaLoop: "See the lines",
+      title: "Chuncheon, on your terms.",
+      sub: "One trip, zero missing links. Plan the ride in, then build your day inside.",
+      ctaGate: "Plan my route",
+      ctaBuild: "Build my day",
       slides: {
         alt1: "A calm blue lake winding between forested mountains",
         alt2: "Morning mist over green ridges and a winding road",
@@ -21,33 +22,38 @@ export default {
         d3: "Show photo 3",
       },
     },
-    problem: {
-      stat: "4 / 5",
-      text: "4 of 5 researchers, independently, reached the same conclusion: the problem isn't content, it's reach.",
-    },
-    gateEntry: {
-      title: "Plan your arrival",
-      sub: "Tell us where you land and when, and we hand you the fastest way into Chuncheon.",
-    },
-    lines: {
-      title: "Three lines, one Chuncheon",
-      perAdult: "per adult",
+    services: {
+      eyebrow: "Start here",
+      title: "Two services, one trip",
+      planner: {
+        title: "Trip Planner",
+        desc: "Compare curated rail and bus routes between your city and Chuncheon.",
+      },
+      builder: {
+        title: "Tour Builder",
+        desc: "Pick meals, places and activities, and meet a day that runs with a ride.",
+      },
     },
     how: {
       eyebrow: "Why it works",
       title: "How it works",
       step1: {
-        title: "Reserve a seat",
-        body: "Pick a line and a departure. Twelve seats per van, and your seat is the match.",
+        title: "Plan your arrival",
+        body: "Wherever you start, plan the ride into Chuncheon along curated rail and bus routes.",
       },
       step2: {
-        title: "We pre-order ahead",
-        body: "This is the difference: while you ride, we call ahead. Food starts cooking and passes get issued before the van arrives.",
+        title: "Build your day",
+        body: "Assemble your own course from meals, local places and activities, all in one flow.",
       },
       step3: {
-        title: "Arrive, it's ready",
-        body: "No waiting line, no ordering hurdle. Walk in and it is already on the table.",
+        title: "Meet a day that is ready",
+        body: "This is the difference: we pre-order ahead, so you arrive with your ride and everything starts without a wait.",
       },
+    },
+    reviews: {
+      eyebrow: "Reviews",
+      title: "Travelers who went first",
+      viewAll: "See all reviews",
     },
     proof: {
       eyebrow: "Pilot proof",
@@ -61,16 +67,14 @@ export default {
     intro: "Land at Incheon or Gimpo, clear immigration, and compare the two ways into Chuncheon: rail or direct bus.",
     form: {
       terminal: "Arrival terminal",
-      // v3.2 §8.2.1: 출발지 필드(현재 위치 1옵션 + 공항 3개 병존) · Gate 플래너 전용 라벨
+      // v3.2 §8.2.1: 출발지 필드(현재 위치 1옵션 + 허브 병존) · Gate 플래너 전용 라벨
       from: "From",
       currentLocation: "Use my current location",
       date: "Arrival date",
-      time: "Arrival time",
       submit: "Find my route",
       placeholders: {
         terminal: "Airport",
         date: "Date",
-        time: "Time",
       },
       terminals: {
         t1: "Incheon T1",
@@ -82,9 +86,6 @@ export default {
         t2: "ICN",
         gmp: "GMP",
       },
-      errors: {
-        time: "Enter your arrival time. We need it to find the first departure you can catch.",
-      },
     },
     // 날짜 라벨 조립 파트 · 오늘부터 7일 옵션(FieldSelect) · 언어별 겹침 렌더로 시프트 0
     dates: {
@@ -94,21 +95,6 @@ export default {
         m1: "Jan", m2: "Feb", m3: "Mar", m4: "Apr", m5: "May", m6: "Jun",
         m7: "Jul", m8: "Aug", m9: "Sep", m10: "Oct", m11: "Nov", m12: "Dec",
       },
-    },
-    // 시간 라벨 · 30분 간격 48개 · 24h 표기(PATTERNS §11: 네이티브 time input의 OS 오전/오후 누수 차단)
-    time: {
-      '0000': "00:00", '0030': "00:30", '0100': "01:00", '0130': "01:30",
-      '0200': "02:00", '0230': "02:30", '0300': "03:00", '0330': "03:30",
-      '0400': "04:00", '0430': "04:30", '0500': "05:00", '0530': "05:30",
-      '0600': "06:00", '0630': "06:30", '0700': "07:00", '0730': "07:30",
-      '0800': "08:00", '0830': "08:30", '0900': "09:00", '0930': "09:30",
-      '1000': "10:00", '1030': "10:30", '1100': "11:00", '1130': "11:30",
-      '1200': "12:00", '1230': "12:30", '1300': "13:00", '1330': "13:30",
-      '1400': "14:00", '1430': "14:30", '1500': "15:00", '1530': "15:30",
-      '1600': "16:00", '1630': "16:30", '1700': "17:00", '1730': "17:30",
-      '1800': "18:00", '1830': "18:30", '1900': "19:00", '1930': "19:30",
-      '2000': "20:00", '2030': "20:30", '2100': "21:00", '2130': "21:30",
-      '2200': "22:00", '2230': "22:30", '2300': "23:00", '2330': "23:30",
     },
     results: {
       heading: "Your options",
@@ -157,11 +143,13 @@ export default {
       },
     },
     // v4 존 B4(IA §9.2) 양방향 플래너 · ko·th와 키 완전 동형 · 줄표 금지
+    // v4.2 존 B5(IA §10.3): dir.to/from = 수직 2섹션 제목으로 전환(칩 토글 폐지 · dir.label 삭제),
+    // clock(§38 라이브 KST)·wheel(TimeWheel 컬럼 라벨)·results.eta*(§39)·demoArrival(§40) 신설
     planner: {
       title: "Getting to and from Chuncheon",
-      intro: "Pick where you start and where you arrive, and we show curated ways between your city and Chuncheon. Flip the direction for the way back.",
+      intro: "Pick where you start and where you arrive, and we show curated ways between your city and Chuncheon. The way back is planned the same way below.",
+      clock: "It is {time} in Korea right now",
       dir: {
-        label: "Direction",
         to: "To Chuncheon",
         from: "From Chuncheon",
       },
@@ -171,6 +159,10 @@ export default {
         time: "Departure time",
         fromPh: "Origin",
         toPh: "Destination",
+      },
+      wheel: {
+        hours: "Hour",
+        minutes: "Minute",
       },
       // 위치 사용 사전 설명 모달 · §21 동의 패턴의 플래너 목적 카피
       locate: {
@@ -186,6 +178,9 @@ export default {
         legMin: "About {min} min",
         varies: "Travel time varies",
         toPlace: "To {place}",
+        // §39 레그 시각 계산 표기 · durMin 합산일 뿐 시간표 아님 · "예상" 라벨 상시
+        eta: "Est. {time}",
+        etaNextDay: "Est. {time} next day",
       },
       routeKind: {
         rail: "Rail",
@@ -195,6 +190,14 @@ export default {
       empty: {
         title: "No curated route for this pair yet",
         body: "We have not verified this combination yet. Try the other Chuncheon stop or another hub while we expand the list.",
+      },
+      // §40 데모 도착 시퀀스 · To 섹션 결과 확정 3초 뒤 중앙 모달 · label은 연출 카피(Kanit 예외)
+      demoArrival: {
+        label: "CHUNCHEON ARRIVAL",
+        title: "You have arrived in Chuncheon",
+        body: "Shall we go book a journey of your own?",
+        cta: "Go build my day",
+        later: "Later",
       },
     },
   },
