@@ -1,6 +1,8 @@
-// 라인 히어로 · v3.1 rev(IA §2.5.1): 라인 컬러 소프트 면(라인 컬러 10% 틴트 · 소면적 고밀도
-// 원칙 준수) + 캐릭터 이미지(콘텐츠로만) + 라인명(Kanit Bold) + 소요·정류장 수·가격.
+// 라인 히어로 · v3.1 rev(IA §2.5.1): 중립 면(surface) + 캐릭터 이미지(콘텐츠로만) +
+// 라인명(Kanit Bold) + 소요·정류장 수·가격.
 // LineDetail 좌측 컬럼 안 카드(그리드 레이아웃 · 풀블리드 아님), 무보더(DESIGN §7).
+// v3.2(§8.3.3): 빈 이미지 박스 0 · 캐릭터 에셋 없거나 로드 실패 시 박스 비렌더.
+import { useState } from 'react';
 import { useLang } from '../../i18n/LangContext';
 import LangSwap from '../../i18n/LangSwap';
 // 언어별 포맷 문자열 겹침 렌더용(PATTERNS §1·§18) · 시프트 0
@@ -30,6 +32,7 @@ const STRIPE = {
 export default function LineHero({ line, stopsCount }) {
   const { lang } = useLang();
   const name = lang === 'ko' ? line.name_ko : line.name_en; // img alt 전용 · th는 en 폴백
+  const [imgFailed, setImgFailed] = useState(false); // 로드 실패 시 박스 비렌더(§8.3.3)
 
   return (
     <header className={`overflow-hidden rounded-xl p-24 lg:p-32 ${SOFT[line.id]}`}>
@@ -89,13 +92,17 @@ export default function LineHero({ line, stopsCount }) {
             </div>
           </dl>
         </div>
-        {/* 캐릭터는 콘텐츠 이미지로만(UI 팔레트 사용 금지 · DESIGN §1) */}
-        <img
-          src={line.character_img}
-          alt={name}
-          loading="lazy"
-          className="h-128 w-128 shrink-0 rounded-lg bg-white object-cover"
-        />
+        {/* 캐릭터는 콘텐츠 이미지로만(UI 팔레트 사용 금지 · DESIGN §1).
+            v3.2 빈 이미지 박스 0: 에셋 없음·로드 실패 시 비렌더(§8.3.3 · PLACEHOLDER 에셋 대기) */}
+        {line.character_img && !imgFailed && (
+          <img
+            src={line.character_img}
+            alt={name}
+            loading="lazy"
+            onError={() => setImgFailed(true)}
+            className="h-128 w-128 shrink-0 rounded-lg bg-white object-cover"
+          />
+        )}
       </div>
     </header>
   );

@@ -1,12 +1,27 @@
 // loop 네임스페이스(TH) · 존 C(LOOP) 소유. en·ko와 키 완전 동형.
 // 초안: en 기반 번역. 네이티브 검수 대기(PROGRESS 준비물).
 // v3.1: 3스텝 키 제거, preview(오버레이)·edit(단일 확인 페이지) 추가.
+// v3.2(존 C2): chips(라인 칩 §24)·poi(POI 앵커 §16.9)·transition(§22)·detail 캘린더 키 추가.
 export default {
   loop: {
     title: "แผนที่สายรถแบบสด",
     panel: {
       viewLine: "ดูสายนี้",
       hint: "เลือกป้ายหยุดเพื่อให้แผนที่บินไปที่นั่น",
+    },
+    chips: {
+      label: "สายรถ",
+      hint: "เลือกสายรถเพื่อให้แสดงบนแผนที่",
+    },
+    poi: {
+      soyangDam: "เขื่อนโซยัง",
+      myeongdong: "มยองดง",
+      namchuncheon: "สถานีนัมชุนชอน",
+    },
+    transition: {
+      // 연출 상태 라벨 · §16.7 연출 카피 예외(3언어 동일 표기)
+      label: "LINES ACTIVE",
+      aria: "แอนิเมชันการมาถึง",
     },
     map: {
       label: "แผนที่สายรถชุนชอนแบบสด",
@@ -34,6 +49,9 @@ export default {
       preorderTag: "สั่งล่วงหน้าแล้ว",
       clipCaption: "คลิปเรื่องราวของเจ้าของร้าน เปิดคำบรรยายตลอด",
       seatsLeft: "ที่นั่งเหลือ",
+      selectedTitle: "รอบเดินทางที่คุณเลือก",
+      pickTime: "เลือกรอบเวลาด้านล่าง",
+      legendLabel: "คำอธิบายสถานะ",
       ridersPre: "รอบนี้คุณจะเดินทางกับนักท่องเที่ยวอีก",
       ridersPost: "คน",
       hostLabel: "โฮสต์ของคุณ",

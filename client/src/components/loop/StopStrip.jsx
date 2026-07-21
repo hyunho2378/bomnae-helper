@@ -1,5 +1,7 @@
 // 정류장 스트립 · IA §2.5 블록 2: 수직 노선도(라인 컬러 세로선 + 정류장 노드).
 // 정류장마다 사진·이름(EN/KR 병기)·체류 시간·선주문 대행 문구.
+// v3.2(§8.3.3): 빈 이미지 박스 0 · 사진이 없거나 로드 실패(onError)하면 박스 자체 비렌더.
+import { useState } from 'react';
 import { useLang } from '../../i18n/LangContext';
 import LangSwap from '../../i18n/LangSwap';
 // 언어별 포맷 문자열 3언어 겹침 렌더용(PATTERNS §1·§18) · 시프트 0
@@ -25,6 +27,14 @@ const NODE = {
 
 export default function StopStrip({ lineId, stops }) {
   const { lang } = useLang();
+  // 로드 실패 사진 id 집합 · 실패 시 박스 비렌더(빈 이미지 박스 0 · §8.3.3)
+  const [failed, setFailed] = useState(() => new Set());
+  const markFailed = (id) =>
+    setFailed((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
 
   return (
     <ol className="flex flex-col">
@@ -56,13 +66,17 @@ export default function StopStrip({ lineId, stops }) {
                 ))}
               </span>
             </div>
-            {/* v3.1 측정폭 해제 · 개별 max-w 캡 제거(컬럼 폭이 결정) */}
-            <img
-              src={stop.photo}
-              alt={lang === 'ko' ? stop.name_ko : stop.name_en}
-              loading="lazy"
-              className="aspect-video w-full rounded-md bg-surface object-cover"
-            />
+            {/* v3.1 측정폭 해제 · 개별 max-w 캡 제거(컬럼 폭이 결정).
+                v3.2 빈 이미지 박스 0: 사진 없음·로드 실패 시 img 비렌더(§8.3.3) */}
+            {stop.photo && !failed.has(stop.id) && (
+              <img
+                src={stop.photo}
+                alt={lang === 'ko' ? stop.name_ko : stop.name_en}
+                loading="lazy"
+                onError={() => markFailed(stop.id)}
+                className="aspect-video w-full rounded-md bg-surface object-cover"
+              />
+            )}
             <div className="flex flex-col gap-4">
               <LangSwap
                 k="loop.detail.preorderTag"

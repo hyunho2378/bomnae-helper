@@ -1,8 +1,8 @@
-// 지도 위 라인 카드 · v3.1 rev(IA §2.4, COMPONENTS v3.1 존 C "Loop rev"):
-// 사이드 컬럼 폐지 → 컨테이너 마진 안쪽, 지도 위에 뜨는 글래스 카드
-// (blur 허용면 · DESIGN §10: 지도 위 라인 카드). 데스크탑 좌측 세로 스택 340px,
-// 모바일 하단 가로 스크롤 스냅. 카드: 아이콘 배지(Sprout/Flame/Waves, 라인 컬러) +
-// 라인명 + 소요·가격 + 정류장 3 미니 리스트 + "View line".
+// 정류장 패널 · v3.2 rev(IA §8.3.2 · COMPONENTS 존 C2 "Loop 초기화 개정"):
+// v3.1 라인 카드 3장 스택 폐지 → 선택된 라인의 정류장 리스트로 전환(칩이 라인 진입점).
+// 데스크탑: 칩 아래 지도 위 글래스 패널 340px(blur 허용면 · DESIGN §10 "지도 위 라인 카드"),
+//   내부 스크롤 scroll-quiet(§25) + tabindex 스크롤 영역(키보드 스크롤 생존).
+// 모바일: 하단 소형 카드 가로 스냅 · 높이 132px 상한(§16.9 · max-h-132) · 지도 점유율 최우선.
 // 정류장 리스트가 지도 대체 접근 경로(키보드 완전 지원 · DESIGN §14).
 import Container from '../layout/Container';
 import { useLang } from '../../i18n/LangContext';
@@ -18,7 +18,7 @@ const LANGS = ['en', 'ko', 'th'];
 const fmtDur = (min, dict) =>
   `${Math.floor(min / 60)}${dict.loop.detail.hoursUnit} ${min % 60}${dict.loop.detail.minutesUnit}`;
 
-// 라인 컬러 클래스 · 정적 클래스 매핑(tailwind 스캐너 대응, 토큰 클래스만)
+// 라인 컬러 정적 클래스 매핑(tailwind 스캐너 대응, 토큰 클래스만)
 // v3.2 §16.1: 아이콘 배지·틴트 폐지 → 원색 컬러 도트 + shadow.sm
 const DOT = { potato: 'bg-yellow', dakgalbi: 'bg-spice', lake: 'bg-primary' };
 
@@ -40,7 +40,7 @@ function DictSwap({ make, className = '' }) {
   );
 }
 
-// 데이터 필드(en/ko · th 없음) 겹침 · th는 en 폴백(v3.1 규칙: lang!=='ko'일 때 en 스팬)
+// 데이터 필드(en/ko · th 없음) 겹침 · th는 en 폴백(v3.1 규칙)
 function BiText({ en: textEn, ko: textKo, className = '' }) {
   const { lang } = useLang();
   return (
@@ -51,130 +51,136 @@ function BiText({ en: textEn, ko: textKo, className = '' }) {
   );
 }
 
-function LineGlassCard({ line, stops, active, focusStopId, onSelectLine, onSelectStop, onViewLine }) {
+// 라인 요약 행 · 데스크탑 패널 헤더 + 모바일 첫 카드가 공유
+function LineSummary({ line, onViewLine }) {
   return (
-    <article
-      className={`rounded-lg bg-glass shadow-lg backdrop-blur-glass ${
-        active ? 'ring-2 ring-primary' : '' // 선택 상태 = ring(v3.1 무보더 · DESIGN §7)
-      }`}
-    >
-      {/* 라인 선택 · flyTo + 타 라인 opacity 0.4(LoopMap) */}
+    <div className="flex min-w-0 flex-col gap-4">
+      <span className="flex items-center gap-8">
+        <span aria-hidden="true" className={`h-[10px] w-[10px] shrink-0 rounded-pill shadow-sm ${DOT[line.id]}`} />
+        {/* 10px = §24 라인 컬러 원 명세값 */}
+        <BiText en={line.name_en} ko={line.name_ko} className="min-w-0 font-display text-body font-semibold text-ink" />
+      </span>
+      <span className="flex items-baseline gap-8 text-caption font-medium text-inkSec">
+        <DictSwap make={(d) => fmtDur(line.duration_min, d)} className="font-display" />
+        <span aria-hidden="true">·</span>
+        <span className="font-display">
+          {'₩'}
+          {line.price_adult.toLocaleString('en-US')}
+        </span>
+      </span>
       <button
         type="button"
-        aria-pressed={active}
-        onClick={() => onSelectLine(line.id)}
-        className="flex min-h-44 w-full items-center gap-12 p-16 text-left"
+        onClick={() => onViewLine(line.id)}
+        className="inline-flex min-h-44 w-fit items-center text-small font-semibold text-primary transition-colors duration-fast hover:text-ink"
       >
-        <span
-          aria-hidden="true"
-          className={`h-12 w-12 shrink-0 rounded-pill shadow-sm ${DOT[line.id]}`}
-        />
-        <span className="flex min-w-0 flex-1 flex-col">
-          <BiText en={line.name_en} ko={line.name_ko} className="font-display text-body font-semibold text-ink" />
-          <span className="flex items-baseline gap-8 text-caption font-medium text-inkSec">
-            <DictSwap make={(d) => fmtDur(line.duration_min, d)} className="font-display" />
-            <span aria-hidden="true">·</span>
-            <span className="font-display">
-              {'₩'}
-              {line.price_adult.toLocaleString('en-US')}
-            </span>
-          </span>
-        </span>
+        <LangSwap k="loop.panel.viewLine" />
       </button>
-
-      {/* 정류장 3 미니 리스트 · 키보드 대체 경로(탭 이동만으로 도달) */}
-      <ul className="flex flex-col px-8">
-        {stops.map((stop) => {
-          const stopActive = focusStopId === stop.id;
-          return (
-            <li key={stop.id}>
-              <button
-                type="button"
-                aria-pressed={stopActive}
-                onClick={() => onSelectStop(line.id, stop.id)}
-                className={`flex min-h-44 w-full items-center gap-8 rounded-sm px-8 text-left text-small transition-colors duration-fast ${
-                  stopActive ? 'font-medium text-ink' : 'text-inkSec hover:text-ink'
-                }`}
-              >
-                <span
-                  aria-hidden="true"
-                  className={`h-8 w-8 shrink-0 rounded-pill ${stopActive ? DOT[line.id] : 'bg-inkMeta'}`}
-                />
-                <BiText en={stop.name_en} ko={stop.name_ko} className="min-w-0 flex-1" />
-                <DictSwap
-                  make={(d) => `${stop.stay_min} ${d.loop.detail.stayUnit}`}
-                  className="shrink-0 font-display text-caption font-medium text-inkSec"
-                />
-              </button>
-            </li>
-          );
-        })}
-      </ul>
-
-      {/* View line · 라우팅 없는 미리보기(LinePreviewOverlay) 오픈(IA §2.4) */}
-      <div className="px-16 pb-8">
-        <button
-          type="button"
-          onClick={() => onViewLine(line.id)}
-          className="inline-flex min-h-44 items-center text-small font-medium text-primary transition-colors duration-fast hover:text-navy"
-        >
-          <LangSwap k="loop.panel.viewLine" />
-        </button>
-      </div>
-    </article>
+    </div>
   );
 }
 
-export default function LinePanel({
-  lines,
-  stopsByLine,
-  focusLineId,
-  focusStopId,
-  onSelectLine,
-  onSelectStop,
-  onViewLine,
-}) {
-  const cards = (layout) =>
-    lines.map((line) => (
-      <li key={line.id} className={layout === 'row' ? 'w-4/5 shrink-0 snap-start' : ''}>
-        <LineGlassCard
-          line={line}
-          stops={stopsByLine[line.id] ?? []}
-          active={focusLineId === line.id}
-          focusStopId={focusStopId}
-          onSelectLine={onSelectLine}
-          onSelectStop={onSelectStop}
-          onViewLine={onViewLine}
-        />
-      </li>
-    ));
+export default function LinePanel({ line, stops, focusStopId, onSelectStop, onViewLine }) {
+  const { t } = useLang();
 
   return (
-    <div className="pointer-events-none absolute inset-0 z-content">
-      {/* 페이지 제목·힌트 · 시각 UI는 카드가 대신한다(스크린리더 전용) */}
-      <h1 className="sr-only">
-        <LangSwap k="loop.title" />
-      </h1>
-      <p className="sr-only">
-        <LangSwap k="loop.panel.hint" />
-      </p>
-
-      {/* 데스크탑 · 컨테이너 마진 안 좌측 세로 스택. 340px는 IA §2.4 v3.1 명세값 */}
-      <div className="hidden h-full lg:block">
+    <>
+      {/* 데스크탑 · 칩 아래 글래스 패널. top 152 = 헤더 오프셋 96 + 칩 40 + 간격 16(§24 배치 산식) */}
+      <div className="absolute inset-x-0 top-[152px] hidden lg:block">
         <Container>
-          <ul className="pointer-events-auto flex max-h-screen w-[340px] flex-col gap-16 overflow-y-auto pb-24 pt-96">
-            {cards('stack')}
-          </ul>
+          {/* 340px = IA §2.4 패널 폭 명세값 / max-h 산식: 100vh - (top 152 + 하단 여백 40) */}
+          <section
+            aria-label={t('loop.detail.routeTitle')}
+            className="pointer-events-auto flex max-h-[calc(100vh-192px)] w-[340px] flex-col rounded-lg bg-glass shadow-lg backdrop-blur-glass"
+          >
+            <header className="p-16 pb-8">
+              <LineSummary line={line} onViewLine={onViewLine} />
+            </header>
+            {/* 내부 스크롤 · scroll-quiet(§25) + tabindex 0(키보드 PageUp/Down·화살표 스크롤 생존) */}
+            <ul
+              tabIndex={0}
+              aria-label={t('loop.panel.hint')}
+              className="scroll-quiet min-h-0 flex-1 overflow-y-auto px-8 pb-16"
+            >
+              {stops.map((stop) => {
+                const active = focusStopId === stop.id;
+                return (
+                  <li key={stop.id}>
+                    <button
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => onSelectStop(stop)}
+                      className={`flex min-h-44 w-full items-center gap-8 rounded-sm px-8 text-left text-small transition-colors duration-fast ${
+                        active ? 'font-semibold text-ink' : 'font-regular text-inkSec hover:text-ink'
+                      }`}
+                    >
+                      <span
+                        aria-hidden="true"
+                        className={`h-8 w-8 shrink-0 rounded-pill shadow-sm ${DOT[line.id]}`}
+                      />
+                      <BiText en={stop.name_en} ko={stop.name_ko} className="min-w-0 flex-1" />
+                      <DictSwap
+                        make={(d) => `${stop.stay_min} ${d.loop.detail.stayUnit}`}
+                        className="shrink-0 font-display text-caption font-medium text-inkSec"
+                      />
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
         </Container>
       </div>
 
-      {/* 모바일 · 하단 가로 스크롤 스냅(마진 = 컨테이너 규칙 px-20/md:px-32), GlassDock 위 여백 */}
+      {/* 모바일 · 하단 소형 카드 가로 스냅(§16.9 · 높이 132 상한, 지도 점유율 최우선).
+          GlassDock 위 여백(pb-96) · 스냅 정지 위치 = 컨테이너 마진 경계 */}
       <div className="absolute inset-x-0 bottom-0 pb-96 lg:hidden">
-        {/* scroll-pl = 컨테이너 마진과 동일 · 스냅 정지 위치가 마진 경계 안에 오도록 */}
-        <ul className="pointer-events-auto flex snap-x snap-mandatory gap-16 overflow-x-auto scroll-pl-16 px-16 pb-8 md:scroll-pl-24 md:px-24">
-          {cards('row')}
+        <ul className="scroll-quiet pointer-events-auto flex snap-x snap-mandatory gap-12 overflow-x-auto scroll-pl-16 px-16 pb-8 md:scroll-pl-24 md:px-24">
+          <li className="w-4/5 shrink-0 snap-start">
+            <div className="h-132 overflow-hidden rounded-lg bg-glass p-12 shadow-lg backdrop-blur-glass">
+              <LineSummary line={line} onViewLine={onViewLine} />
+            </div>
+          </li>
+          {stops.map((stop) => {
+            const active = focusStopId === stop.id;
+            return (
+              <li key={stop.id} className="w-4/5 shrink-0 snap-start">
+                <button
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => onSelectStop(stop)}
+                  className={`flex h-132 w-full flex-col gap-4 overflow-hidden rounded-lg bg-glass p-12 text-left shadow-lg backdrop-blur-glass ${
+                    active ? 'ring-2 ring-primary' : ''
+                  }`}
+                >
+                  <span className="flex items-center gap-8">
+                    <span
+                      aria-hidden="true"
+                      className={`h-8 w-8 shrink-0 rounded-pill shadow-sm ${DOT[line.id]}`}
+                    />
+                    <BiText en={stop.name_en} ko={stop.name_ko} className="min-w-0 text-small font-semibold text-ink" />
+                  </span>
+                  <DictSwap
+                    make={(d) => `${stop.stay_min} ${d.loop.detail.stayUnit}`}
+                    className="font-display text-caption font-medium text-inkSec"
+                  />
+                  {/* 선주문 한 줄 · 데이터 본문(시프트 허용 영역) */}
+                  <StopPreorder stop={stop} />
+                </button>
+              </li>
+            );
+          })}
         </ul>
       </div>
-    </div>
+    </>
+  );
+}
+
+// 선주문 문구(모바일 카드) · 데이터 본문은 현재 언어 직접 렌더(th는 en 폴백)
+function StopPreorder({ stop }) {
+  const { lang } = useLang();
+  return (
+    <span className="line-clamp-2 text-caption font-regular text-inkSec">
+      {lang === 'ko' ? stop.preorder_ko : stop.preorder_en}
+    </span>
   );
 }

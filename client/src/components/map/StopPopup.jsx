@@ -4,6 +4,8 @@
 // 내용: 정류장명(h3) + 한 줄 소개(선주문 대행 문구 재사용 · stops 데이터의 유일한 한 줄 카피,
 // 질문 목록 보고) + 체류시간 chip + "View line" 텍스트 버튼.
 // 동시에 1개(단일 인스턴스 + stop 변경 시 이전 popup remove), 지도 탭·Escape 닫기.
+// v3.2(§16.9): hover 즉시 표시 대응 · onPointerEnter/onPointerLeave로 마커→팝업 이동 시
+// 200ms 닫힘 타이머를 유지/재개(타이머는 Loop 페이지 소관).
 import { useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import maplibregl from 'maplibre-gl';
@@ -17,7 +19,7 @@ import th from '../../i18n/th';
 const DICTS = { en, ko, th };
 const LANGS = ['en', 'ko', 'th'];
 
-export default function StopPopup({ map, stop, onClose, onViewLine }) {
+export default function StopPopup({ map, stop, onClose, onViewLine, onPointerEnter, onPointerLeave }) {
   const { lang } = useLang();
   // 팝업 콘텐츠 루트 · stop이 바뀌면 새 엘리먼트(이전 팝업은 cleanup에서 remove)
   const container = useMemo(() => document.createElement('div'), [stop?.id]);
@@ -60,7 +62,11 @@ export default function StopPopup({ map, stop, onClose, onViewLine }) {
   if (!map || !stop) return null;
 
   return createPortal(
-    <div className="flex min-w-0 flex-col gap-8 font-body text-ink">
+    <div
+      onMouseEnter={onPointerEnter}
+      onMouseLeave={onPointerLeave}
+      className="flex min-w-0 flex-col gap-8 font-body text-ink"
+    >
       {/* 정류장명 · 데이터 필드(th 없음)는 en 폴백: lang!=='ko'일 때 en 스팬(v3.1 규칙) */}
       <h3 className="grid font-display text-h3 font-semibold">
         <span aria-hidden={lang === 'ko'} className={`col-start-1 row-start-1 ${lang !== 'ko' ? '' : 'invisible'}`}>{stop.name_en}</span>
@@ -88,7 +94,7 @@ export default function StopPopup({ map, stop, onClose, onViewLine }) {
       <button
         type="button"
         onClick={() => onViewLineRef.current?.(stop.line_id)}
-        className="inline-flex min-h-44 w-fit items-center text-small font-medium text-primary transition-colors duration-fast hover:text-navy"
+        className="inline-flex min-h-44 w-fit items-center text-small font-semibold text-primary transition-colors duration-fast hover:text-ink"
       >
         <LangSwap k="loop.panel.viewLine" />
       </button>

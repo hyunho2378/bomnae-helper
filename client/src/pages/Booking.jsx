@@ -43,7 +43,7 @@ function Row({ labelKey, editHref, children }) {
         {editHref && (
           <Link
             to={editHref}
-            className="shrink-0 text-small font-medium text-primary transition-colors duration-fast hover:text-navy"
+            className="shrink-0 text-small font-semibold text-primary transition-colors duration-fast hover:text-ink"
           >
             <LangSwap k="booking.edit" />
           </Link>
@@ -146,7 +146,7 @@ export default function Booking() {
   if (!line || !meetingPoint || !departures) {
     return (
       <Container>
-        <div className="flex flex-col gap-16 py-64 lg:pt-96">
+        <div className="flex flex-col gap-16 pb-64 pt-96">
           <Skeleton className="h-24 w-full" />
           <Skeleton className="h-128 w-full" />
         </div>
@@ -158,7 +158,7 @@ export default function Booking() {
   if (done) {
     return (
       <Container>
-        <div className="mx-auto w-full max-w-dialog py-64 lg:pt-96">
+        <div className="mx-auto w-full max-w-dialog pb-64 pt-96">
           <SuccessStamp line={line}>
             <div className="flex flex-col items-center gap-16">
               <LangSwap k="booking.success.title" as="h1" className="text-h2 font-semibold" />
@@ -175,7 +175,7 @@ export default function Booking() {
 
   return (
     <Container>
-      <div className="flex flex-col gap-32 py-64 lg:pt-96">
+      <div className="flex flex-col gap-32 pb-64 pt-96">
         <LangSwap k="booking.title" as="h1" className="text-h2 font-semibold" />
 
         {/* 좌 요약 / 우 합계+확정(IA §2.6) · 우폭 380px은 §15 패널 폭 준용 명세값 */}

@@ -25,6 +25,8 @@ function makeShuttleElement(lineId, characterImg, label) {
   img.src = characterImg; // PLACEHOLDER · 봄내크루 배경 제거본 에셋 대기(PROGRESS 준비물)
   img.alt = '';
   img.className = 'h-20 w-20 rounded-pill object-cover';
+  // v3.2 §8.3.3 · 이미지 없으면 박스 비렌더(로드 실패 시 깨진 글리프 제거 · 컬러 원만 남긴다)
+  img.onerror = () => img.remove();
   el.appendChild(img);
   return el;
 }

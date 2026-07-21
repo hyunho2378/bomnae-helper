@@ -82,6 +82,8 @@ export default function Ticket() {
   const { bookingId } = useParams();
   const [state, setState] = useState({ loading: true, booking: null, line: null, meetingPoint: null, story: null });
   const { lang } = useLang();
+  // v3.2 §8.3.3 빈 이미지 박스 0 · 클립 썸네일 로드 실패 시 박스 비렌더
+  const [thumbFailed, setThumbFailed] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -112,7 +114,7 @@ export default function Ticket() {
   if (loading) {
     return (
       <Container>
-        <div className="mx-auto flex w-full max-w-dialog flex-col gap-16 py-64 lg:pt-96">
+        <div className="mx-auto flex w-full max-w-dialog flex-col gap-16 pb-64 pt-96">
           <Skeleton className="h-128 w-full" />
           <Skeleton className="h-44 w-full" />
         </div>
@@ -137,7 +139,7 @@ export default function Ticket() {
 
   return (
     <Container>
-      <div className="mx-auto flex w-full max-w-dialog flex-col gap-32 py-64 lg:pt-96">
+      <div className="mx-auto flex w-full max-w-dialog flex-col gap-32 pb-64 pt-96">
         <LangSwap k="ticket.title" as="h1" className="text-h2 font-semibold" />
 
         {/* navy 티켓 카드 · 강대비 면(DESIGN §2) */}
@@ -230,12 +232,16 @@ export default function Ticket() {
             <LangSwap k="ticket.watch" as="h2" className="text-h3 font-semibold" />
             {/* v3.1 무보더 · 카드 shadow.sm + radius 카드 스케일 lg(DESIGN §7) */}
             <div className="flex items-center gap-16 rounded-lg bg-white p-16 shadow-sm">
-              <img
-                src={story.thumb}
-                alt=""
-                loading="lazy"
-                className="h-64 w-96 shrink-0 rounded-md bg-surface object-cover"
-              />
+              {/* 썸네일 없음·로드 실패 시 비렌더(빈 이미지 박스 0 · §8.3.3) */}
+              {story.thumb && !thumbFailed && (
+                <img
+                  src={story.thumb}
+                  alt=""
+                  loading="lazy"
+                  onError={() => setThumbFailed(true)}
+                  className="h-64 w-96 shrink-0 rounded-md bg-surface object-cover"
+                />
+              )}
               <div className="flex min-w-0 flex-col gap-4">
                 <p className="truncate text-body font-semibold">
                   {lang === 'ko' ? story.title_ko : story.title_en}
