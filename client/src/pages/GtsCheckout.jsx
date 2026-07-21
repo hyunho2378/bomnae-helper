@@ -1,20 +1,24 @@
-// GTS 체크아웃 · IA §9.6 + PATTERNS §33 (존 C4 확장 · 스텁 확장 — 교체 아님).
-// 요약(차량·인원·짐·식사·픽 순서 리스트) + 금액 내역(fares 산식 · 전항목 + 합계 + DRAFT) 전부
-// 1뷰 노출(다크패턴 금지 §16.10). 최종 하차 지점 = 텍스트 입력 필수(지오코딩 없음 · 원문 저장).
-// 결제 → 미로그인 시 LoginGate → 확인 Dialog(프로토타입 · 실결제 없음 고지) →
-// createGtsBooking(목 창구) → SuccessStamp 재사용 → /ticket/:id.
+// GTS 체크아웃 · IA §9.6 + §10.6 + PATTERNS §42 (존 C5 개정 — Pay 흐름 교체).
+// 요약(차량·인원·짐·식사·픽 순서) + 금액 내역 전부 1뷰 노출(다크패턴 금지 §16.10) 유지.
+// §42 결제: 결제 수단 그리드 8종 → 카드 계열 = 하단 카드 폼 확장(easeOut 220ms · 검증 없음 ·
+//   빈 제출 허용 · 폼 하단 프로토타입 고지 caption) / Apple Pay·Alipay = 폼 생략 + 월렛
+//   시뮬레이션 카피 1줄 + 바로 Pay. 확인 Dialog·성공 인터스티셜(스탬프 화면·View ticket) 삭제 —
+//   Pay → createGtsBooking(결제 수단 문자열 저장 확장) → /ticket/:id replace 직행.
+//   스탬프는 Ticket 페이지 진입 시 1회 재생으로 이동(§43).
+// 로그인: 기본 데모 유저(§10.6)로 게이트 통과 — user 없을 때만 LoginGate 폴백(Guest-first 보존).
 // 가드(§31): route 경유 — 미충족 시 route로 replace.
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Bus, CarFront, Loader2 } from 'lucide-react';
-import SuccessStamp from '../components/booking/SuccessStamp';
+import CardForm from '../components/pay/CardForm';
+import PayMethodGrid from '../components/pay/PayMethodGrid';
+import { PAY_METHODS } from '../components/pay/payMethods';
 import FareBreakdown from '../components/gts/FareBreakdown';
 import TriText from '../components/gts/TriText';
 import { itineraryVenues } from '../components/gts/itinerary';
 import Container from '../components/layout/Container';
 import Button from '../components/ui/Button';
 import LoginGate from '../components/ui/LoginGate';
-import Modal from '../components/ui/Modal';
 import { useAuth } from '../context/AuthContext';
 import { useGts, useGtsGuard } from '../context/GtsContext';
 import { computeGtsTotal, createGtsBooking } from '../data/gts/api';
@@ -44,10 +48,10 @@ export default function GtsCheckout() {
   const { user } = useAuth();
   const { t } = useLang();
   const { party, luggage, vehicle, mealPlan, meals, picks, dropoffText, setDropoffText } = useGts();
+  const navigate = useNavigate();
   const [gateOpen, setGateOpen] = useState(false);
-  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [payMethod, setPayMethod] = useState(null);
   const [submitting, setSubmitting] = useState(false);
-  const [done, setDone] = useState(null); // 생성된 gts booking
 
   if (!ok) return null;
 
@@ -55,7 +59,9 @@ export default function GtsCheckout() {
   const total = computeGtsTotal(vehicle, luggage, party);
   const dropoffOk = dropoffText.trim().length > 0;
   const Icon = VEHICLE_ICON[vehicle];
+  const method = PAY_METHODS.find((m) => m.id === payMethod) ?? null;
 
+  // §42: 카드 입력값은 저장하지 않는다(검증 없음 · 빈 제출 허용) — 수단 문자열만 예약에 저장
   const submit = async () => {
     setSubmitting(true);
     const booking = await createGtsBooking({
@@ -67,38 +73,18 @@ export default function GtsCheckout() {
       picks,
       itinerary: entries.map((venue) => venue.id), // 순서 보존(§9.6 picks 순서 원칙)
       dropoffText: dropoffText.trim(), // 지오코딩 없음 · 원문 저장(§9.6)
+      payMethod: method.id, // §42 결제 수단 문자열 저장 확장
       total,
     });
-    setSubmitting(false);
-    setConfirmOpen(false);
-    setDone(booking);
+    // 성공 인터스티셜 없음 · 티켓 직행(§42 replace) — 스탬프는 Ticket 진입 시 1회(§43)
+    navigate(`/ticket/${booking.id}`, { replace: true });
   };
 
-  // 결제 → 미로그인 시에만 LoginGate(액션 레벨 · Guest-first) → 확인 Dialog(§33 순서)
+  // 데모 유저 기본 로그인(§10.6) — user 없을 때만 LoginGate(Guest-first 폴백)
   const onPay = () => {
-    if (user) setConfirmOpen(true);
+    if (user) submit();
     else setGateOpen(true);
   };
-
-  // 성공 · 스탬프 드롭(SuccessStamp 재사용) 후 티켓 이동
-  if (done) {
-    return (
-      <Container>
-        <div className="mx-auto w-full max-w-dialog pb-64 pt-96">
-          {/* GTS는 라인이 없어 lake(=primary 면) 어댑터 객체로 'G' 이니셜 표기(완료 보고 참조) */}
-          <SuccessStamp line={{ id: 'lake', name_en: 'GTS' }}>
-            <div className="flex flex-col items-center gap-16">
-              <LangSwap k="gts.checkout.success.title" as="h1" className="text-h2 font-semibold" />
-              <LangSwap k="gts.checkout.success.sub" as="p" className="text-small font-medium text-inkSec" />
-              <Button as={Link} to={`/ticket/${done.id}`}>
-                <LangSwap k="gts.checkout.success.viewTicket" />
-              </Button>
-            </div>
-          </SuccessStamp>
-        </div>
-      </Container>
-    );
-  }
 
   return (
     <Container>
@@ -173,14 +159,26 @@ export default function GtsCheckout() {
                 )}
               </div>
             </section>
+
+            {/* §42 결제 수단 그리드 8종 + 카드 폼/월렛 카피 */}
+            <section className="flex flex-col gap-16 rounded-xl bg-white p-24 shadow-sm">
+              <LangSwap k="gts.pay.title" as="h2" className="text-h3 font-semibold" />
+              <PayMethodGrid value={payMethod} onChange={setPayMethod} />
+              {/* 월렛(Apple Pay·Alipay) = 폼 생략 + 시뮬레이션 카피 1줄 + 바로 Pay(§42) */}
+              {method?.wallet && (
+                <LangSwap k="gts.pay.walletNote" as="p" className="text-small font-medium text-inkSec" />
+              )}
+              {/* 카드 계열 = 하단 카드 폼 확장(마운트 시 220ms easeOut · CardForm 내장) */}
+              {method && !method.wallet && <CardForm />}
+            </section>
           </div>
 
-          {/* 금액 내역 + 결제 · 전 항목 + 합계 + DRAFT 항상 펼침(§33) */}
+          {/* 금액 내역 + Pay · 전 항목 + 합계 항상 펼침(§33) */}
           <aside className="flex flex-col gap-24 rounded-xl bg-white p-24 shadow-md">
             <LangSwap k="gts.checkout.priceTitle" as="h2" className="text-h3 font-semibold" />
             <FareBreakdown vehicle={vehicle} luggage={luggage} party={party} />
             <div className="grid">
-              <Button disabled={!dropoffOk || submitting} onClick={onPay}>
+              <Button disabled={!dropoffOk || !method || submitting} onClick={onPay}>
                 <LangSwap k="gts.checkout.payCta" />
                 {submitting && (
                   <Loader2 size={16} aria-hidden="true" className="animate-spin motion-reduce:animate-none" />
@@ -191,29 +189,7 @@ export default function GtsCheckout() {
         </div>
       </div>
 
-      <LoginGate open={gateOpen} onClose={() => setGateOpen(false)} onSuccess={() => setConfirmOpen(true)} />
-
-      {/* 프로토타입 결제 확인 · 실결제 없음 고지(§33 · Terms §2와 일치하는 신설 gts 키) */}
-      <Modal open={confirmOpen} onClose={() => setConfirmOpen(false)} title="gts.checkout.confirmTitle">
-        <div className="flex flex-col gap-24">
-          <LangSwap k="gts.checkout.prototypeNotice" as="p" className="text-body" />
-          <div className="flex items-baseline justify-between">
-            <LangSwap k="gts.fare.total" className="text-small font-medium text-inkSec" />
-            <span className="font-display text-h3 font-bold text-primary">
-              {'₩'}
-              {total.toLocaleString('en-US')}
-            </span>
-          </div>
-          <div className="grid">
-            <Button disabled={submitting} onClick={submit}>
-              <LangSwap k="gts.checkout.confirmCta" />
-              {submitting && (
-                <Loader2 size={16} aria-hidden="true" className="animate-spin motion-reduce:animate-none" />
-              )}
-            </Button>
-          </div>
-        </div>
-      </Modal>
+      <LoginGate open={gateOpen} onClose={() => setGateOpen(false)} onSuccess={submit} />
     </Container>
   );
 }

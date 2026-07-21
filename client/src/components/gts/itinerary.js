@@ -16,3 +16,18 @@ export function itineraryVenues(selection) {
     .map((id) => venues.find((v) => v.id === id))
     .filter(Boolean);
 }
+
+// 정오 기점 stayMin(120) 누적 시각 · §9.5 DRAFT 표기 규칙의 공유 구현(route + ticket §43).
+// 시각표 생성이 아니라 표기 전용(코드 주석 한정 · 사용자 노출 초안 고지 없음 §10.4).
+const NOON_MIN = 12 * 60;
+
+export function itinerarySchedule(entries) {
+  let acc = NOON_MIN;
+  return entries.map((venue) => {
+    const start = acc;
+    acc += venue.stayMin;
+    const h = String(Math.floor(start / 60)).padStart(2, '0');
+    const m = String(start % 60).padStart(2, '0');
+    return { venue, time: `${h}:${m}` };
+  });
+}

@@ -1,18 +1,20 @@
-// GTS 조립 · IA §9.4 + PATTERNS §30·§31 (존 C4 확장 · 스텁 확장 — 교체 아님).
-// Step 0 식사 플랜 3택(none/lunch/lunchDinner) → Step 1 식사 선택(플랜 none 스킵 ·
-// 정원 lunch 1 / lunchDinner 2 · 고른 순서 = 점심→저녁 배지) → Step 2 음식공간/액티비티 탭 +
-// 합산 정확히 2픽. 정원 초과 = Context toggle 반환 false → 자동 해제 금지, 안내 문구 렌더.
-// 하단 고정 진행 바: 현재 스텝 · 선택 요약 · 다음(미충족 disabled + 사유).
+// GTS 조립 · IA §9.4 + §10.4 + PATTERNS §41 (존 C5 전면 개정 — BuildProgressBar 폐지).
+// 전체 플로우를 StepStage 풀스크린 몰입 레이어로 재구성:
+//   Step 0 식사 플랜 3택(단일 선택 — 카드 탭 → 프레스 피드백 120ms(durPress) 후 자동 전진 §41)
+//   → Step 1 식사 선택(플랜 none 스킵 · 정원 lunch 1 / lunchDinner 2 · 순서 = 점심→저녁 배지)
+//   → Step 2 반반 분할(§10.4 탭 폐지): 데스크탑 좌 음식공간 4장 / 우 액티비티 4장 동시
+//     (모바일 상하 스택) · 합산 정확히 2픽 · 카운터 상단 상시 · 초과 시 자동 해제 없음.
+// 페이지네이션 페어([이전][다음] · 경계 비활성)는 VenueGrid 소유(§10.4 새로고침 폐지).
 // 가드(§31): party 필수 — 미충족 시 setup으로 replace.
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import BuildProgressBar from '../components/gts/BuildProgressBar';
+import StepStage from '../components/gts/StepStage';
 import VenueGrid from '../components/gts/VenueGrid';
 import Container from '../components/layout/Container';
-import Chip from '../components/ui/Chip';
 import { mealCap, useGts, useGtsGuard } from '../context/GtsContext';
 import { venues } from '../data/gts/venues';
 import LangSwap from '../i18n/LangSwap';
+import { motion } from '../tokens';
 
 // 식사 순서 배지 사전 키(§9.4 · 고른 순서 = 점심 → 저녁)
 const MEAL_BADGES = ['gts.build.lunchBadge', 'gts.build.dinnerBadge'];
@@ -23,7 +25,7 @@ function PlanCard({ plan, active, onSelect }) {
       type="button"
       onClick={() => onSelect(plan)}
       aria-pressed={active}
-      className={`flex min-h-44 flex-col items-start gap-8 rounded-lg bg-white p-24 text-left shadow-sm transition-shadow duration-fast ${
+      className={`pressable flex min-h-44 flex-col items-start gap-8 rounded-lg bg-white p-24 text-left shadow-sm ${
         active ? 'ring-2 ring-primary' : 'hover:shadow-md'
       }`}
     >
@@ -33,7 +35,7 @@ function PlanCard({ plan, active, onSelect }) {
   );
 }
 
-// 선택 카운터 · 상시 노출(§9.4 인식>회상)
+// 선택 카운터 · 상시 노출(§9.4 인식>회상 · §10.4 상단 상시)
 function Counter({ n, max }) {
   return (
     <div className="flex items-baseline gap-8">
@@ -50,13 +52,15 @@ export default function GtsBuild() {
   const navigate = useNavigate();
   const { mealPlan, meals, picks, setMealPlan, toggleMeal, togglePick } = useGts();
   const [step, setStep] = useState('plan');
-  const [tab, setTab] = useState('foodspace');
   const [capNotice, setCapNotice] = useState(false);
+  const autoRef = useRef(0);
 
   // 풀은 조회 전용(venues.js 값 수정 금지) · 참조 고정으로 VenueGrid 페이지 리셋 방지
   const mealPool = useMemo(() => venues.filter((v) => v.category === 'meal'), []);
   const foodPool = useMemo(() => venues.filter((v) => v.category === 'foodspace'), []);
   const activityPool = useMemo(() => venues.filter((v) => v.category === 'activity'), []);
+
+  useEffect(() => () => clearTimeout(autoRef.current), []);
 
   if (!ok) return null;
 
@@ -65,12 +69,19 @@ export default function GtsBuild() {
   const stepIndex = Math.max(0, steps.indexOf(step));
 
   // 정원 초과 시 자동 해제 금지 · 안내만(§9.4) — 수용되면 안내 해제
-  const guarded = (toggle) => (id) => {
-    const accepted = toggle(id);
-    setCapNotice(!accepted);
+  const guarded = (toggle) => (id) => setCapNotice(!toggle(id));
+
+  // §41 단일 선택 스텝: 카드 탭 → 프레스 피드백 120ms(tokens durPress) 후 자동 전진
+  const onPlanSelect = (plan) => {
+    setMealPlan(plan);
+    clearTimeout(autoRef.current);
+    autoRef.current = setTimeout(() => {
+      setCapNotice(false);
+      setStep(plan === 'none' ? 'picks' : 'meals');
+    }, parseInt(motion.durPress, 10));
   };
 
-  // 다음 버튼 게이트 + 사유(진행 바 §9.4)
+  // 다음 버튼 게이트 + 사유(§9.4 → StepStage 하단 aria-live)
   let disabled = false;
   let reasonKey = null;
   if (step === 'plan' && mealPlan == null) {
@@ -90,27 +101,38 @@ export default function GtsBuild() {
     else if (step === 'meals') setStep('picks');
     else navigate('/gts/route');
   };
-  const onBack =
-    stepIndex === 0
-      ? null
-      : () => {
-          setCapNotice(false);
-          setStep(steps[stepIndex - 1]);
-        };
+  const onBack = () => {
+    setCapNotice(false);
+    setStep(steps[stepIndex - 1]);
+  };
 
   return (
-    <Container>
-      {/* pb-128 = 하단 고정 진행 바 클리어런스 */}
-      <div className="flex flex-col gap-32 pb-128 pt-96">
-        <LangSwap k="gts.build.title" as="h1" className="text-h1 font-bold tracking-display" />
+    <>
+      {/* 오버레이 아래 바닥 페이지(넓은 컨테이너 · §10.4 확폭) — 실콘텐츠는 StepStage 소유 */}
+      <Container>
+        <div className="flex flex-col gap-32 pb-64 pt-96">
+          <LangSwap k="gts.build.title" as="h1" className="text-h1 font-bold tracking-display" />
+        </div>
+      </Container>
 
-        {/* Step 0 · 식사 플랜 3택(§9.4) */}
+      <StepStage
+        stepIndex={stepIndex}
+        stepCount={steps.length}
+        titleKey={`gts.build.step.${step}`}
+        stepKey={step}
+        onBack={onBack}
+        onNext={onNext}
+        nextDisabled={disabled}
+        reasonKey={reasonKey}
+        onExit={() => navigate('/gts/setup')}
+      >
+        {/* Step 0 · 식사 플랜 3택(§9.4 · 단일 선택 자동 전진) */}
         {step === 'plan' && (
           <section className="flex flex-col gap-16">
             <LangSwap k="gts.build.planTitle" as="h2" className="text-h3 font-semibold" />
             <div className="grid grid-cols-1 gap-12 md:grid-cols-3">
               {['none', 'lunch', 'lunchDinner'].map((plan) => (
-                <PlanCard key={plan} plan={plan} active={mealPlan === plan} onSelect={setMealPlan} />
+                <PlanCard key={plan} plan={plan} active={mealPlan === plan} onSelect={onPlanSelect} />
               ))}
             </div>
           </section>
@@ -141,57 +163,46 @@ export default function GtsBuild() {
           </section>
         )}
 
-        {/* Step 2 · 음식공간/액티비티 합산 정확히 2픽(§9.4) */}
+        {/* Step 2 · §10.4 반반 분할(탭 폐지): 좌 음식공간 4장 / 우 액티비티 4장 동시 노출 ·
+            합산 정확히 2픽 · 카운터 상단 상시 */}
         {step === 'picks' && (
           <section className="flex flex-col gap-16">
             <div className="flex flex-wrap items-baseline justify-between gap-12">
               <LangSwap k="gts.build.picksTitle" as="h2" className="text-h3 font-semibold" />
               <Counter n={picks.length} max={2} />
             </div>
-            <div className="flex items-center gap-8">
-              <Chip active={tab === 'foodspace'} onClick={() => setTab('foodspace')}>
-                <LangSwap k="gts.build.tabFoodspace" />
-              </Chip>
-              <Chip active={tab === 'activity'} onClick={() => setTab('activity')}>
-                <LangSwap k="gts.build.tabActivity" />
-              </Chip>
-            </div>
             <div aria-live="polite">
               {capNotice && (
                 <LangSwap k="gts.build.capFull" as="p" className="text-small font-medium text-spice" />
               )}
             </div>
-            <VenueGrid
-              pool={tab === 'foodspace' ? foodPool : activityPool}
-              selected={picks}
-              max={2}
-              onToggle={guarded(togglePick)}
-            />
+            <div className="grid gap-24 lg:grid-cols-2">
+              <section className="flex flex-col gap-12">
+                <LangSwap k="gts.build.tabFoodspace" as="h3" className="text-body font-semibold" />
+                <VenueGrid
+                  pool={foodPool}
+                  pageSize={4}
+                  cols="half"
+                  selected={picks}
+                  max={2}
+                  onToggle={guarded(togglePick)}
+                />
+              </section>
+              <section className="flex flex-col gap-12">
+                <LangSwap k="gts.build.tabActivity" as="h3" className="text-body font-semibold" />
+                <VenueGrid
+                  pool={activityPool}
+                  pageSize={4}
+                  cols="half"
+                  selected={picks}
+                  max={2}
+                  onToggle={guarded(togglePick)}
+                />
+              </section>
+            </div>
           </section>
         )}
-      </div>
-
-      <BuildProgressBar
-        stepIndex={stepIndex}
-        stepCount={steps.length}
-        disabled={disabled}
-        reasonKey={reasonKey}
-        onBack={onBack}
-        onNext={onNext}
-      >
-        {/* 선택 요약 · 플랜 + 현재 스텝 정원 카운터(인식>회상 §16.10) */}
-        {mealPlan && (
-          <LangSwap
-            k={`gts.build.plan.${mealPlan}`}
-            className="truncate text-caption font-medium text-inkSec"
-          />
-        )}
-        {step !== 'plan' && (
-          <span className="shrink-0 font-display text-small font-bold">
-            {step === 'meals' ? meals.length : picks.length} / {step === 'meals' ? cap : 2}
-          </span>
-        )}
-      </BuildProgressBar>
-    </Container>
+      </StepStage>
+    </>
   );
 }

@@ -5,6 +5,7 @@ import gate from './gate';
 import legal from './legal';
 import gts from './gts';
 import loop from './loop';
+import reviews from './reviews';
 
-const en = { ...common, ...gate, ...loop, ...brand, ...legal, ...gts };
+const en = { ...common, ...gate, ...loop, ...brand, ...legal, ...gts, ...reviews };
 export default en;

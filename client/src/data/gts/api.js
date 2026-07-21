@@ -20,7 +20,8 @@ export function computeGtsTotal(vehicleType, luggage, party) {
   return fare.base + (luggage ? fares.luggageFee : 0) + fare.perPerson * party;
 }
 
-// payload: {party, luggage, vehicleType, mealPlan, meals, picks, itinerary(순서 보존 · §9.6), dropoffText, total}
+// payload: {party, luggage, vehicleType, mealPlan, meals, picks, itinerary(순서 보존 · §9.6),
+//           dropoffText, payMethod(§42 결제 수단 문자열 · 존 C5 확장), total}
 export async function createGtsBooking(payload) {
   const code = makeCode();
   const booking = { id: code, code, kind: 'gts', status: 'confirmed', ...payload };

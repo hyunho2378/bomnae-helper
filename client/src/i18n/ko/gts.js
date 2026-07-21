@@ -32,6 +32,19 @@ export default {
     build: {
       title: "하루 조립",
       stepLabel: "단계",
+      // §41 StepStage 상단 라벨("1 / 3 · …")용 짧은 스텝명 + 나가기 확인 Dialog(존 C5)
+      step: {
+        plan: "식사 플랜",
+        meals: "식사 장소",
+        picks: "하루 픽",
+      },
+      exitTitle: "조립을 나갈까요?",
+      exitBody: "설정 단계로 돌아갑니다. 코스 만들기 안에 있는 동안에는 선택이 유지돼요.",
+      exitStay: "계속 조립하기",
+      exitLeave: "나가기",
+      // §10.4 페이지네이션 페어(새로고침 폐지 · 경계 비활성)
+      prevPage: "이전 페이지",
+      nextPage: "다음 페이지",
       planTitle: "식사는 어떻게 할까요?",
       plan: {
         none: "식사 안 함",
@@ -45,7 +58,6 @@ export default {
       mealsOrderHint: "먼저 고른 곳이 점심, 다음이 저녁입니다.",
       lunchBadge: "점심",
       dinnerBadge: "저녁",
-      refresh: "다른 곳 보기",
       comingSoon: "공개 예정",
       cat: {
         meal: "식사",
@@ -86,18 +98,30 @@ export default {
       dropoffRequired: "하차 지점을 입력하면 결제할 수 있어요",
       priceTitle: "금액 내역",
       payCta: "결제하기",
-      confirmTitle: "프로토타입 결제",
+      // §42: 폼 하단 caption 1줄 프로토타입 고지(Terms §2 취지) — 확인 Dialog·성공 인터스티셜 폐지
       prototypeNotice: "프로토타입: 실제 결제가 이루어지지 않습니다.",
-      confirmCta: "예약 확정",
-      success: {
-        title: "GTS 하루가 완성됐어요",
-        sub: "전체 일정은 티켓에서 확인하세요",
-        viewTicket: "티켓 보기",
-      },
+    },
+    // §42 결제 수단 그리드 + 카드 폼(존 C5)
+    pay: {
+      title: "결제 수단",
+      walletNote: "이 프로토타입에서는 월렛 결제가 시뮬레이션으로 진행됩니다. 앱은 열리지 않아요.",
+      cardNumber: "카드 번호",
+      expiry: "유효기간",
+      expiryPlaceholder: "MM/YY",
+      cvc: "CVC",
+      nameOnCard: "카드 소유자 이름",
     },
     ticket: {
       orderTitle: "하루 일정",
       dropoffLabel: "하차 지점",
+      // §43 좌측 상세 패널(존 C5) · 환불 규정은 legal.terms.s3 재사용(신규 창작 금지)
+      detailsTitle: "예약 상세",
+      payMethodLabel: "결제 수단",
+      guideTitle: "이용 안내",
+      guide1: "탑승할 때 기사님께 티켓 코드를 보여 주세요.",
+      guide2: "각 장소는 2시간 슬롯으로 진행되며 기사님이 일정을 지켜 드립니다.",
+      guide3: "변경이 필요하면 하루 시작 전에 official@gts.ac.kr 로 알려 주세요.",
+      saveCta: "이미지 저장",
     },
   },
 };

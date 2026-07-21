@@ -32,6 +32,19 @@ export default {
     build: {
       title: "Build your day",
       stepLabel: "Step",
+      // §41 StepStage 상단 라벨("1 / 3 · …")용 짧은 스텝명 + 나가기 확인 Dialog(존 C5)
+      step: {
+        plan: "Meal plan",
+        meals: "Meal spots",
+        picks: "Day picks",
+      },
+      exitTitle: "Leave the builder?",
+      exitBody: "You will go back to the setup step. Your picks are kept while you stay in the tour builder.",
+      exitStay: "Keep building",
+      exitLeave: "Leave",
+      // §10.4 페이지네이션 페어(새로고침 폐지 · 경계 비활성)
+      prevPage: "Previous page",
+      nextPage: "Next page",
       planTitle: "How about meals?",
       plan: {
         none: "No meals",
@@ -45,7 +58,6 @@ export default {
       mealsOrderHint: "First pick is lunch, second is dinner.",
       lunchBadge: "Lunch",
       dinnerBadge: "Dinner",
-      refresh: "See other places",
       comingSoon: "Coming soon",
       cat: {
         meal: "Meal",
@@ -86,18 +98,30 @@ export default {
       dropoffRequired: "Enter your drop off point to continue",
       priceTitle: "Price breakdown",
       payCta: "Pay",
-      confirmTitle: "Prototype checkout",
+      // §42: 폼 하단 caption 1줄 프로토타입 고지(Terms §2 취지) — 확인 Dialog·성공 인터스티셜 폐지
       prototypeNotice: "Prototype: no real payment is processed.",
-      confirmCta: "Confirm booking",
-      success: {
-        title: "Your GTS day is set",
-        sub: "Your ticket keeps the full plan",
-        viewTicket: "View ticket",
-      },
+    },
+    // §42 결제 수단 그리드 + 카드 폼(존 C5)
+    pay: {
+      title: "Payment method",
+      walletNote: "Wallet payment is simulated in this prototype, so no app will open.",
+      cardNumber: "Card number",
+      expiry: "Expiry",
+      expiryPlaceholder: "MM/YY",
+      cvc: "CVC",
+      nameOnCard: "Name on card",
     },
     ticket: {
       orderTitle: "Day schedule",
       dropoffLabel: "Drop off",
+      // §43 좌측 상세 패널(존 C5) · 환불 규정은 legal.terms.s3 재사용(신규 창작 금지)
+      detailsTitle: "Booking details",
+      payMethodLabel: "Payment method",
+      guideTitle: "Good to know",
+      guide1: "Show your ticket code to the driver when you board.",
+      guide2: "Each stop runs as a 2 hour slot and your driver keeps the schedule.",
+      guide3: "Need a change? Write to official@gts.ac.kr before your day starts.",
+      saveCta: "Save image",
     },
   },
 };

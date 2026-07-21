@@ -1,0 +1,25 @@
+/* StepStage.css · PATTERNS §41 스텝 전환 키프레임(존 C5).
+   ±24px 슬라이드 거리 = §41 명세값(나가는 -24px / 들어오는 24px→0 + opacity).
+   지속·이징은 컴포넌트가 tokens.motion(dur 280ms · easeInOut)으로 인라인 주입한다.
+   reduced-motion: index.css 전역 룰이 animation-duration을 0.01ms로 강제해
+   즉시 크로스페이드(잔상 없는 상태 교체)로 축약된다(§41 크로스페이드 요구 충족). */
+@keyframes bh-step-in {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes bh-step-out {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+}

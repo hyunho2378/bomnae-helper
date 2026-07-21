@@ -31,12 +31,14 @@ export default function GtsSetup() {
 
   return (
     <Container>
-      <div className="mx-auto flex w-full max-w-dialog flex-col gap-32 pb-64 pt-96">
+      {/* v4.2 §10.4 데스크탑 확폭: max-w-dialog 페이지 래퍼 제거 — lg 2컬럼으로 v3.2 컨테이너 실사용 */}
+      <div className="flex w-full flex-col gap-32 pb-64 pt-96">
         <div className="flex flex-col gap-8">
           <LangSwap k="gts.setup.title" as="h1" className="text-h1 font-bold tracking-display" />
           <LangSwap k="gts.setup.sub" as="p" className="text-body text-inkSec" />
         </div>
 
+        <div className="grid gap-24 lg:grid-cols-2 lg:items-start">
         {/* 인원 + 짐 보관 · 입력 카드(무보더 · shadow.sm) */}
         <section className="flex flex-col gap-24 rounded-xl bg-white p-24 shadow-sm">
           <Stepper value={party ?? 1} min={1} max={12} onChange={setParty} label="gts.setup.partyLabel" />
@@ -89,6 +91,7 @@ export default function GtsSetup() {
           {/* 요금 구성 · fares 조회 전용 + DRAFT 고지(§9.3) */}
           {vehicle && <FareBreakdown vehicle={vehicle} luggage={luggage} party={party ?? 1} />}
         </section>
+        </div>
 
         <div className="flex">
           <Button onClick={() => navigate('/gts/build')}>
