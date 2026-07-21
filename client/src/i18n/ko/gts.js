@@ -43,8 +43,6 @@ export default {
       exitStay: "계속 조립하기",
       exitLeave: "나가기",
       // §10.4 페이지네이션 페어(새로고침 폐지 · 경계 비활성)
-      prevPage: "이전 페이지",
-      nextPage: "다음 페이지",
       planTitle: "식사는 어떻게 할까요?",
       plan: {
         none: "식사 안 함",
@@ -104,7 +102,6 @@ export default {
     // §42 결제 수단 그리드 + 카드 폼(존 C5)
     pay: {
       title: "결제 수단",
-      walletNote: "이 프로토타입에서는 월렛 결제가 시뮬레이션으로 진행됩니다. 앱은 열리지 않아요.",
       cardNumber: "카드 번호",
       expiry: "유효기간",
       expiryPlaceholder: "MM/YY",

@@ -14,7 +14,7 @@ import Button from '../ui/Button';
 import FieldSelect from '../ui/FieldSelect';
 import Modal from '../ui/Modal';
 import CalendarField from './CalendarField';
-import TimeWheel from './TimeWheel';
+import TimeField from './TimeField';
 import {
   CURRENT_LOCATION_ID,
   buildDestOptions,
@@ -137,13 +137,15 @@ export default function GateForm({ direction, onResult }) {
   return (
     <>
       <form noValidate onSubmit={submit} className="rounded-lg bg-white p-24 shadow-sm">
-        <div className="grid gap-16 md:grid-cols-2 xl:grid-cols-3">
+        {/* [H2-6] 컴팩트 인라인 · lg+ 한 행 4필드(내용 기반 h-48 트리거) — 우측 거대 여백 제거 */}
+        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
           <FieldSelect
             label="gate.form.from"
             value={originValue}
             placeholder="gate.planner.form.fromPh"
             options={buildOriginOptions(direction)}
             onChange={pickOrigin}
+            compact
           />
           <FieldSelect
             label="gate.planner.form.to"
@@ -151,6 +153,7 @@ export default function GateForm({ direction, onResult }) {
             placeholder="gate.planner.form.toPh"
             options={buildDestOptions(direction)}
             onChange={pickDest}
+            compact
           />
           <CalendarField
             label="gate.planner.form.date"
@@ -158,11 +161,8 @@ export default function GateForm({ direction, onResult }) {
             placeholder="gate.form.placeholders.date"
             onChange={setDate}
           />
-        </div>
-
-        {/* §38 TimeWheel · 30분 스텝 FieldSelect 시간 폐지 · 디폴트 = KST 현재 시각 */}
-        <div className="mt-16">
-          <TimeWheel value={time} onChange={setTime} />
+          {/* [H2-5] 시간 = FieldSelect 문법 닫힘(KST 현재 디폴트) + 클릭 시 TimeWheel 팝(§38) */}
+          <TimeField label="gate.planner.form.time" value={time} onChange={setTime} />
         </div>
 
         <div className="mt-24">

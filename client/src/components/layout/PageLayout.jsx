@@ -38,15 +38,17 @@ export default function PageLayout() {
     document.title = `Global Tourism System · ${t(`meta.title.${routeKey}`)}`;
   }, [routeKey, t]);
 
-  // 라우트 변경 시 스크롤 top 복원 (ROUTES §4)
+  // [H2-3] 라우트 변경 시 항상 최상단(결제→티켓 replace 포함) · 해시 앵커(#proof) 이동만 예외
   useEffect(() => {
-    window.scrollTo(0, 0);
+    if (!window.location.hash) window.scrollTo(0, 0);
   }, [pathname]);
 
   return (
     <>
       <Header />
-      <main className="relative z-content pb-96 lg:pb-0">
+      {/* [H2-4] 짧은 페이지 푸터 밀어내기 · 헤더는 fixed(문서 공간 미점유)라 main이 top 0부터
+          시작 — min-height 100dvh로 푸터를 첫 화면 밖으로 민다 */}
+      <main className="relative z-content min-h-[100dvh] pb-96 lg:pb-0">
         <Outlet />
       </main>
       <GlassDock />

@@ -5,7 +5,9 @@ import { useLang } from '../../i18n/LangContext';
 
 const LANGS = ['en', 'ko', 'th'];
 
-export default function TriText({ text, className = '' }) {
+// clampClass([H2-12]): 각 언어 span에 line-clamp 적용 — 겹침 렌더라 최장 언어 기준
+// 높이가 이미 고정되고, clamp가 그 상한을 카드 규격으로 캡한다.
+export default function TriText({ text, className = '', clampClass = '' }) {
   const { lang } = useLang();
   return (
     <span className={`grid ${className}`}>
@@ -13,7 +15,7 @@ export default function TriText({ text, className = '' }) {
         <span
           key={code}
           aria-hidden={lang !== code}
-          className={`col-start-1 row-start-1 ${lang === code ? '' : 'invisible'}`}
+          className={`col-start-1 row-start-1 ${clampClass} ${lang === code ? '' : 'invisible'}`}
         >
           {text[code] ?? text.en}
         </span>

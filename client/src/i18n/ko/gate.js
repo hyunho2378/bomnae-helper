@@ -66,7 +66,7 @@ export default {
       terminal: "도착 터미널",
       // v3.2 §8.2.1: 출발지 필드(현재 위치 1옵션 + 허브 병존) · Gate 플래너 전용 라벨
       from: "출발지",
-      currentLocation: "현재 위치 사용",
+      currentLocation: "현재 위치",
       date: "도착 날짜",
       submit: "내 경로 찾기",
       placeholders: {

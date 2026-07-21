@@ -43,8 +43,6 @@ export default {
       exitStay: "Keep building",
       exitLeave: "Leave",
       // §10.4 페이지네이션 페어(새로고침 폐지 · 경계 비활성)
-      prevPage: "Previous page",
-      nextPage: "Next page",
       planTitle: "How about meals?",
       plan: {
         none: "No meals",
@@ -104,7 +102,6 @@ export default {
     // §42 결제 수단 그리드 + 카드 폼(존 C5)
     pay: {
       title: "Payment method",
-      walletNote: "Wallet payment is simulated in this prototype, so no app will open.",
       cardNumber: "Card number",
       expiry: "Expiry",
       expiryPlaceholder: "MM/YY",

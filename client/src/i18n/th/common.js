@@ -34,6 +34,7 @@ export default {
     login: "เข้าสู่ระบบ",
     logout: "ออกจากระบบ",
     menu: "เมนู",
+    pagination: "การนำทางหน้า",
   },
   status: {
     confirmed: "ยืนยันออกเดินทาง",

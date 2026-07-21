@@ -8,7 +8,7 @@ import LangSwap from '../../i18n/LangSwap';
 import { useLang } from '../../i18n/LangContext';
 import usePopExit from './usePopExit';
 
-export default function FieldSelect({ label, value, placeholder, options, onChange }) {
+export default function FieldSelect({ label, value, placeholder, options, onChange, compact = false }) {
   const { t } = useLang();
   const [open, setOpen] = useState(false);
   const [instantPop, setInstantPop] = useState(false);
@@ -86,12 +86,17 @@ export default function FieldSelect({ label, value, placeholder, options, onChan
           setInstantPop(e.detail === 0); // detail 0 = 키보드 발화 클릭(§17.1)
           setOpen((v) => !v);
         }}
-        className="flex w-full flex-col gap-4 rounded-md bg-surface p-16 text-left transition-shadow duration-fast focus:shadow-md"
+        // [H2-6] compact: 라벨 좌 caption + 값 우측 정렬 한 줄(h-48) · 기본: 기존 2행 문법
+        className={
+          compact
+            ? 'flex h-48 w-full items-center justify-between gap-12 rounded-md bg-surface px-16 text-left transition-shadow duration-fast focus:shadow-md'
+            : 'flex w-full flex-col gap-4 rounded-md bg-surface p-16 text-left transition-shadow duration-fast focus:shadow-md'
+        }
       >
-        <LangSwap k={label} className="text-caption font-medium text-inkMeta" />
-        <span className="flex items-center justify-between gap-8">
+        <LangSwap k={label} className={`text-caption font-medium text-inkMeta ${compact ? 'shrink-0' : ''}`} />
+        <span className={`flex items-center gap-8 ${compact ? 'min-w-0 justify-end' : 'justify-between'}`}>
           {selected ? (
-            <span className="text-body font-medium text-ink">{selected.primary}</span>
+            <span className={`text-body font-medium text-ink ${compact ? 'truncate' : ''}`}>{selected.primary}</span>
           ) : (
             <LangSwap k={placeholder} className="text-body font-medium text-inkSec" />
           )}

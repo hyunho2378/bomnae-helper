@@ -8,9 +8,8 @@
 //   (§9.4 "없으면 렌더 안 함 · 빈 박스 금지").
 // 정원 초과 시 자동 해제 금지 — 수용 여부 판정은 Context toggle의 반환값을 페이지가 처리.
 import { useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import LangSwap from '../../i18n/LangSwap';
-import Button from '../ui/Button';
+import Pagination from '../ui/Pagination';
 import TriText from './TriText';
 
 const COLS = {
@@ -41,7 +40,10 @@ export default function VenueGrid({ pool, pageSize = 8, selected, max, onToggle,
               type="button"
               onClick={() => onToggle(venue.id)}
               aria-pressed={isSelected}
-              className={`pressable relative flex min-h-44 flex-col items-start gap-8 rounded-lg p-16 text-left shadow-sm ${
+              // [H2-12] 카드 규격 통일: 고정 높이 172px(명세값 · 이름 1줄 + 한 줄 2줄 + Chip) ·
+              //   이름·한 줄·Chip의 y좌표 전 카드 동일(Chip = mt-auto 바닥 고정) · 텍스트 line-clamp
+              style={{ height: 172 }}
+              className={`pressable relative flex flex-col items-start gap-8 overflow-hidden rounded-lg p-16 text-left shadow-sm ${
                 venue.mock ? 'bg-surface' : 'bg-white'
               } ${isSelected ? 'ring-2 ring-primary' : 'hover:shadow-md'}`}
             >
@@ -51,11 +53,15 @@ export default function VenueGrid({ pool, pageSize = 8, selected, max, onToggle,
                   {badgeKeys?.[orderIdx] ? <LangSwap k={badgeKeys[orderIdx]} /> : orderIdx + 1}
                 </span>
               )}
-              <TriText text={venue.name} className="text-body font-bold" />
-              <TriText text={venue.oneLine} className="text-caption font-medium text-inkSec" />
-              {/* 목업 = Coming soon Chip / 실명 = 카테고리 Chip(§30) */}
+              <TriText text={venue.name} className="text-body font-bold" clampClass="line-clamp-1" />
+              <TriText
+                text={venue.oneLine}
+                className="text-caption font-medium text-inkSec"
+                clampClass="line-clamp-2"
+              />
+              {/* 목업 = Coming soon Chip / 실명 = 카테고리 Chip(§30) · [H2-12] mt-auto 바닥 고정 */}
               <span
-                className={`inline-flex items-center rounded-pill px-12 py-4 text-caption font-medium text-inkSec ${
+                className={`mt-auto inline-flex items-center rounded-pill px-12 py-4 text-caption font-medium text-inkSec ${
                   venue.mock ? 'bg-white' : 'bg-surface'
                 }`}
               >
@@ -66,23 +72,8 @@ export default function VenueGrid({ pool, pageSize = 8, selected, max, onToggle,
         })}
       </div>
 
-      {/* §10.4 페이지네이션 페어 · 경계 비활성(순환 아님) — 풀이 한 페이지를 넘는 경우에만 */}
-      {pool.length > pageSize && (
-        <div className="flex items-center gap-12">
-          <Button variant="secondary" disabled={page === 0} onClick={() => setPage((p) => Math.max(0, p - 1))}>
-            <ChevronLeft size={16} aria-hidden="true" />
-            <LangSwap k="gts.build.prevPage" />
-          </Button>
-          <Button
-            variant="secondary"
-            disabled={page === pages - 1}
-            onClick={() => setPage((p) => Math.min(pages - 1, p + 1))}
-          >
-            <LangSwap k="gts.build.nextPage" />
-            <ChevronRight size={16} aria-hidden="true" />
-          </Button>
-        </div>
-      )}
+      {/* [H2-11] 숫자 원형 페이지네이션(IA §10.4 페어 규정 대체 · 전 그리드 공통) */}
+      <Pagination page={page} pages={pages} onSelect={setPage} />
     </div>
   );
 }

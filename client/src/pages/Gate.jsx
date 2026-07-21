@@ -1,7 +1,7 @@
 // Trip Planner(/gate) · v4.2 존 B5(IA §10.3): 칩 토글 폐지 → 수직 2섹션
 // ("To Chuncheon" 폼 섹션 → 아래 "From Chuncheon" 폼 섹션 · 각자 독립 상태 · 구조 동일).
 // 폼 상단 라이브 KST 시계(§38 · KoreaClock) · 결과 카드는 §39 레그 시각 계산("예상" 라벨) 표기.
-// §40 데모 도착 시퀀스: To 섹션 결과 확정(내 경로 찾기 제출) 3초 뒤 중앙 모달 → /gts.
+// §40 데모 도착 시퀀스: To 섹션 결과 확정(내 경로 찾기 제출) 10초([H2-8]) 뒤 중앙 모달 → /gts.
 //   타이머는 페이지 이탈 시 clear · 세션당 1회 발화(재검색 제출 시 재장전 허용).
 // 구 도착 감지 카드(§8.5·§21)는 렌더 제거하되 ARRIVAL_MODE='geo' 플래그로 코드 보존(삭제 금지).
 // 홈 미니 폼(GateEntryCard) 삭제로 쿼리 프리필 계약 소멸 · useSearchParams 프리필 제거.
@@ -14,7 +14,6 @@ import EmptyState from '../components/ui/EmptyState';
 import ArrivalCard from '../components/gate/ArrivalCard';
 import DemoArrivalModal from '../components/gate/DemoArrivalModal';
 import GateForm from '../components/gate/GateForm';
-import KoreaClock from '../components/gate/KoreaClock';
 import RouteOptionCard from '../components/gate/RouteOptionCard';
 import { ArrivalProvider } from '../context/ArrivalContext';
 
@@ -31,7 +30,7 @@ function PlannerSection({ direction, onConfirmed }) {
   };
 
   return (
-    <section className="mt-48">
+    <section className="mt-32">
       <LangSwap k={`gate.planner.dir.${direction}`} as="h2" className="text-h2 font-bold" />
       <div className="mt-24">
         <GateForm direction={direction} onResult={handleResult} />
@@ -69,7 +68,7 @@ export default function Gate() {
   const scheduleDemo = (payload) => {
     if (ARRIVAL_MODE !== 'demo' || payload.options.length === 0) return;
     clearTimeout(demoTimer.current);
-    demoTimer.current = setTimeout(() => setDemoOpen(true), 3000);
+    demoTimer.current = setTimeout(() => setDemoOpen(true), 10000); // [H2-8] 3초 → 10초
   };
 
   // 이탈(언마운트) 시 타이머 clear(§40)
@@ -88,11 +87,6 @@ export default function Gate() {
           <LangSwap k="gate.planner.title" as="h1" className="mt-8 text-h1 font-bold tracking-display" />
           {/* v3.1: 텍스트 max-w 캡 해제(컨테이너가 폭 결정, DESIGN §13) */}
           <LangSwap k="gate.planner.intro" as="p" className="mt-16 text-body text-inkSec" />
-
-          {/* §38 라이브 시계 · "지금 한국은 HH:MM:SS" · 1초 틱 */}
-          <div className="mt-24">
-            <KoreaClock />
-          </div>
 
           {/* §10.3 수직 2섹션 · To 먼저, 아래 From · 데모 도착은 To에서만 발화(§40) */}
           <PlannerSection direction="to" onConfirmed={scheduleDemo} />

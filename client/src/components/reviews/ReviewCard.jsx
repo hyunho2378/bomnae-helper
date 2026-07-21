@@ -41,7 +41,9 @@ export default function ReviewCard({ review, liked, onLike }) {
       <p lang={review.lang} className="text-small text-inkSec">
         {review.body}
       </p>
-      <div className="flex flex-wrap items-center justify-between gap-12 pt-4">
+      {/* [H2-18] 메타 = 고정 슬롯 3행(이니셜·국가 / 코스 / 좋아요) · 본문만 가변,
+          메타 블록은 mt-auto 바닥 고정 — 전 카드 행 구조·위치 동일 */}
+      <div className="mt-auto flex flex-col gap-4 pt-4">
         <span className="flex min-w-0 items-baseline gap-8">
           <span className="font-display text-small font-semibold">{review.initials}</span>
           {review.country && (

@@ -69,7 +69,7 @@ export default {
       terminal: "Arrival terminal",
       // v3.2 §8.2.1: 출발지 필드(현재 위치 1옵션 + 허브 병존) · Gate 플래너 전용 라벨
       from: "From",
-      currentLocation: "Use my current location",
+      currentLocation: "Current location",
       date: "Arrival date",
       submit: "Find my route",
       placeholders: {

@@ -35,6 +35,7 @@ export default {
     login: "Sign in",
     logout: "Sign out",
     menu: "Menu",
+    pagination: "Page navigation",
   },
   status: {
     confirmed: "Confirmed",

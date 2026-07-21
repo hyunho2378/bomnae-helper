@@ -42,8 +42,6 @@ export default {
       exitStay: "จัดต่อ",
       exitLeave: "ออก",
       // §10.4 페이지네이션 페어(새로고침 폐지 · 경계 비활성)
-      prevPage: "หน้าก่อนหน้า",
-      nextPage: "หน้าถัดไป",
       planTitle: "มื้ออาหารเอาแบบไหนดี",
       plan: {
         none: "ไม่รวมมื้ออาหาร",
@@ -103,7 +101,6 @@ export default {
     // §42 결제 수단 그리드 + 카드 폼(존 C5)
     pay: {
       title: "วิธีการชำระเงิน",
-      walletNote: "ต้นแบบนี้จำลองการชำระเงินผ่านวอลเล็ต จะไม่มีแอปเปิดขึ้น",
       cardNumber: "หมายเลขบัตร",
       expiry: "วันหมดอายุ",
       expiryPlaceholder: "MM/YY",

@@ -127,10 +127,11 @@ export default function CalendarField({ label, value, placeholder, onChange }) {
         aria-haspopup="grid"
         aria-expanded={open}
         onClick={toggle}
-        className="flex w-full flex-col gap-4 rounded-md bg-surface p-16 text-left transition-shadow duration-fast focus:shadow-md"
+        // [H2-6] compact 트리거 · 라벨 좌 caption / 값 우측 정렬(h-48)
+        className="flex h-48 w-full items-center justify-between gap-12 rounded-md bg-surface px-16 text-left transition-shadow duration-fast focus:shadow-md"
       >
-        <LangSwap k={label} className="text-caption font-medium text-inkMeta" />
-        <span className="flex items-center justify-between gap-8">
+        <LangSwap k={label} className="shrink-0 text-caption font-medium text-inkMeta" />
+        <span className="flex min-w-0 items-center justify-end gap-8">
           {value ? (
             <span className="text-body font-medium text-ink">
               <DateText date={parseDate(value)} />

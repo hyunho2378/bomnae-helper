@@ -4,8 +4,8 @@
 export default {
   brand: {
     hero: {
-      title: "We move you to the story.",
-      sub: "Global Tourism System runs the missing links of a Chuncheon trip: from the airport gate to the last local stop, with your hands free.",
+      title: "One app. Every preference. Explore Chuncheon.",
+      sub: "Sightseeing on your terms for those seeking convenience and new experiences. GTS simplifies your trip to Chuncheon with a customized itinerary.",
     },
     before: {
       title: "Before you even get here",
@@ -141,10 +141,146 @@ export default {
       title: "Built with the town, ready for the world",
       body: "Every seat sold routes money to a small shop before you arrive. And the platform already speaks English, Korean and Thai, because Chuncheon's next guests are already booking flights.",
     },
+    // [H2-19] 크라우드펀딩 카피(어바웃.md 전문 이식 · 이모지 제거 · Web platform 교정 · Tourism 통일)
+    crowd: {
+      story: {
+        title: "Traveling Should Be About Discovering, Not Getting Lost.",
+        intro: "Every year, thousands of international visitors come to Chuncheon to experience its lakes, food, culture, and famous attractions. Unfortunately, many leave without experiencing everything the city has to offer. Why?",
+        b1: "Transportation is confusing for first-time visitors.",
+        b2: "Information is often only available in Korean.",
+        b3: "Tourist attractions are spread across the city.",
+        b4: "Taxi fares become expensive.",
+        b5: "Lack of knowledge on all that the city has to offer.",
+        outro1: "Instead of creating memories, travelers spend their time planning routes, waiting for buses, and worrying about getting lost and scammed.",
+        outro2: "We believe exploring a city should feel exciting, not overwhelming. That's why we created the Global Tourism System (GTS).",
+        missionLead: "Our mission is simple:",
+        mission: "Make Chuncheon easy to explore for everyone, regardless of language or travel experience interests.",
+      },
+      product: {
+        title: "Product Introduction",
+        body: "GTS is an integrated tourism mobility platform that combines transportation, multilingual guidance, and travel convenience into one seamless experience.",
+        offersTitle: "What our service offers:",
+        o1: "Comfortable transportation",
+        o2: "Flexible schedules",
+        o3: "Multilingual guidance",
+        o4: "Friendly onboard host",
+        o5: "Fixed cost",
+        o6: "Customized itinerary of the best places in Chuncheon",
+      },
+      strengths: {
+        title: "Core Strengths & Key Features",
+        cards: {
+          routes: {
+            title: "Curated Tourist Routes",
+            body: "Visit more attractions in less time with carefully planned, personalized itineraries.",
+          },
+          cost: {
+            title: "Affordable Alternative",
+            body: "Enjoy a more economical option than taking multiple taxi rides while avoiding the complexity of public transportation.",
+          },
+          local: {
+            title: "Boosting Local Business",
+            body: "Connecting global travelers with authentic local experiences while creating new opportunities for local business growth.",
+          },
+          ease: {
+            title: "Stress-Free Travel",
+            body: "Everything you need, from arrival to sightseeing, is available through one integrated platform.",
+          },
+        },
+      },
+      specs: {
+        title: "Product Specifications",
+        rows: {
+          product: {
+            k: "Product",
+            v: "Global Tourism System (GTS)",
+          },
+          platform: {
+            k: "Platform",
+            v: "Web platform + Shuttle Service",
+          },
+          languages: {
+            k: "Languages",
+            v: "English + Multilingual Support",
+          },
+          services: {
+            k: "Services",
+            v: "Airport Guidance, Shuttle Transportation",
+          },
+          routes: {
+            k: "Shuttle Routes",
+            v: "Based on individualized preferences",
+          },
+          booking: {
+            k: "Booking",
+            v: "Online Pre-Reservation",
+          },
+          boarding: {
+            k: "Boarding",
+            v: "Customized Stops and flexible schedules",
+          },
+          addon: {
+            k: "Additional Service",
+            v: "On-board Host and Tourist Information",
+          },
+          target: {
+            k: "Target Users",
+            v: "International Tourists, Exchange Students, Domestic Visitors",
+          },
+          revenue: {
+            k: "Revenue Model",
+            v: "Service Fares, Travel fees, Partnership Commissions",
+          },
+        },
+      },
+      support: {
+        title: "Why Support GTS?",
+        intro: "By supporting GTS, you're helping us:",
+        i1: "Make Chuncheon more accessible to international visitors.",
+        i2: "Support local businesses by bringing tourists directly to them.",
+        i3: "Reduce travel stress through smarter transportation.",
+        i4: "Build a tourism model that can expand to cities across Korea and the world.",
+        outro: "You're not just paying for transportation. You're creating better travel experiences.",
+      },
+      faq: {
+        title: "FAQ",
+        q1: {
+          q: "Why Chuncheon?",
+          a: "Chuncheon is one of Korea's most beautiful tourist destinations, famous for its lakes, dakgalbi, rail bike, and cultural attractions. Yet many visitors struggle to explore beyond one or two locations due to transportation challenges. GTS unlocks the full city experience.",
+        },
+        q2: {
+          q: "Who is GTS for?",
+          i1: "International tourists",
+          i2: "Exchange students",
+          i3: "Foreign residents",
+          i4: "Families",
+          i5: "Seniors",
+          i6: "Domestic travelers seeking convenience",
+        },
+        q3: {
+          q: "Why is GTS different?",
+          intro: "Unlike buses, taxis, or ride-hailing apps, GTS combines:",
+          i1: "Transportation",
+          i2: "Multilingual guidance",
+          i3: "Curated sightseeing",
+          i4: "Local recommendations",
+          outro: "All within one seamless platform.",
+        },
+        q4: {
+          q: "How will funds be used?",
+          intro: "Your contributions will help us:",
+          i1: "Launch transportation operations",
+          i2: "Develop and improve the GTS web platform",
+          i3: "Expand multilingual support",
+          i4: "Build partnerships with local businesses",
+          i5: "Promote Chuncheon as a world-class travel destination",
+        },
+      },
+    },
     cta: {
-      title: "Back the first line.",
-      sub: "Crowdfunding opens soon. Until then, ride the pilot.",
-      button: "See the lines",
+      title: "Help Us Redefine Travel in Chuncheon and the World",
+      sub: "Travel should be about discovering new places, not worrying about transportation. GTS will make Chuncheon easier and more welcoming for visitors from around the world. Together, we can transform every arrival into an unforgettable journey. Join us in building the future of tourism mobility.",
+      button: "Support GTS today",
     },
   },
 };

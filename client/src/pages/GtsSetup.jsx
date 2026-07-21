@@ -38,9 +38,28 @@ export default function GtsSetup() {
           <LangSwap k="gts.setup.sub" as="p" className="text-body text-inkSec" />
         </div>
 
-        <div className="grid gap-24 lg:grid-cols-2 lg:items-start">
-        {/* 인원 + 짐 보관 · 입력 카드(무보더 · shadow.sm) */}
-        <section className="flex flex-col gap-24 rounded-xl bg-white p-24 shadow-sm">
+        {/* [H2-10] 단일 카드: 좌 = Your ride / 우 = Travelers+짐 토글, CTA는 우측 컬럼 아래 우측 정렬 */}
+        <div className="grid gap-24 rounded-xl bg-white p-24 shadow-sm lg:grid-cols-2 lg:items-start lg:gap-40 lg:p-40">
+        {/* 매칭 결과(Your ride) · 좌측 컬럼(lg) — 파생 vehicle(§9.3) · 카드 안 서브 영역(surface 면) */}
+        <section className="flex flex-col gap-24 rounded-lg bg-surface p-24">
+          <LangSwap k="gts.setup.matchTitle" as="h2" className="text-h3 font-semibold" />
+          <div className="flex items-center gap-16">
+            <span
+              aria-hidden="true"
+              className="flex h-64 w-64 shrink-0 items-center justify-center rounded-pill bg-primary text-white"
+            >
+              <Icon size={32} aria-hidden="true" />
+            </span>
+            {vehicle && (
+              <LangSwap k={`gts.vehicle.${vehicle}`} className="font-display text-h2 font-bold" />
+            )}
+          </div>
+          {/* 요금 구성 · fares 조회 전용(§9.3) */}
+          {vehicle && <FareBreakdown vehicle={vehicle} luggage={luggage} party={party ?? 1} />}
+        </section>
+
+        {/* 인원 + 짐 보관 · 우측 컬럼(lg) */}
+        <section className="flex flex-col gap-24">
           <Stepper value={party ?? 1} min={1} max={12} onChange={setParty} label="gts.setup.partyLabel" />
           {/* 수평 디바이더 · colors.line 허용 예외(Booking 요약 카드 선례) */}
           <div aria-hidden="true" className="h-px w-full bg-line" />
@@ -74,29 +93,12 @@ export default function GtsSetup() {
           </div>
         </section>
 
-        {/* 매칭 결과 카드 · 파생 vehicle(§9.3 결정론) — 인원·짐 변경 시 카드 갱신만(§31) */}
-        <section className="flex flex-col gap-24 rounded-xl bg-white p-24 shadow-md">
-          <LangSwap k="gts.setup.matchTitle" as="h2" className="text-h3 font-semibold" />
-          <div className="flex items-center gap-16">
-            <span
-              aria-hidden="true"
-              className="flex h-64 w-64 shrink-0 items-center justify-center rounded-pill bg-primary text-white"
-            >
-              <Icon size={32} aria-hidden="true" />
-            </span>
-            {vehicle && (
-              <LangSwap k={`gts.vehicle.${vehicle}`} className="font-display text-h2 font-bold" />
-            )}
-          </div>
-          {/* 요금 구성 · fares 조회 전용 + DRAFT 고지(§9.3) */}
-          {vehicle && <FareBreakdown vehicle={vehicle} luggage={luggage} party={party ?? 1} />}
-        </section>
-        </div>
-
-        <div className="flex">
+        {/* [H2-10] CTA · 우측 컬럼 바로 아래 우측 정렬(고아 좌측 버튼 금지) */}
+        <div className="flex justify-end lg:col-start-2">
           <Button onClick={() => navigate('/gts/build')}>
             <LangSwap k="gts.setup.cta" />
           </Button>
+        </div>
         </div>
       </div>
     </Container>

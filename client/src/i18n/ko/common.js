@@ -33,6 +33,7 @@ export default {
     login: "로그인",
     logout: "로그아웃",
     menu: "메뉴",
+    pagination: "페이지 이동",
   },
   status: {
     confirmed: "출발확정",

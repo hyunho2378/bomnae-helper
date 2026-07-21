@@ -62,11 +62,14 @@ export default function HeroCarousel() {
           {/* v4.2 §10.2 CTA 페어 · 동일 size(동일 높이·패딩)·나란히·컨테이너 정렬 축 일치(§16.8).
               secondary는 Button variant 재사용(§16.8 투명 배경+primary 텍스트+1.5px primary 보더).
               §10.2의 white 배경은 래퍼 white pill이 제공(사진·스크림 위 가독 · 변형 스타일 중복 없음). */}
-          <div className="mt-32 flex flex-wrap items-center gap-16">
-            <Button as={Link} to="/gate" size="lg">
-              <LangSwap k="home.hero.ctaGate" />
-            </Button>
-            <span className="inline-flex rounded-pill bg-white">
+          {/* [H2-1] 페어 동일 폭(넓은 쪽 기준 1fr 균등)·동일 높이·간격 12 · grid 아이템 stretch로 폭 통일 */}
+          <div className="mt-32 inline-grid w-fit grid-flow-col auto-cols-fr items-stretch gap-12">
+            <span className="grid">
+              <Button as={Link} to="/gate" size="lg">
+                <LangSwap k="home.hero.ctaGate" />
+              </Button>
+            </span>
+            <span className="grid rounded-pill bg-white">
               <Button as={Link} to="/gts" variant="secondary" size="lg">
                 <LangSwap k="home.hero.ctaBuild" />
               </Button>

@@ -67,7 +67,7 @@ export default {
       terminal: "อาคารผู้โดยสารขาเข้า",
       // v3.2 §8.2.1: 출발지 필드(현재 위치 1옵션 + 허브 병존) · Gate 플래너 전용 라벨
       from: "จุดเริ่มต้น",
-      currentLocation: "ใช้ตำแหน่งปัจจุบันของฉัน",
+      currentLocation: "ตำแหน่งปัจจุบัน",
       date: "วันที่มาถึง",
       submit: "ค้นหาเส้นทางของฉัน",
       placeholders: {

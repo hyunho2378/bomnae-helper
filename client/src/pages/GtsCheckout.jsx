@@ -164,17 +164,14 @@ export default function GtsCheckout() {
             <section className="flex flex-col gap-16 rounded-xl bg-white p-24 shadow-sm">
               <LangSwap k="gts.pay.title" as="h2" className="text-h3 font-semibold" />
               <PayMethodGrid value={payMethod} onChange={setPayMethod} />
-              {/* 월렛(Apple Pay·Alipay) = 폼 생략 + 시뮬레이션 카피 1줄 + 바로 Pay(§42) */}
-              {method?.wallet && (
-                <LangSwap k="gts.pay.walletNote" as="p" className="text-small font-medium text-inkSec" />
-              )}
+              {/* [H2-16] 월렛 시뮬레이션 카피 삭제 · 월렛 = 폼 생략 + 바로 Pay(§42 유지) */}
               {/* 카드 계열 = 하단 카드 폼 확장(마운트 시 220ms easeOut · CardForm 내장) */}
               {method && !method.wallet && <CardForm />}
             </section>
           </div>
 
-          {/* 금액 내역 + Pay · 전 항목 + 합계 항상 펼침(§33) */}
-          <aside className="flex flex-col gap-24 rounded-xl bg-white p-24 shadow-md">
+          {/* 금액 내역 + Pay · 전 항목 + 합계 항상 펼침(§33) · [H2-14] lg+ sticky 동행 */}
+          <aside className="flex flex-col gap-24 rounded-xl bg-white p-24 shadow-md lg:sticky lg:top-24">
             <LangSwap k="gts.checkout.priceTitle" as="h2" className="text-h3 font-semibold" />
             <FareBreakdown vehicle={vehicle} luggage={luggage} party={party} />
             <div className="grid">

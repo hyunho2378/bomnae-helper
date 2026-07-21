@@ -105,11 +105,12 @@ export default function Reviews() {
 
         {/* 정렬 토글 · 최신순/좋아요순 Chip 페어(§10.8) */}
         <div className="flex items-center gap-8">
+          {/* [H2-17] 정렬 라벨 600 상향(과경량 수리 · Chip 기본 500 위에 자식 세미볼드) */}
           <Chip active={sort === 'latest'} onClick={() => setSort('latest')}>
-            <LangSwap k="reviews.sortLatest" />
+            <LangSwap k="reviews.sortLatest" className="font-semibold" />
           </Chip>
           <Chip active={sort === 'likes'} onClick={() => setSort('likes')}>
-            <LangSwap k="reviews.sortLikes" />
+            <LangSwap k="reviews.sortLikes" className="font-semibold" />
           </Chip>
         </div>
 

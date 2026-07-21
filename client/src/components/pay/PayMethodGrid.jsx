@@ -8,8 +8,10 @@ import { PAY_METHODS } from './payMethods';
 
 export default function PayMethodGrid({ value, onChange }) {
   const { t } = useLang();
-  // 로고 로드 실패 수단 id 집합 · 텍스트 라벨 폴백(§42)
-  const [failed, setFailed] = useState({});
+  // [H2-15] 로고 폴백 단계: (svg) → 'png' → 'text' · 깨진 이미지 아이콘 노출 금지(§42)
+  const [stage, setStage] = useState({});
+  const fail = (id) =>
+    setStage((s) => ({ ...s, [id]: s[id] === 'png' ? 'text' : 'png' }));
 
   return (
     <div role="radiogroup" aria-label={t('gts.pay.title')} className="grid grid-cols-2 gap-12 md:grid-cols-3 lg:grid-cols-4">
@@ -26,15 +28,15 @@ export default function PayMethodGrid({ value, onChange }) {
               selected ? 'ring-2 ring-primary' : 'hover:shadow-md'
             }`}
           >
-            {failed[method.id] ? (
+            {stage[method.id] === 'text' ? (
               <span className="text-body font-semibold">{method.label}</span>
             ) : (
               <img
-                src={method.file}
+                src={stage[method.id] === 'png' ? method.file.replace(/\.svg$/, '.png') : method.file}
                 alt={method.label}
                 // 로고 높이 32px = 아이콘 5단계 스케일 준용(h-32 토큰 클래스)
                 className="h-32 w-auto object-contain"
-                onError={() => setFailed((f) => ({ ...f, [method.id]: true }))}
+                onError={() => fail(method.id)}
               />
             )}
           </button>

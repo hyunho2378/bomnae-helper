@@ -113,12 +113,19 @@ export default function StepStage({
       <div
         ref={panelRef}
         tabIndex={-1}
-        // §41 명세값 최대 폭 1040px · 높이는 §18.3(100vh 금지 · dvh): 모바일 88dvh / lg 84dvh
-        style={{ maxWidth: 1040 }}
-        className="relative flex h-[88dvh] w-full flex-col overflow-hidden rounded-xl bg-glass shadow-lg backdrop-blur-glass lg:h-[84dvh]"
+        // [H2-13] 최대 폭 1120 · §35 문법 머티리얼(0.72 + blur24 saturate180 + 상단 하이라이트 엣지)
+        //   — 어두운 scrim(0.7) 위 밝은 화이트 글래스 대비("반투명 회색 모달" 톤 금지)
+        style={{
+          maxWidth: 1120,
+          background: 'rgba(255,255,255,0.72)',
+          backdropFilter: 'blur(24px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+          borderTop: '1px solid rgba(255,255,255,0.4)',
+        }}
+        className="relative flex h-[88dvh] w-full flex-col overflow-hidden rounded-xl shadow-lg lg:h-[84dvh]"
       >
         {/* 상단 · 스텝 라벨 + 진행 도트(§41) */}
-        <div className="flex flex-col items-center gap-8 px-24 pb-16 pt-24">
+        <div className="flex flex-col items-center gap-8 px-24 pb-32 pt-24 lg:px-40 lg:pt-40">
           <p className="flex items-baseline gap-8 tracking-glass">
             <span className="font-display text-small font-bold">
               {stepIndex + 1} / {stepCount}
@@ -138,7 +145,7 @@ export default function StepStage({
         </div>
 
         {/* 콘텐츠 · 내부 스크롤 scroll-quiet(§41) — 전환 중엔 나가는 씬을 절대배치로 겹침 */}
-        <div className="relative flex-1 overflow-y-auto scroll-quiet px-24 pb-24 md:px-40">
+        <div className="relative flex-1 overflow-y-auto scroll-quiet px-24 pb-32 lg:px-40">
           {leaving && (
             <div
               aria-hidden="true"
@@ -155,19 +162,22 @@ export default function StepStage({
 
         {/* 하단 중앙 고정 버튼 페어(§41) · 항상 동일 위치 · 사유는 aria-live · §18.3 safe-area */}
         <div
-          className="flex flex-col items-center gap-8 px-24 pt-16"
-          style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}
+          className="flex flex-col items-center gap-8 px-24 pt-32 lg:px-40"
+          style={{ paddingBottom: 'max(24px, env(safe-area-inset-bottom))' }}
         >
           <div aria-live="polite">
             {nextDisabled && reasonKey && (
               <LangSwap k={reasonKey} className="text-caption font-medium text-spice" />
             )}
           </div>
+          {/* [H2-13] Back = white 채움 + primary 텍스트 + shadow.sm(글래스 위 가시성) · 두 버튼 높이 48 */}
           <div className="flex items-center justify-center gap-12">
-            <Button variant="secondary" onClick={handleBack}>
-              <LangSwap k="common.back" />
-            </Button>
-            <Button disabled={nextDisabled} onClick={onNext}>
+            <span className="grid rounded-pill bg-white shadow-sm">
+              <Button variant="secondary" onClick={handleBack} style={{ height: 48 }}>
+                <LangSwap k="common.back" />
+              </Button>
+            </span>
+            <Button disabled={nextDisabled} onClick={onNext} style={{ height: 48 }}>
               <LangSwap k="common.next" />
             </Button>
           </div>
