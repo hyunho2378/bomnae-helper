@@ -9,7 +9,7 @@ import { useEffect, useId, useRef } from 'react';
 import { useLang } from '../../i18n/LangContext';
 import LangSwap from '../../i18n/LangSwap';
 
-const ITEM_PX = 40; // §38 명세값 · 항목 높이
+const ITEM_PX = 44; // §18.3 터치 계약([H1]) — §38의 40px에 우선(전 인터랙티브 44px)
 const VIEW_PX = 180; // §38 명세값 · 뷰포트 높이
 const PAD_PX = (VIEW_PX - ITEM_PX) / 2; // 중앙 정렬 상하 패딩
 const RANGE = { h: 24, m: 60 };

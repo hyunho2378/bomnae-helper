@@ -7,6 +7,7 @@
 // 스텝 전환: 나가는 콘텐츠 translateX(-24px)+opacity / 들어오는 24px→0+opacity ·
 //   280ms(tokens dur) easeInOut · reduced-motion 크로스페이드(StepStage.css 주석 참조).
 // Escape = 뒤로 1스텝(첫 스텝은 나가기 확인). 글래스 위 텍스트는 ink 계열 선명색만(§17.4).
+import { createPortal } from 'react-dom';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from '../../tokens';
 import { useLang } from '../../i18n/LangContext';
@@ -96,7 +97,7 @@ export default function StepStage({
   // §41 전환 수치는 tokens.motion 주입(키프레임은 StepStage.css)
   const stepAnim = (name) => ({ animation: `${name} ${motion.dur} ${motion.easeInOut} both` });
 
-  return (
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
@@ -112,9 +113,9 @@ export default function StepStage({
       <div
         ref={panelRef}
         tabIndex={-1}
-        // §41 명세값: 최대 폭 1040px · 높이 84vh — 명세 인용 한정 허용
-        style={{ maxWidth: 1040, height: '84vh' }}
-        className="relative flex w-full flex-col overflow-hidden rounded-xl bg-glass shadow-lg backdrop-blur-glass"
+        // §41 명세값 최대 폭 1040px · 높이는 §18.3(100vh 금지 · dvh): 모바일 88dvh / lg 84dvh
+        style={{ maxWidth: 1040 }}
+        className="relative flex h-[88dvh] w-full flex-col overflow-hidden rounded-xl bg-glass shadow-lg backdrop-blur-glass lg:h-[84dvh]"
       >
         {/* 상단 · 스텝 라벨 + 진행 도트(§41) */}
         <div className="flex flex-col items-center gap-8 px-24 pb-16 pt-24">
@@ -152,8 +153,11 @@ export default function StepStage({
           </div>
         </div>
 
-        {/* 하단 중앙 고정 버튼 페어(§41) · 항상 동일 위치 · 사유는 aria-live */}
-        <div className="flex flex-col items-center gap-8 px-24 py-16">
+        {/* 하단 중앙 고정 버튼 페어(§41) · 항상 동일 위치 · 사유는 aria-live · §18.3 safe-area */}
+        <div
+          className="flex flex-col items-center gap-8 px-24 pt-16"
+          style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}
+        >
           <div aria-live="polite">
             {nextDisabled && reasonKey && (
               <LangSwap k={reasonKey} className="text-caption font-medium text-spice" />
@@ -185,5 +189,5 @@ export default function StepStage({
         </div>
       </Modal>
     </div>
-  );
+  , document.body);
 }

@@ -113,7 +113,7 @@ export default function Reviews() {
           </Chip>
         </div>
 
-        <div className="grid grid-cols-1 gap-16 md:grid-cols-2 md:gap-24 xl:grid-cols-3">
+        <div className="grid grid-cols-2 gap-16 md:grid-cols-3 md:gap-24 lg:grid-cols-4">
           {sorted.map((review) => (
             <ReviewCard
               key={review.id}

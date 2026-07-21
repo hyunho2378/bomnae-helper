@@ -1,9 +1,11 @@
 // 데스크탑 모달리티 · DESIGN §7: 중앙 Dialog, max-width 560, BottomSheet과 동일 glass 면.
 // lg+ 전용. Escape·바깥 탭 닫기 + 닫기 IconButton + 포커스 트랩.
+import { createPortal } from 'react-dom';
 import { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 import LangSwap from '../../i18n/LangSwap';
 import IconButton from './IconButton';
+import useBodyScrollLock from './useBodyScrollLock';
 
 const trapTab = (e, root) => {
   const els = root.querySelectorAll(
@@ -23,6 +25,7 @@ const trapTab = (e, root) => {
 
 export default function Dialog({ open, onClose, title, children }) {
   const panelRef = useRef(null);
+  useBodyScrollLock(open); // §18([H1]) 배경 스크롤 락
 
   useEffect(() => {
     if (open) panelRef.current?.focus();
@@ -38,7 +41,7 @@ export default function Dialog({ open, onClose, title, children }) {
     if (e.key === 'Tab') trapTab(e, panelRef.current);
   };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-dialog hidden place-items-center lg:grid">
       <div aria-hidden="true" onClick={onClose} className="absolute inset-0" />
       <div
@@ -57,5 +60,5 @@ export default function Dialog({ open, onClose, title, children }) {
         <div className="mt-16">{children}</div>
       </div>
     </div>
-  );
+  , document.body);
 }

@@ -105,6 +105,8 @@ export default function GlassDock() {
         style={{
           bottom: `max(${spacing[4]}px, env(safe-area-inset-bottom))`,
           width: open ? `calc(100vw - ${spacing[4] * 2}px)` : undefined,
+          // [H1] 접힘 상태에도 확장 영역(invisible) intrinsic 폭이 스크롤 폭을 만들던 사고 수리
+          maxWidth: `calc(100vw - ${spacing[4] * 2}px)`,
         }}
       >
         {/* 접힘 시 visibility로 포커스·접근성 트리에서도 제외(높이 전환과 함께 지연 적용) */}

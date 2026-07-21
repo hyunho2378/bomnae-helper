@@ -2,9 +2,11 @@
 // 드래그 1:1(잡은 오프셋 존중) · 상단 러버밴드 · 릴리즈 = 모멘텀 투영 스냅 + 속도 인계 스프링(motion)
 // · 애니메이션 중 재터치 인터럽트(현재 표시값 재시작) · reduced-motion은 릴리즈 크로스페이드.
 // blur 예산 3/3, 그림자 예산 2/2, 그랩바, 바깥 탭·Escape 닫기, 포커스 트랩. <lg 전용.
+import { createPortal } from 'react-dom';
 import { useEffect, useRef, useState } from 'react';
 import { animate } from 'motion';
 import LangSwap from '../../i18n/LangSwap';
+import useBodyScrollLock from './useBodyScrollLock';
 import { spacing } from '../../tokens';
 
 const trapTab = (e, root) => {
@@ -39,6 +41,7 @@ const currentY = (el) => {
 
 export default function BottomSheet({ open, onClose, title, children }) {
   const panelRef = useRef(null);
+  useBodyScrollLock(open); // §18([H1]) 배경 스크롤 락
   const [shown, setShown] = useState(false);
   const drag = useRef(null); // { pointerId, grabY, baseY, lastY, lastT, vy }
   const anim = useRef(null);
@@ -147,7 +150,7 @@ export default function BottomSheet({ open, onClose, title, children }) {
     anim.current.finished.then(() => settleOpen(el)).catch(() => {});
   };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-sheet lg:hidden">
       <div aria-hidden="true" onClick={onClose} className="absolute inset-0" />
       <div
@@ -160,13 +163,16 @@ export default function BottomSheet({ open, onClose, title, children }) {
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
-        className={`absolute inset-x-0 bottom-0 touch-none rounded-t-xl bg-glass shadow-sheet backdrop-blur-glass transition-transform duration-sheet ease-drawer motion-reduce:transition-none ${
+        className={`absolute inset-x-0 bottom-0 flex max-h-[90dvh] touch-none flex-col rounded-t-xl bg-glass shadow-sheet backdrop-blur-glass transition-transform duration-sheet ease-drawer motion-reduce:transition-none ${
           shown ? 'translate-y-0' : 'translate-y-full'
         }`}
       >
-        <div className="mx-auto mt-8 h-4 w-32 rounded-pill bg-line" aria-hidden="true" />
+        {/* 그랩바 · 시각 4px, 터치 히트 44px(§18.3) */}
+        <div aria-hidden="true" className="flex min-h-44 w-full shrink-0 items-center justify-center">
+          <div className="h-4 w-32 rounded-pill bg-line" />
+        </div>
         <div
-          className="touch-auto p-24"
+          className="min-h-0 touch-auto overflow-y-auto scroll-quiet p-24 pt-8"
           style={{ paddingBottom: `max(${spacing[6]}px, env(safe-area-inset-bottom))` }}
         >
           {title && <LangSwap k={title} as="h2" className="text-h3 font-semibold" />}
@@ -174,5 +180,5 @@ export default function BottomSheet({ open, onClose, title, children }) {
         </div>
       </div>
     </div>
-  );
+  , document.body);
 }

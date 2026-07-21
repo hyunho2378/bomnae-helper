@@ -134,7 +134,7 @@ function GtsTicket({ gts }) {
 
   return (
     <Container>
-      <div className="flex flex-col gap-32 pb-64 pt-96">
+      <div className="flex flex-col gap-32 pb-128 pt-96 lg:pb-64">
         <LangSwap k="ticket.title" as="h1" className="text-h2 font-semibold" />
 
         {/* §43 명세값: 우측 티켓 컬럼 폭 320px(1/3 축소) — grid 템플릿 인용 */}
@@ -252,12 +252,24 @@ function GtsTicket({ gts }) {
                 </div>
               </div>
             </article>
-            {/* §43 이미지 저장 = 즉시 다운로드(공유 시트 경유 금지) */}
-            <Button onClick={save}>
-              <LangSwap k="gts.ticket.saveCta" />
-              <Download size={16} aria-hidden="true" />
-            </Button>
+            {/* §43 이미지 저장 = 즉시 다운로드(공유 시트 경유 금지) · lg+ 인라인(모바일은 하단 고정 바) */}
+            <div className="hidden lg:flex">
+              <Button onClick={save}>
+                <LangSwap k="gts.ticket.saveCta" />
+                <Download size={16} aria-hidden="true" />
+              </Button>
+            </div>
           </aside>
+        </div>
+      </div>
+
+      {/* §18.2 모바일 하단 고정 CTA 바 · LineDetail 선례(bottom-80 = Dock 위 · z-content) */}
+      <div className="fixed inset-x-0 bottom-80 z-content px-16 md:px-24 lg:hidden">
+        <div className="mx-auto max-w-dialog rounded-lg bg-white p-12 shadow-md">
+          <Button onClick={save} style={{ width: '100%' }}>
+            <LangSwap k="gts.ticket.saveCta" />
+            <Download size={16} aria-hidden="true" />
+          </Button>
         </div>
       </div>
     </Container>

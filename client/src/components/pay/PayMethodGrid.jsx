@@ -12,7 +12,7 @@ export default function PayMethodGrid({ value, onChange }) {
   const [failed, setFailed] = useState({});
 
   return (
-    <div role="radiogroup" aria-label={t('gts.pay.title')} className="grid grid-cols-2 gap-12 lg:grid-cols-4">
+    <div role="radiogroup" aria-label={t('gts.pay.title')} className="grid grid-cols-2 gap-12 md:grid-cols-3 lg:grid-cols-4">
       {PAY_METHODS.map((method) => {
         const selected = value === method.id;
         return (

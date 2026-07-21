@@ -27,8 +27,9 @@ function Stars({ rating }) {
 export default function ReviewCard({ review, liked, onLike }) {
   const { t } = useLang();
   return (
-    <article className="flex flex-col gap-12 rounded-lg bg-white p-24 shadow-sm">
-      <div className="flex items-center justify-between gap-12">
+    <article className="flex min-w-0 flex-col gap-12 rounded-lg bg-white p-16 shadow-sm md:p-24">
+      {/* [H1] flex-wrap: 320 2열(§18.2)에서 별점+날짜가 카드 폭을 밀어내던 사고 수리 */}
+      <div className="flex flex-wrap items-center justify-between gap-x-12 gap-y-4">
         <Stars rating={review.rating} />
         <span className="font-display text-caption font-medium text-inkMeta">{review.date}</span>
       </div>

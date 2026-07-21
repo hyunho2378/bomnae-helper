@@ -27,7 +27,16 @@
 | [D4] | 존 C4 BUILDER: setup 매칭(4케이스 규칙 일치·CarFront/Bus 실존 확인), build 3스텝(VenueGrid §30 — 2/3/4열·로테이션 중 선택 보존·cap 초과 자동 해제 없음·순서 배지), route ItineraryMap §32(번호핀·draw-on·fitBounds·목업 coord null 시 리스트 폴백), checkout §33(1뷰·하차 필수·프로토타입 Dialog·LoginGate·스탬프), Ticket GTS 모드, data/gts/api.js 목 창구(api.js 원본 미수정), gts 3언어 74키 |
 | [DR] | 검수: 임의 시각 정규식 신규 코드 0 / DEPRECATED 라이브 참조 0(주석·CSS 재사용 3건은 판정 무해) / 3언어 527키 동형 / HEX·localStorage·select·이모지·blur 신규·font-normal 전부 0 / 매트릭스 320·1280·3840 가로 스크롤 0·캡 1800·그리드 2→4열 / E2E: 게이트 양방향 + setup→build→route→checkout→ticket 전 구간 브라우저 통과 / gateRoutes.js 소비자 0 → DEPRECATED 주석 |
 
-### 서버 v1 (2026-07-21 · [G1] 커밋 대기)
+### 반응형 패스 v1 (2026-07-21 · [H1] 커밋 대기)
+
+- DESIGN §18 신설(내비 단일 규칙 <1024/≥1024 · 그리드 2/3/4 · 터치 44 · safe-area · dvh · 동일 DOM).
+- 크롬: 모바일 헤더 56(lg 80), StepStage 88dvh/84dvh+safe-area, BottomSheet 90dvh+내부 스크롤+그랩바 44px 히트, TimeWheel 항목 44px(§18.3이 §38 40px에 우선), Dialog·BottomSheet body 스크롤 락(useBodyScrollLock 훅), **오버레이 3종(StepStage·BottomSheet·Dialog) body 포털** — main z-content 스태킹에 갇혀 Dock pill이 오버레이 위에 그려지고 탭을 가로채던 실버그 수리.
+- 수리(전→후): 홈 320 가로 스크롤 1065px(ReviewsStrip truncate×grid min-width:auto → min-w-0) / /reviews 333px(ReviewCard 별점·날짜 행 오버플로 → flex-wrap+p-16 md:p-24, GlassDock 접힘 intrinsic 폭 → maxWidth 캡) / 결제 그리드 md 3열 / 리뷰 그리드 2/3/4 / 티켓 lg 미만 하단 고정 CTA 바(bottom-80 · LineDetail 선례)+pb-128.
+- 매트릭스: 12뷰포트(320~3840) × 9라우트 + StepStage 3스텝·route·checkout·티켓 — 가로 스크롤 0·내비 모드 정확(1023 모바일/1024 데스크탑 경계 스크린샷)·잘림 0. 스크린샷: 768 모바일 모드, 1024 데스크탑 모드, 320 스텝1·2, 768 스텝2, 320 티켓 CTA 바.
+- reduced-motion: 전역 룰(0.01ms)·크로스페이드 분기 전부 opacity/transform 한정 — 레이아웃 속성 무변경(코드 판정 · 임베디드 브라우저는 미디어 강제 불가).
+- 미해결 잔존: 없음(전 항목 통과). vh 잔존 4건은 전부 DEPRECATED 파일(라이브 0).
+
+### 서버 v1 (2026-07-21 · [G1] 커밋 완료)
 
 - 스키마 v4: users·gts_bookings·reviews(+title·seed_likes 최소 추가)·review_likes, migrate 2회 멱등 실증(Neon · reviews 12 유지), seed.sql은 클라 시드 문안 그대로 생성.
 - Auth: Google OAuth code 플로우(/api/auth/google 302 확인·tokeninfo 검증·users upsert·HMAC 서명 httpOnly 쿠키) + DEMO_MODE 기본(비로그인 쓰기 → demo@gts.ac.kr 귀속). 실OAuth 왕복은 사용자 수동 확인 항목(구글 콘솔 redirect_uri 등록 필요).

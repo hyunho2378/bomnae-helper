@@ -27,7 +27,8 @@ export default function ReviewsStrip() {
     <div className="flex flex-col gap-24">
       <div className="grid gap-16 md:grid-cols-3 md:gap-24">
         {top.map((review) => (
-          <article key={review.id} className="flex flex-col gap-12 rounded-lg bg-white p-24 shadow-sm">
+          // [H1] min-w-0: truncate 본문의 intrinsic 폭이 grid 아이템 최소폭이 되어 320 가로 스크롤을 만들던 사고 수리
+          <article key={review.id} className="flex min-w-0 flex-col gap-12 rounded-lg bg-white p-24 shadow-sm">
             {/* 별점 · 채운 별 primary(IA §10.8) · 빈 별은 primary 스트로크만 */}
             <span role="img" aria-label={`${review.rating ?? 0}/5`} className="flex items-center gap-4 text-primary">
               {STARS.map((n) => (

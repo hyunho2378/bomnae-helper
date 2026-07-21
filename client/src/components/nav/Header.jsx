@@ -34,7 +34,8 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="chrome fixed inset-x-0 top-0 z-header h-80">
+    // §18.1: <lg 모바일 컴팩트 헤더 56(메뉴 없음 · Dock이 내비 소유) / lg+ 풀 헤더 80
+    <header className="chrome fixed inset-x-0 top-0 z-header h-56 lg:h-80">
       <div className="mx-auto flex h-full w-full max-w-lg items-center justify-between px-16 md:px-24 lg:px-40 2xl:max-w-2xl 3xl:max-w-3xl">
         <Link to="/" aria-label={t('nav.home')} className="flex items-center gap-8">
           <LogoMark className="h-24 w-24 shrink-0 text-primary" aria-hidden="true" />
