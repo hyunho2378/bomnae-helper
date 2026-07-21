@@ -42,13 +42,7 @@ export default function FareBreakdown({ vehicle, luggage, party }) {
           {total.toLocaleString('en-US')}
         </span>
       </div>
-      {/* DRAFT 고지 · 쨍한 원색 배지(yellow 면 + ink 텍스트 · §16.1) */}
-      <div className="flex items-center gap-8">
-        <span className="inline-flex items-center rounded-pill bg-yellow px-12 py-4 text-caption font-semibold text-ink">
-          <LangSwap k="gts.draft" />
-        </span>
-        <LangSwap k="gts.draftNote" className="text-caption font-medium text-inkSec" />
-      </div>
+      {/* v4.2 §10.4: 사용자 노출 DRAFT 고지 삭제(가격 초안 여부는 코드 주석·PROGRESS만) */}
     </div>
   );
 }

@@ -9,8 +9,6 @@ export default {
       bus: "버스가 하루 종일 자주 다닙니다", // PLACEHOLDER — verify
       metro: "전철이 수시로 다닙니다", // PLACEHOLDER — verify
     },
-    draft: "DRAFT",
-    draftNote: "초안 가격입니다. 최종 금액은 확정 후 안내됩니다.",
     vehicle: {
       taxi: "택시형",
       van: "밴형",
@@ -67,7 +65,6 @@ export default {
     },
     route: {
       title: "나의 동선",
-      draftSchedule: "정오부터 한 곳당 약 2시간으로 잡은 초안 시간입니다. 시간표가 아닙니다.",
       listTitle: "방문 순서",
       mockNotice: "정확한 위치는 장소 확정 후 표시됩니다.",
       mapLabel: "동선 지도",

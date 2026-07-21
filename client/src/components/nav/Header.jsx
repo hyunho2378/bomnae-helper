@@ -16,6 +16,7 @@ const MENU = [
   { to: '/about', k: 'nav.about' },
   { to: '/gate', k: 'nav.gate' },
   { to: '/gts', k: 'nav.gts' },
+  { to: '/reviews', k: 'nav.reviews' },
 ];
 
 export default function Header() {

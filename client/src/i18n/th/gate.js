@@ -180,7 +180,6 @@ export default {
       },
       results: {
         // §9.2.4 PLACEHOLDER 마킹 · 초안 추정값 고지
-        draftNote: "เวลาเป็นค่าประมาณฉบับร่างและจะถูกตรวจสอบกับผู้ให้บริการ",
         totalApprox: "ประมาณ {min} นาที",
         legMin: "ประมาณ {min} นาที",
         varies: "เวลาเดินทางแตกต่างกันไป",

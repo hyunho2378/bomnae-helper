@@ -55,14 +55,8 @@ export default function GtsRoute() {
     <Container>
       <div className="flex flex-col gap-32 pb-64 pt-96">
         <div className="flex flex-col gap-12">
+          {/* v4.2 §10.4: 사용자 노출 DRAFT 고지 삭제 · 시각 초안 여부는 코드 주석만 */}
           <LangSwap k="gts.route.title" as="h1" className="text-h1 font-bold tracking-display" />
-          {/* DRAFT 고지 · 시각은 초안 표기임을 상시 노출(§9.5) */}
-          <div className="flex flex-wrap items-center gap-8">
-            <span className="inline-flex items-center rounded-pill bg-yellow px-12 py-4 text-caption font-semibold text-ink">
-              <LangSwap k="gts.draft" />
-            </span>
-            <LangSwap k="gts.route.draftSchedule" className="text-small font-medium text-inkSec" />
-          </div>
         </div>
 
         <div

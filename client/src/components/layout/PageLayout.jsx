@@ -19,6 +19,7 @@ export function routeKeyFromPath(pathname) {
   if (/^\/loop\/[^/]+\/book\/?$/.test(pathname)) return 'booking';
   if (/^\/loop\/[^/]+\/?$/.test(pathname)) return 'lineDetail';
   if (pathname.startsWith('/ticket/')) return 'ticket';
+  if (pathname === '/reviews') return 'reviews';
   if (pathname === '/about' || pathname === '/pilot') return 'about';
   if (pathname === '/legal/privacy') return 'legalPrivacy';
   if (pathname === '/legal/terms') return 'legalTerms';

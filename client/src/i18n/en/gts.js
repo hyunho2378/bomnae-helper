@@ -9,8 +9,6 @@ export default {
       bus: "Buses run frequently through the day", // PLACEHOLDER — verify
       metro: "Metro-style service through the day", // PLACEHOLDER — verify
     },
-    draft: "DRAFT",
-    draftNote: "Draft prices. Final amounts will be confirmed later.",
     vehicle: {
       taxi: "Taxi",
       van: "Van",
@@ -67,7 +65,6 @@ export default {
     },
     route: {
       title: "Your route",
-      draftSchedule: "Draft times from noon, about 2 hours per stop. This is not a timetable.",
       listTitle: "Visit order",
       mockNotice: "Exact locations will appear once these places are confirmed.",
       mapLabel: "Itinerary map",

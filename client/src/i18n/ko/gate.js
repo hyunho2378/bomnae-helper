@@ -179,7 +179,6 @@ export default {
       },
       results: {
         // §9.2.4 PLACEHOLDER 마킹 · 초안 추정값 고지
-        draftNote: "소요 시간은 초안 추정값이며 운영사와 함께 검증할 예정입니다.",
         totalApprox: "약 {min}분",
         legMin: "약 {min}분",
         varies: "소요 시간은 상황에 따라 달라요",

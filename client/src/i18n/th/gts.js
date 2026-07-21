@@ -8,8 +8,6 @@ export default {
       bus: "รถบัสให้บริการบ่อยตลอดทั้งวัน", // PLACEHOLDER — verify
       metro: "รถไฟฟ้าให้บริการเป็นระยะตลอดวัน", // PLACEHOLDER — verify
     },
-    draft: "DRAFT",
-    draftNote: "ราคาฉบับร่าง ยอดสุดท้ายจะยืนยันภายหลัง",
     vehicle: {
       taxi: "แท็กซี่",
       van: "รถแวน",
@@ -66,7 +64,6 @@ export default {
     },
     route: {
       title: "เส้นทางของคุณ",
-      draftSchedule: "เวลาฉบับร่างเริ่มเที่ยงวัน แห่งละประมาณ 2 ชั่วโมง ไม่ใช่ตารางเวลาจริง",
       listTitle: "ลำดับการเยี่ยมชม",
       mockNotice: "ตำแหน่งที่แน่นอนจะแสดงเมื่อยืนยันสถานที่แล้ว",
       mapLabel: "แผนที่เส้นทาง",

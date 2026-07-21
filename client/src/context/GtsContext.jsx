@@ -2,8 +2,8 @@
 // vehicle은 저장하지 않고 셀렉터로 파생(§9.3 규칙) — 인원·짐 변경 시 자동 재매칭.
 // in-memory 전용: 새로고침 시 setup부터(웹스토리지 금지 유지).
 // 가드: build = party 필수 / route = mealPlan 충족 && picks 2 / checkout = route 경유.
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { matchVehicle } from '../data/gts/vehicles';
 
 const GtsContext = createContext(null);
@@ -27,6 +27,16 @@ export function mealCap(mealPlan) {
 
 export function GtsProvider({ children }) {
   const [state, setState] = useState(initial);
+  const { pathname } = useLocation();
+  const wasInFlow = useRef(false);
+
+  // v4.2 §10.4 상태 리셋 정책: /gts/* 밖으로 이탈하면 하차 텍스트 포함 전체 초기화.
+  // 플로우 내부 이동은 보존. 결제 직행(/ticket)도 이탈 — 예약 스냅샷은 data/gts/api 저장분이 소유.
+  useEffect(() => {
+    const inFlow = pathname.startsWith('/gts');
+    if (wasInFlow.current && !inFlow) setState(initial);
+    wasInFlow.current = inFlow;
+  }, [pathname]);
 
   const setParty = useCallback((party) => setState((s) => ({ ...s, party })), []);
   const setLuggage = useCallback((luggage) => setState((s) => ({ ...s, luggage })), []);

@@ -18,6 +18,7 @@ import Home from './pages/Home';
 import LegalPrivacy from './pages/LegalPrivacy';
 import LegalTerms from './pages/LegalTerms';
 import NotFound from './pages/NotFound';
+import Reviews from './pages/Reviews';
 import Ticket from './pages/Ticket';
 
 export default function App() {
@@ -39,6 +40,7 @@ export default function App() {
                     <Route path="/gts/route" element={<GtsRoute />} />
                     <Route path="/gts/checkout" element={<GtsCheckout />} />
                     <Route path="/ticket/:bookingId" element={<Ticket />} />
+                    <Route path="/reviews" element={<Reviews />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/legal/privacy" element={<LegalPrivacy />} />
                     <Route path="/legal/terms" element={<LegalTerms />} />

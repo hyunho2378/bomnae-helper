@@ -69,8 +69,7 @@ export default function Gate() {
                 <>
                   {/* v3.2 §16.2: h2 = 700 */}
                   <LangSwap k="gate.results.heading" as="h2" className="text-h2 font-bold" />
-                  {/* §9.2.4 PLACEHOLDER 마킹 · 초안 추정값 고지 */}
-                  <p className="mt-8 text-small text-inkSec">{t('gate.planner.results.draftNote')}</p>
+                  {/* v4.2 §10.4: 사용자 노출 초안 고지 삭제 · "예상" 라벨은 §39 레그 시각이 담당(존 B5) */}
                   <div className="mt-24 flex flex-col gap-24">
                     {options.map((option) => (
                       <RouteOptionCard key={option.id} option={option} />

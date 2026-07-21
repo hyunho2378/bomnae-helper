@@ -155,12 +155,7 @@ function GtsTicketCard({ gts }) {
                   {gts.total.toLocaleString('en-US')}
                 </span>
               </div>
-              <div className="flex items-center gap-8">
-                <span className="inline-flex items-center rounded-pill bg-yellow px-12 py-4 text-caption font-semibold text-ink">
-                  <LangSwap k="gts.draft" />
-                </span>
-                <LangSwap k="gts.draftNote" className="text-caption font-medium text-white" />
-              </div>
+              {/* v4.2 §10.4: 사용자 노출 DRAFT 고지 삭제 */}
             </div>
           </div>
         </article>

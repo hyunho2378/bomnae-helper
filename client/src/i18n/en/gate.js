@@ -182,7 +182,6 @@ export default {
       },
       results: {
         // §9.2.4 PLACEHOLDER 마킹 · 초안 추정값 고지
-        draftNote: "Times are draft estimates and will be verified with operators.",
         totalApprox: "About {min} min",
         legMin: "About {min} min",
         varies: "Travel time varies",
