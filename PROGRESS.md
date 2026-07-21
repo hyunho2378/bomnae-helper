@@ -39,6 +39,20 @@
 - FieldSelect primary는 문자열 기본 + 겹침 렌더 노드 허용(날짜·터미널) — 계약 문서화 예외.
 - StickyBookPanel sticky top은 §15의 top-24를 픽셀 스케일 환산(top-96 = 헤더 72+24)으로 적용.
 
+## v3.2 리디자인 (2026-07-21 2차 크리틱 · 오케스트레이터 + 존 B2/C2 서브에이전트)
+
+| 커밋 | 내용 |
+|---|---|
+| 8f471fd [C1] | 파운데이션: primary #0073EC·니어블랙 3단·SUIT Variable(Pretendard 폐지)·컨테이너 확폭(1320/1560/1800·마진 16/24/40)·헤더 80/64·17px 600·About 최좌측·모바일 상단 헤더 신설·모바일 독 깨짐 수리·푸터 2단 202px·표시명 교체(§16.7)·Button secondary·CalendarGrid·scroll-quiet·법적 위치 조항 3언어 |
+| fade3ca [C2] | Getting Here: 현위치 옵션+최근접 공항 매칭+무음 폴백·CalendarField(§19)·크로스셀 삭제·Optional 배지·ArrivalWatcher 상태기 7종(§21 · 사전 설명 모달 선행, 2연속 판정, 좌표 비노출)·ArrivalProvider 전역 배선 |
+| 5ab8d3f [C3] | City Lines: 초기 라인 0+칩 3(§24)·§23 지도 수술 6항목(줌 20회 무아티팩트)·hover 즉시 팝업(200ms 유지)·POI 앵커 3·scroll-quiet·모바일 카드 ≤132px·2개월 캘린더+원색 도트 범례+회차 전부 펼침(§20)·GateToLinesTransition(§22 · Escape 스킵) |
+| [CR] | 검수: navy 잔재 3건 수리(Button hover·PilotStrip 면)·StoryClips 구 마진 4px 오버플로 수리·매트릭스 100/100·3언어 구조 동형 확인 |
+
+### v3.2 검수 판정 기록
+- 3언어 레이아웃 동형(§16.6): 4개 라우트에서 요소 수·태그 시퀀스 3언어 완전 동일, EN↔KO 좌표 0(About는 장문 세로 캐스케이드만·가로 0), TH x변동은 §18 Kanit 스택 메트릭 파생으로 허용(요소 재배치·조건부 노출 없음).
+- 확정 판정: §20 gap-12 채택 / C2 패널 브래킷 2곳(산식 조합) / 전환 라벨 850ms 연출+1.5s 비차단 잔존 / 도착 모달은 Modal 래퍼(모바일 대응·COMPONENTS A4 정합) / denied "설정 다시 보기"=사전 설명 모달 재노출 / LineDetail 날짜 기본값 오늘.
+- 도착 모달 본문 2문장은 IA 미지정으로 최소 창작(확정 카피 교체 대상), 크로스셀 키 3언어 제거.
+
 ## 사용자 준비물 (v3.1 추가)
 
 - [ ] 히어로 실사진 3장 교체 (`client/public/images/hero-1..3.jpg` — 현재 무료 스톡)

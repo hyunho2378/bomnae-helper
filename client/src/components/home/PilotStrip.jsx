@@ -15,7 +15,8 @@ export default function PilotStrip() {
   return (
     <Link
       to="/about#proof"
-      className="block overflow-hidden rounded-lg bg-navy text-white shadow-sm transition-all duration-fast hover:-translate-y-0.5 hover:shadow-md"
+      // v3.2 §16.1: navy 면은 티켓 전용 · 크롬 단일색(primary)으로 교체([CR] 수정)
+      className="block overflow-hidden rounded-lg bg-primary text-white shadow-sm transition-all duration-fast hover:-translate-y-0.5 hover:shadow-md"
     >
       <div className="grid md:grid-cols-2">
         {/* PLACEHOLDER · 파일럿 실운행 촬영분으로 교체(3~4일차, PROGRESS 준비물) */}

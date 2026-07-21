@@ -17,8 +17,9 @@ export default function StoryClips({ stories }) {
       return next;
     });
 
+  // v3.2 확폭 마진(16/24) 정합 · 구 마진(20/32) 잔재가 320에서 4px 가로 오버플로를 만들던 것 수리([CR])
   return (
-    <ul className="-mx-20 flex snap-x gap-16 overflow-x-auto px-20 pb-8 md:-mx-32 md:px-32 lg:mx-0 lg:grid lg:grid-cols-3 lg:gap-24 lg:overflow-visible lg:px-0 lg:pb-0">
+    <ul className="-mx-16 flex snap-x gap-16 overflow-x-auto px-16 pb-8 md:-mx-24 md:px-24 lg:mx-0 lg:grid lg:grid-cols-3 lg:gap-24 lg:overflow-visible lg:px-0 lg:pb-0">
       {stories.map((story) => (
         // v3.1 무보더 · 카드 깊이는 shadow.sm, radius 카드 스케일 lg(DESIGN §7)
         <li

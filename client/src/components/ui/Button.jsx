@@ -2,10 +2,11 @@
 // primary: primary 면+white / secondary: 투명+primary 텍스트+1.5px primary 보더(무보더 원칙의 명시적 예외 1호)
 //   · hover 8% 틴트는 §16.8이 허용한 상호작용 피드백 예외(스케일상 /10 스텝 적용)
 // ghost: 흐름 전진 텍스트 버튼. 폭은 텍스트+패딩으로 결정(§16.8 · 임의 고정폭 금지).
+// v3.2 §16.1: navy는 티켓 면 전용 · hover는 elevation/불투명도 피드백으로 대체([CR] 수정)
 const VARIANTS = {
-  primary: 'bg-primary text-white hover:bg-navy',
+  primary: 'bg-primary text-white hover:shadow-md',
   secondary: 'border-1.5 border-primary bg-transparent text-primary hover:bg-primary/10',
-  ghost: 'bg-transparent text-primary hover:text-navy',
+  ghost: 'bg-transparent text-primary hover:opacity-80',
 };
 
 const SIZES = {
