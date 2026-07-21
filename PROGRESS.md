@@ -17,6 +17,12 @@
 
 - 없음
 
+## v4 GTS 피벗 (2026-07-21)
+
+| 커밋 | 내용 |
+|---|---|
+| [D1] | GTS 시드 데이터 격리 세션: `data/gts/` 3파일 — hubs(§29 허브 6·도착점 2·템플릿 7, durMin 11건 전부 PLACEHOLDER), vehicles(§9.3 결정론 매칭 + 요금 5건 전부 DRAFT), venues(카테고리당 12 = 실명 11 + Mockup 25, 3언어 동형·목업 coord null). 창작 실명 0, 시각표·편명 0 |
+
 ## 다음 작업
 
 - CC_PROMPT_5_AGENT_SERVER 실행 (전제: .env — Google OAuth ID/Secret + Neon DATABASE_URL)
@@ -93,6 +99,9 @@
 - [ ] unDraw 일러스트 3종(login/404/빈결과) primary 단색 재컬러 SVG → `client/public/images/illustrations/` (현재 img 경로만 참조 중)
 - [ ] og-image.png (1200x630) 제작·배치 (`client/public/og-image.png` — index.html og:image가 이미 참조 중), 배치 후 카카오 캐시 초기화 도구로 갱신
 - [ ] apple-touch-icon.png (180x180, 흰 배경 위 logo.svg 중앙 배치) 제작·배치 후 index.html 주석 해제
+- [ ] GTS 허브 소요시간(durMin 11건)·배차 실측 검증 (`data/gts/hubs.js` — 전건 PLACEHOLDER)
+- [ ] GTS 요금표 확정 (`data/gts/vehicles.js` — base/perPerson/luggageFee 5건 전부 DRAFT)
+- [ ] GTS 실명 로컬 브랜드 추가 확보 — 목업 25슬롯(meal 11·foodspace 9·activity 5) 교체 + 실명 11곳 좌표 현장 검증 (`data/gts/venues.js`)
 
 ## 사고 이력 / 교훈
 
