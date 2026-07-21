@@ -1,3 +1,4 @@
+// DEPRECATED v4(IA §9.2) — 플래너가 data/gts/hubs.js 조회로 전환되며 소비자 0. 삭제 금지, 재활용 예정.
 // Gate 경로 목데이터 · 룰 기반 정적 시간표(MVP는 실시간 API 없음, IA §2.2).
 // 시간표·요금·소요 전부 DRAFT · PLACEHOLDER · verify on site.
 // terminal 키: 't1'(ICN T1) | 't2'(ICN T2) | 'gmp'(GMP) · GateForm select value와 동일해야 한다.

@@ -22,6 +22,17 @@
 | 커밋 | 내용 |
 |---|---|
 | [D1] | GTS 시드 데이터 격리 세션: `data/gts/` 3파일 — hubs(§29 허브 6·도착점 2·템플릿 7, durMin 11건 전부 PLACEHOLDER), vehicles(§9.3 결정론 매칭 + 요금 5건 전부 DRAFT), venues(카테고리당 12 = 실명 11 + Mockup 25, 3언어 동형·목업 coord null). 창작 실명 0, 시각표·편명 0 |
+| [D2] | 존 A4 셸: /gts 4라우트 + /gts(=setup), 리다이렉트 5종(/loop*→/gts, /hands-free·/gate/hands-free→/gts/setup, /pilot→/about), GtsContext(§31 파생 vehicle·가드 캐스케이드 실검증), 내비 3항목(헤더·독·푸터 동일), i18n gts 뼈대(freq 3키)+nav/meta 키, 구 loop 15파일 DEPRECATED(삭제 0) |
+| [D3] | 존 B4 PLANNER: 양방향 플래너(토글 시 DOM 불변 실측), hubs.js 조회 전용 결과(임의 HH:MM 0, 빈 조합 EmptyState 5종), RouteTimeline §28 세로(GateJourney·CSS 완전 삭제, grep 0), 현위치 §21 동형 모달, gate.planner 3언어 +25키 |
+| [D4] | 존 C4 BUILDER: setup 매칭(4케이스 규칙 일치·CarFront/Bus 실존 확인), build 3스텝(VenueGrid §30 — 2/3/4열·로테이션 중 선택 보존·cap 초과 자동 해제 없음·순서 배지), route ItineraryMap §32(번호핀·draw-on·fitBounds·목업 coord null 시 리스트 폴백), checkout §33(1뷰·하차 필수·프로토타입 Dialog·LoginGate·스탬프), Ticket GTS 모드, data/gts/api.js 목 창구(api.js 원본 미수정), gts 3언어 74키 |
+| [DR] | 검수: 임의 시각 정규식 신규 코드 0 / DEPRECATED 라이브 참조 0(주석·CSS 재사용 3건은 판정 무해) / 3언어 527키 동형 / HEX·localStorage·select·이모지·blur 신규·font-normal 전부 0 / 매트릭스 320·1280·3840 가로 스크롤 0·캡 1800·그리드 2→4열 / E2E: 게이트 양방향 + setup→build→route→checkout→ticket 전 구간 브라우저 통과 / gateRoutes.js 소비자 0 → DEPRECATED 주석 |
+
+### v4 검수 판정·미결 기록
+- StopPopup 2줄 조건화(존 C4 보고): onViewLine 부재 시 버튼 비렌더 — Loop 호출부 영향 0 판정, 수용.
+- ArrivalCard가 From Chuncheon 탭에서도 렌더(구조 동형 우선, 존 B4 결정) — 의미상 To 전용이 맞는지 사용자 판단 대기.
+- 결제 완료 후 GtsContext reset 미호출(Booking 선례 동일) — 재조립 UX 확정 필요.
+- Ticket GTS 모드 PNG 공유 미구현(§7은 라인 티켓 명세 — GTS 공유는 후속 결정).
+- 서버 gts_bookings 확장은 다음 서버 세션 몫(§9.6.4 스키마 메모만 존재).
 
 ## 다음 작업
 
