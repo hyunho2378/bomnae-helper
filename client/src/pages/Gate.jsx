@@ -1,7 +1,7 @@
 // Trip Planner(/gate) · v4.2 존 B5(IA §10.3): 칩 토글 폐지 → 수직 2섹션
 // ("To Chuncheon" 폼 섹션 → 아래 "From Chuncheon" 폼 섹션 · 각자 독립 상태 · 구조 동일).
 // 폼 상단 라이브 KST 시계(§38 · KoreaClock) · 결과 카드는 §39 레그 시각 계산("예상" 라벨) 표기.
-// §40 데모 도착 시퀀스: To 섹션 결과 확정(내 경로 찾기 제출) 10초([H2-8]) 뒤 중앙 모달 → /gts.
+// §40 데모 도착 시퀀스: To 섹션 결과 확정(내 경로 찾기 제출) 8초([v4.4-3]) 뒤 중앙 모달 → /gts.
 //   타이머는 페이지 이탈 시 clear · 세션당 1회 발화(재검색 제출 시 재장전 허용).
 // 구 도착 감지 카드(§8.5·§21)는 렌더 제거하되 ARRIVAL_MODE='geo' 플래그로 코드 보존(삭제 금지).
 // 홈 미니 폼(GateEntryCard) 삭제로 쿼리 프리필 계약 소멸 · useSearchParams 프리필 제거.
@@ -68,7 +68,7 @@ export default function Gate() {
   const scheduleDemo = (payload) => {
     if (ARRIVAL_MODE !== 'demo' || payload.options.length === 0) return;
     clearTimeout(demoTimer.current);
-    demoTimer.current = setTimeout(() => setDemoOpen(true), 10000); // [H2-8] 3초 → 10초
+    demoTimer.current = setTimeout(() => setDemoOpen(true), 8000); // [v4.4-3] 10초 → 8초
   };
 
   // 이탈(언마운트) 시 타이머 clear(§40)

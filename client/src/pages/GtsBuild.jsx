@@ -128,7 +128,7 @@ export default function GtsBuild() {
       >
         {/* Step 0 · 식사 플랜 3택(§9.4 · 단일 선택 자동 전진) */}
         {step === 'plan' && (
-          <section className="flex flex-col gap-16">
+          <section className="flex flex-col gap-12">
             <LangSwap k="gts.build.planTitle" as="h2" className="text-h3 font-semibold" />
             <div className="grid grid-cols-1 gap-12 md:grid-cols-3">
               {['none', 'lunch', 'lunchDinner'].map((plan) => (
@@ -140,7 +140,7 @@ export default function GtsBuild() {
 
         {/* Step 1 · 식사 선택(플랜 none 스킵 · §9.4) */}
         {step === 'meals' && (
-          <section className="flex flex-col gap-16">
+          <section className="flex flex-col gap-12">
             <div className="flex flex-wrap items-baseline justify-between gap-12">
               <LangSwap k="gts.build.mealsTitle" as="h2" className="text-h3 font-semibold" />
               <Counter n={meals.length} max={cap} />
@@ -166,7 +166,7 @@ export default function GtsBuild() {
         {/* Step 2 · §10.4 반반 분할(탭 폐지): 좌 음식공간 4장 / 우 액티비티 4장 동시 노출 ·
             합산 정확히 2픽 · 카운터 상단 상시 */}
         {step === 'picks' && (
-          <section className="flex flex-col gap-16">
+          <section className="flex flex-col gap-12">
             <div className="flex flex-wrap items-baseline justify-between gap-12">
               <LangSwap k="gts.build.picksTitle" as="h2" className="text-h3 font-semibold" />
               <Counter n={picks.length} max={2} />
@@ -176,7 +176,7 @@ export default function GtsBuild() {
                 <LangSwap k="gts.build.capFull" as="p" className="text-small font-medium text-spice" />
               )}
             </div>
-            <div className="grid gap-24 lg:grid-cols-2">
+            <div className="grid gap-16 lg:grid-cols-2 lg:gap-24">
               <section className="flex flex-col gap-12">
                 <LangSwap k="gts.build.tabFoodspace" as="h3" className="text-body font-semibold" />
                 <VenueGrid

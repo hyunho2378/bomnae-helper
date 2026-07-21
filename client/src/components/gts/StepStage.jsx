@@ -125,7 +125,7 @@ export default function StepStage({
         className="relative flex h-[88dvh] w-full flex-col overflow-hidden rounded-xl shadow-lg lg:h-[84dvh]"
       >
         {/* 상단 · 스텝 라벨 + 진행 도트(§41) */}
-        <div className="flex flex-col items-center gap-8 px-24 pb-32 pt-24 lg:px-40 lg:pt-40">
+        <div className="flex flex-col items-center gap-8 px-24 pb-16 pt-24 lg:px-32 lg:pb-24 lg:pt-32">
           <p className="flex items-baseline gap-8 tracking-glass">
             <span className="font-display text-small font-bold">
               {stepIndex + 1} / {stepCount}
@@ -145,11 +145,11 @@ export default function StepStage({
         </div>
 
         {/* 콘텐츠 · 내부 스크롤 scroll-quiet(§41) — 전환 중엔 나가는 씬을 절대배치로 겹침 */}
-        <div className="relative flex-1 overflow-y-auto scroll-quiet px-24 pb-32 lg:px-40">
+        <div className="relative flex-1 overflow-y-auto scroll-quiet px-24 pb-24 lg:px-32">
           {leaving && (
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute inset-x-24 top-0 md:inset-x-40"
+              className="pointer-events-none absolute inset-x-24 top-0 lg:inset-x-32"
               style={stepAnim('bh-step-out')}
             >
               {leaving.node}
@@ -162,8 +162,8 @@ export default function StepStage({
 
         {/* 하단 중앙 고정 버튼 페어(§41) · 항상 동일 위치 · 사유는 aria-live · §18.3 safe-area */}
         <div
-          className="flex flex-col items-center gap-8 px-24 pt-32 lg:px-40"
-          style={{ paddingBottom: 'max(24px, env(safe-area-inset-bottom))' }}
+          className="flex flex-col items-center gap-8 px-24 pt-16 lg:px-32 lg:pt-24"
+          style={{ paddingBottom: 'max(20px, env(safe-area-inset-bottom))' }}
         >
           <div aria-live="polite">
             {nextDisabled && reasonKey && (

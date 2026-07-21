@@ -57,7 +57,8 @@ export default function Header() {
                 }`
               }
             >
-              <LangSwap k={k} />
+              {/* [v4.4-2] 단일 언어 렌더 · LangSwap 겹침 유령 폭이 시각 간격을 깨던 원인 수리 */}
+              {t(k)}
             </NavLink>
           ))}
         </nav>

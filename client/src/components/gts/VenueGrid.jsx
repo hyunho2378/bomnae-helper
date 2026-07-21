@@ -40,10 +40,9 @@ export default function VenueGrid({ pool, pageSize = 8, selected, max, onToggle,
               type="button"
               onClick={() => onToggle(venue.id)}
               aria-pressed={isSelected}
-              // [H2-12] 카드 규격 통일: 고정 높이 172px(명세값 · 이름 1줄 + 한 줄 2줄 + Chip) ·
-              //   이름·한 줄·Chip의 y좌표 전 카드 동일(Chip = mt-auto 바닥 고정) · 텍스트 line-clamp
-              style={{ height: 172 }}
-              className={`pressable relative flex flex-col items-start gap-8 overflow-hidden rounded-lg p-16 text-left shadow-sm ${
+              // [H2-12]+[v4.4-1] 카드 규격: 모바일 172 / lg 136(무스크롤 수납 명세값) ·
+              //   이름·한 줄·Chip y좌표 전 카드 동일(Chip = mt-auto 바닥) · line-clamp
+              className={`pressable relative flex h-[172px] flex-col items-start gap-8 overflow-hidden rounded-lg p-16 text-left shadow-sm lg:h-[136px] ${
                 venue.mock ? 'bg-surface' : 'bg-white'
               } ${isSelected ? 'ring-2 ring-primary' : 'hover:shadow-md'}`}
             >

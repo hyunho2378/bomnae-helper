@@ -142,139 +142,237 @@ export default {
       body: "Every seat sold routes money to a small shop before you arrive. And the platform already speaks English, Korean and Thai, because Chuncheon's next guests are already booking flights.",
     },
     // [H2-19] 크라우드펀딩 카피(어바웃.md 전문 이식 · 이모지 제거 · Web platform 교정 · Tourism 통일)
+    // [I1] v4.4 크라우드펀딩 전사 카피(레퍼런스 구도 · 지시 문자열 우선 · 13~15 일부 DEMO 초안)
     crowd: {
-      story: {
-        title: "Traveling Should Be About Discovering, Not Getting Lost.",
-        intro: "Every year, thousands of international visitors come to Chuncheon to experience its lakes, food, culture, and famous attractions. Unfortunately, many leave without experiencing everything the city has to offer. Why?",
-        b1: "Transportation is confusing for first-time visitors.",
-        b2: "Information is often only available in Korean.",
-        b3: "Tourist attractions are spread across the city.",
-        b4: "Taxi fares become expensive.",
-        b5: "Lack of knowledge on all that the city has to offer.",
-        outro1: "Instead of creating memories, travelers spend their time planning routes, waiting for buses, and worrying about getting lost and scammed.",
-        outro2: "We believe exploring a city should feel exciting, not overwhelming. That's why we created the Global Tourism System (GTS).",
-        missionLead: "Our mission is simple:",
-        mission: "Make Chuncheon easy to explore for everyone, regardless of language or travel experience interests.",
+      hero: {
+        title1: "One app. Every preference.",
+        title2: "Explore Chuncheon.",
+        sub: "Sightseeing on your terms.",
+        cta: "Support GTS",
       },
-      product: {
-        title: "Product Introduction",
-        body: "GTS is an integrated tourism mobility platform that combines transportation, multilingual guidance, and travel convenience into one seamless experience.",
-        offersTitle: "What our service offers:",
-        o1: "Comfortable transportation",
-        o2: "Flexible schedules",
-        o3: "Multilingual guidance",
-        o4: "Friendly onboard host",
-        o5: "Fixed cost",
-        o6: "Customized itinerary of the best places in Chuncheon",
-      },
-      strengths: {
-        title: "Core Strengths & Key Features",
+      problem: {
+        title: "If you've traveled Korea without a car, you know this.",
+        sub: "Chuncheon has everything, except an easy way around.",
         cards: {
-          routes: {
-            title: "Curated Tourist Routes",
-            body: "Visit more attractions in less time with carefully planned, personalized itineraries.",
+          signs: {
+            t: "Signs and schedules, all in Korean",
           },
-          cost: {
-            title: "Affordable Alternative",
-            body: "Enjoy a more economical option than taking multiple taxi rides while avoiding the complexity of public transportation.",
+          spread: {
+            t: "The best places, scattered far apart",
           },
-          local: {
-            title: "Boosting Local Business",
-            body: "Connecting global travelers with authentic local experiences while creating new opportunities for local business growth.",
-          },
-          ease: {
-            title: "Stress-Free Travel",
-            body: "Everything you need, from arrival to sightseeing, is available through one integrated platform.",
+          taxi: {
+            t: "Taxi meters that keep climbing",
           },
         },
       },
-      specs: {
-        title: "Product Specifications",
-        rows: {
-          product: {
-            k: "Product",
-            v: "Global Tourism System (GTS)",
+      system: {
+        label: "WHAT WE RUN",
+        title: "So we built the whole trip into one system.",
+        nodes: {
+          route: {
+            t: "Plan your route",
+            sub: "rail and bus compared",
           },
-          platform: {
-            k: "Platform",
-            v: "Web platform + Shuttle Service",
+          ride: {
+            t: "Match your ride",
+            sub: "taxi or 12-seat van",
           },
-          languages: {
-            k: "Languages",
-            v: "English + Multilingual Support",
+          day: {
+            t: "Build your day",
+            sub: "meals, places, activities",
           },
-          services: {
-            k: "Services",
-            v: "Airport Guidance, Shuttle Transportation",
-          },
-          routes: {
-            k: "Shuttle Routes",
-            v: "Based on individualized preferences",
-          },
-          booking: {
-            k: "Booking",
-            v: "Online Pre-Reservation",
-          },
-          boarding: {
-            k: "Boarding",
-            v: "Customized Stops and flexible schedules",
-          },
-          addon: {
-            k: "Additional Service",
-            v: "On-board Host and Tourist Information",
-          },
-          target: {
-            k: "Target Users",
-            v: "International Tourists, Exchange Students, Domestic Visitors",
-          },
-          revenue: {
-            k: "Revenue Model",
-            v: "Service Fares, Travel fees, Partnership Commissions",
+          arrive: {
+            t: "Arrive, it's ready",
+            sub: "pre-ordered before you arrive",
           },
         },
       },
-      support: {
-        title: "Why Support GTS?",
-        intro: "By supporting GTS, you're helping us:",
-        i1: "Make Chuncheon more accessible to international visitors.",
-        i2: "Support local businesses by bringing tourists directly to them.",
-        i3: "Reduce travel stress through smarter transportation.",
-        i4: "Build a tourism model that can expand to cities across Korea and the world.",
-        outro: "You're not just paying for transportation. You're creating better travel experiences.",
+      day: {
+        title: "Here's what a GTS day actually looks like.",
+        sub: "You pick the stops. We run the clock.",
+        items: {
+          i1: {
+            text: "Dakgalbi lunch, table already set",
+          },
+          i2: {
+            text: "Soyang Dam skywalk",
+          },
+          i3: {
+            text: "Lakeside roastery, beans ready",
+          },
+          i4: {
+            text: "Makguksu dinner",
+          },
+          i5: {
+            text: "Drop-off anywhere you say",
+          },
+        },
+      },
+      proof: {
+        title: "This wasn't a mockup. We ran it.",
+        stats: {
+          courses: "courses run",
+          riders: "riders on board",
+          intl: "international riders",
+        },
+      },
+      photo: {
+        cardTitle: "Pre-ordered before arrival",
+        zeroTail: "wasted minutes",
+        checks: {
+          c1: "No queue",
+          c2: "No language barrier",
+          c3: "No missed spots",
+        },
+      },
+      stories: {
+        title: "The people your seat supports.",
+        sub: "Real shops, real families, real stories on every line.",
+        cards: {
+          bakery: {
+            t: "The farm that became a bakery",
+            body: "Miso Lee came back to her father's potato farm and turned its harvest into Chuncheon's famous gamja-bbang.",
+            tag: "Bakery · 3rd generation",
+          },
+          roastery: {
+            t: "Beans roasted by the lake",
+            body: "A roaster who moved here for the water explains why the lake changes the cup.",
+            tag: "Roastery · Lakeside",
+          },
+        },
+      },
+      cycle: {
+        title: "Your seat feeds a local shop before you even arrive.",
+        body: "Every booking sends a pre-order to a family-run kitchen, bakery or roastery in Chuncheon.",
+      },
+      math: {
+        title: "Do the math.",
+        badge: "BEST VALUE",
+        cols: {
+          taxi: {
+            name: "Taxis all day",
+            price: "₩80,000+",
+            r1: "Meters keep running",
+            r2: "Language barrier",
+            r3: "No plan included",
+          },
+          bus: {
+            name: "Tour bus",
+            price: "₩45,000",
+            r1: "45 seats, one fixed route",
+            r2: "Long queues at small shops",
+            r3: "No flexibility",
+          },
+          gts: {
+            name: "GTS",
+            price: "₩35,000",
+            r1: "12-seat van, your route",
+            r2: "Pre-ordered, zero queue",
+            r3: "Host and guidance included",
+          },
+        },
+      },
+      said: {
+        title: "Travelers already said it.",
       },
       faq: {
-        title: "FAQ",
+        title: "Questions, answered.",
         q1: {
           q: "Why Chuncheon?",
-          a: "Chuncheon is one of Korea's most beautiful tourist destinations, famous for its lakes, dakgalbi, rail bike, and cultural attractions. Yet many visitors struggle to explore beyond one or two locations due to transportation challenges. GTS unlocks the full city experience.",
+          a: "Lakes, food, culture, hard to reach without a car",
         },
         q2: {
           q: "Who is GTS for?",
-          i1: "International tourists",
-          i2: "Exchange students",
-          i3: "Foreign residents",
-          i4: "Families",
-          i5: "Seniors",
-          i6: "Domestic travelers seeking convenience",
+          a: "Anyone visiting without a car",
         },
         q3: {
-          q: "Why is GTS different?",
-          intro: "Unlike buses, taxis, or ride-hailing apps, GTS combines:",
-          i1: "Transportation",
-          i2: "Multilingual guidance",
-          i3: "Curated sightseeing",
-          i4: "Local recommendations",
-          outro: "All within one seamless platform.",
+          q: "How is it different?",
+          a: "One platform runs the whole day",
         },
         q4: {
-          q: "How will funds be used?",
-          intro: "Your contributions will help us:",
-          i1: "Launch transportation operations",
-          i2: "Develop and improve the GTS web platform",
-          i3: "Expand multilingual support",
-          i4: "Build partnerships with local businesses",
-          i5: "Promote Chuncheon as a world-class travel destination",
+          q: "Where do funds go?",
+          a: "Operations, platform, local partnerships",
         },
+      },
+      rewards: {
+        title: "Back the first line. Ride it first.",
+        select: "Select",
+        ribbon: "MOST POPULAR",
+        tiers: {
+          early: {
+            price: "₩15,000",
+            name: "Early Bird Seat",
+            r1: "One seat on any line",
+            r2: "Priority booking",
+            r3: "Digital thank-you card",
+          },
+          full: {
+            price: "₩39,000",
+            name: "Full Day Course",
+            r1: "Seat plus lunch pre-order",
+            r2: "Line stamp kit",
+            r3: "Host guidance",
+          },
+          duo: {
+            price: "₩69,000",
+            name: "Duo Pack",
+            r1: "Two seats together",
+            r2: "Both meals pre-ordered",
+            r3: "Photo spot map",
+          },
+          patron: {
+            price: "₩150,000",
+            name: "Local Patron",
+            r1: "Four seats any date",
+            r2: "Your name on the van",
+            r3: "Local goods box",
+          },
+        },
+      },
+      funds: {
+        title: "Where every won goes.",
+        raisedOf: "raised of",
+        goalTail: "goal",
+        backers: "backers",
+        daysLeft: "days left",
+        center1: "100%",
+        center2: "transparent",
+        legend: {
+          ops: "Van operations",
+          local: "Local partnerships",
+          platform: "Web platform",
+          reserve: "Reserve fund",
+        },
+      },
+      roadmap: {
+        title: "Chuncheon first. Then every lake city.",
+        steps: {
+          s1: "Funding closes",
+          s2: "Daily lines launch",
+          s3: "Gangwon cities",
+          s4: "Asia's tourism template",
+        },
+      },
+      team: {
+        label: "TEAM 5",
+        title: "Six students who actually ran the line.",
+        body: "Design, development, operations and research, all students at Hallym University, Chuncheon.",
+        promiseTitle: "Our promise to backers",
+        p1: "Full refund if your departure isn't confirmed",
+        p2: "Licensed chartered bus partners only",
+        p3: "Insurance included on every ride",
+        p4: "Funds tracked and reported openly",
+      },
+      ctaBand: {
+        title: "Help us redefine travel in Chuncheon.",
+        sub: "Every arrival becomes a journey.",
+        primary: "Support GTS today",
+        secondary: "Try the live platform",
+      },
+      sticky: {
+        label: "Back the first line",
+        of: "of",
+        cta: "Support GTS",
       },
     },
     cta: {

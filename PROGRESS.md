@@ -27,7 +27,15 @@
 | [D4] | 존 C4 BUILDER: setup 매칭(4케이스 규칙 일치·CarFront/Bus 실존 확인), build 3스텝(VenueGrid §30 — 2/3/4열·로테이션 중 선택 보존·cap 초과 자동 해제 없음·순서 배지), route ItineraryMap §32(번호핀·draw-on·fitBounds·목업 coord null 시 리스트 폴백), checkout §33(1뷰·하차 필수·프로토타입 Dialog·LoginGate·스탬프), Ticket GTS 모드, data/gts/api.js 목 창구(api.js 원본 미수정), gts 3언어 74키 |
 | [DR] | 검수: 임의 시각 정규식 신규 코드 0 / DEPRECATED 라이브 참조 0(주석·CSS 재사용 3건은 판정 무해) / 3언어 527키 동형 / HEX·localStorage·select·이모지·blur 신규·font-normal 전부 0 / 매트릭스 320·1280·3840 가로 스크롤 0·캡 1800·그리드 2→4열 / E2E: 게이트 양방향 + setup→build→route→checkout→ticket 전 구간 브라우저 통과 / gateRoutes.js 소비자 0 → DEPRECATED 주석 |
 
-### v4.3 폴리시 + About 크라우드펀딩 (2026-07-22 · [H2] 커밋 대기)
+### v4.4 수리 3건 + About 정밀 전사 (2026-07-22 · [I1])
+
+- 수리: ① /gts/build lg 1280×800 3스텝 내부 스크롤 0(패딩 32·카드 lg 136·gap 12 — 스크롤 대신 크기 축소, over 0 실측) ② 헤더 시각 간격 포렌식 — LangSwap 겹침 유령 폭(0~44px)이 원인, 내비 단일 언어 렌더로 [60,76,49]→[32,32,32] 오차 0(언어 전환 시 내비 폭 변동 트레이드오프 보고) ③ 데모 도착 8초.
+- About 15섹션 전사(레퍼런스 구도·지시 카피): Hero 55:45+폰 SVG draw-on / 문제 3카드 / WHAT WE RUN 수평 플로우 / 하루 타임라인 5 / #proof 카운트업 3·14·5 / 실사 풀블리드+글래스 카드 / 스토리 2 / 순환 궤도 SVG / Do the math 3열(GTS 승격) / 후기 시드 3건 인용 / FAQ 상시 노출 / 리워드 4카드(MOST POPULAR 링·리본) / 자금 도넛+진행바(campaign.js 단일 출처) / 로드맵 4노드 / 팀·약속+CTA 밴드. StickyBackBar(§35 · 히어로 후 등장·CTA 도달 시 소멸) 실측 3상태 통과.
+- 3언어 646키 동형 · 이모지 0 · 사전 줄표 0 · 320 가로 스크롤 0.
+- DEMO 초안(지시 13~15 카피 부재 — 레퍼런스 가독 대형 텍스트+campaign 연출값 기반, 교정 대상): funds h2·범례 4종/퍼센트(40/25/20/15), roadmap 연도(2026/2027/2027/2028), team body. 사진 3종(/images/about/) 부재 시 surface 폴백.
+- Kanit 800 미로드 → 700 대체(로드 스택 400~700).
+
+### v4.3 폴리시 + About 크라우드펀딩 (2026-07-22 · [H2] 커밋 — 사용자 "6번째 세팅" 포함)
 
 - 19항목 전부 수리·브라우저 검증: CTA 페어 동일 폭(grid 1fr)·gap12 / 내비 gap 32 균일(개별 마진 0) / ScrollToTop 해시 예외 / main 100dvh(짧은 페이지 푸터 폴드 밖 — fixed 헤더라 -헤더높이 빼면 안 되는 함정 수리) / 시간 필드 = FieldSelect 닫힘(KST 현재)+TimeWheel 팝(TimeField 신설·KoreaClock 렌더 제거·DEPRECATED) / 폼 컴팩트(compact 트리거 h-48·lg 4필드 한 행) / 두 섹션 첫 화면 동시 인지 / 데모 10초 / 현위치 스텁 검증(동의 모달→값 교체→용산 최근접+varies, 라벨 "Current location" 상태형 통일) / setup 단일 카드 좌 Your ride·우 입력·CTA 우하(1차 order 배치 버그 재수리) / 숫자 원형 페이지네이션(Pagination 신설 · IA §10.4 페어 대체 · ←→ 키보드) / 벤처 카드 172px 고정+line-clamp+Chip 바닥(TriText clampClass — 겹침 렌더라 언어 불변 자동) / StepStage 1120·§35 화이트 글래스·Back white 채움 48 / 결제 sticky top-24 / 로고 svg→png→텍스트 3단 폴백 / 월렛 시뮬 문구 3언어 삭제 / 정렬 라벨 600 / 리뷰 메타 고정 슬롯(mt-auto).
 - About 크라우드펀딩: 어바웃.md 전문 이식(brand.crowd 3언어 · 이모지 0 · 줄표 값 0 · "Mobile App"→"Web platform" 교정 · Travel→Tourism 브랜드 통일 보고) — 섹션 8종 md 순서, #proof 블록 보존 삽입, FAQ 4항목 전부 펼침, 구 섹션 6종 렌더 제거(파일·키 보존). 3언어 601키 동형.
