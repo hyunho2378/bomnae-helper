@@ -6,10 +6,14 @@ import Footer from '../nav/Footer';
 import GlassDock from '../nav/GlassDock';
 import Header from '../nav/Header';
 
-// pathname → meta.title 키 (ROUTES §1 라우트 테이블 기준). GlassDock 현재 페이지명도 사용.
+// pathname → meta.title 키 (v4 라우트 기준 · 구 loop 분기는 리다이렉트 경유라 잔존 무해).
 export function routeKeyFromPath(pathname) {
   if (pathname === '/') return 'home';
   if (pathname === '/gate') return 'gate';
+  if (pathname === '/gts' || pathname === '/gts/setup') return 'gtsSetup';
+  if (pathname === '/gts/build') return 'gtsBuild';
+  if (pathname === '/gts/route') return 'gtsRoute';
+  if (pathname === '/gts/checkout') return 'gtsCheckout';
   if (pathname === '/hands-free' || pathname === '/gate/hands-free') return 'handsfree';
   if (pathname === '/loop') return 'loop';
   if (/^\/loop\/[^/]+\/book\/?$/.test(pathname)) return 'booking';
@@ -25,7 +29,8 @@ export default function PageLayout() {
   const { pathname } = useLocation();
   const { t } = useLang();
   const routeKey = routeKeyFromPath(pathname);
-  const hideFooter = pathname === '/loop';
+  // v4: /loop 퇴역으로 Footer 숨김 대상 없음(분기 메커니즘은 보존 — BUILDER가 §9.5에서 필요 시 보고 후 사용)
+  const hideFooter = false;
 
   // 페이지 title · "Global Tourism System · {meta.title.*}" (ROUTES §4)
   useEffect(() => {

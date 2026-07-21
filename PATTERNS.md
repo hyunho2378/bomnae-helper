@@ -272,3 +272,50 @@ locar.add(marker, stop.lng, stop.lat);      // 경도, 위도 순서
 
 ## §27 폰트 로딩 v3.2
 SUIT Variable CDN(jsdelivr suit 패키지) + Kanit(구글폰트, thai+latin 서브셋 포함) preconnect. `font-display: swap`. th 로케일 시 html lang="th" + body 폰트 스택 교체(tokens.fonts.thai).
+
+---
+
+# v4 신규 패턴
+
+## §28 RouteTimeline (세로 경로 타임라인)
+구조: `<ol>` 시맨틱. 좌측 수직 라인(2px, colors.line) 위에 단계 노드 겹침 — 노드 = white 원 40px + shadow.sm + lucide 아이콘 20px(ink). 마지막 도착 노드만 primary 배경 + white 아이콘. 노드 우측: 단계명(600) + 소요·비고(inkSec 14px) + 요금 있으면 우측 정렬. 세그먼트별 아이콘 매핑: origin=MapPin(공항이면 Plane), subway/rail=TrainFront, intercityBus=Bus, walk=Footprints, taxi=CarFront, arrive=Building2. **주행·이동 애니메이션 금지** — 진입 시 카드 리빌(0.96→1.0, 화이트리스트)만. 구 GateJourney 컴포넌트·keyframes 삭제.
+
+## §29 허브 경로 엔진 (할루시네이션 차단 설계)
+원칙: **경로는 코드가 계산하지 않는다. `src/data/gts/hubs.js`의 큐레이션 템플릿에서 조회만 한다.**
+```js
+// hubs.js 형태 — 값은 전부 초안, // PLACEHOLDER — verify 필수
+export const hubs = [
+  { id:'icn',  name:{en:'Incheon Airport'},  coord:[126.4505,37.4602], kind:'airport' },
+  { id:'gmp',  name:{en:'Gimpo Airport'},    coord:[126.7911,37.5586], kind:'airport' },
+  { id:'yongsan', name:{en:'Yongsan Station'}, coord:[126.9648,37.5298], kind:'rail' },
+  { id:'sangbong', name:{en:'Sangbong Station'}, coord:[127.0857,37.5967], kind:'rail' },
+  { id:'dongseoul', name:{en:'Dong Seoul Terminal'}, coord:[127.0947,37.5350], kind:'bus' },
+  { id:'busan', name:{en:'Busan Station'},   coord:[129.0416,35.1151], kind:'rail' },
+];
+export const routeTemplates = [ // 춘천역/춘천터미널 도착 고정 2종
+  { from:'yongsan', to:'chuncheon-station', legs:[{mode:'rail', label:'ITX-Cheongchun', durMin:75}], headwayNote:'freq.rail' },
+  { from:'dongseoul', to:'chuncheon-terminal', legs:[{mode:'intercityBus', durMin:80}], headwayNote:'freq.bus' },
+  // ...
+];
+```
+- 사용자 현재 위치 → 하버사인 최근접 허브 매핑 + 첫 레그로 `{mode:'subway'|'taxi', label:'to <허브>', durMin:null}` 부착(소요 미상은 "varies" 카피).
+- **구체 출발 시각(07:00 등)·요금 숫자·편명 생성 전면 금지.** 배차는 사전 키(freq.rail="Runs frequently through the day" 급) + PLACEHOLDER 마킹. durMin도 전부 `// PLACEHOLDER — verify` 주석.
+- From Chuncheon = 동일 템플릿 역방향 조회(legs reverse).
+
+## §30 카드 그리드 + 새로고침
+`VenueGrid`: props { pool, pageSize:8, selected[], max, onToggle }. lg `grid-cols-4` 2행 / md 3열 / 모바일 2열. 새로고침 = 세컨더리 버튼(RefreshCw + "다른 곳 보기") — `page = (page+1) % ceil(pool/8)` 로테이션, 선택된 카드가 현재 페이지에 없어도 선택 상태 유지(하단 진행 바에 요약 상시). 선택 카드: primary 2px 링(box-shadow, 보더 아님) + 우상단 순서 배지(Lunch/Dinner 또는 1·2). 목업 카드: 이름 "Mockup N" + 회색 아님 — surface 면 + "Coming soon" Chip, 사진 영역 렌더 안 함.
+
+## §31 GTS 조립 상태기 (GtsContext)
+```
+state = { party, luggage, vehicle(derived), mealPlan:null|'none'|'lunch'|'lunchDinner',
+          meals:[], picks:[], dropoffText:'' }
+```
+- vehicle은 저장하지 않고 셀렉터로 파생(§9.3 규칙) — 인원·짐 변경 시 자동 재매칭 + 변경 안내 토스트 아님, 카드 갱신만.
+- 가드: build 진입에 party 필수, route 진입에 (mealPlan 충족 && picks.length===2), checkout 진입에 route 경유. 미충족 시 앞 단계로 replace(쿼리 아님 — Context, 새로고침 시 setup부터, localStorage 금지 유지).
+- meals: lunchDinner일 때 push 순서 = 점심, 저녁. 해제 시 순서 재계산.
+
+## §32 일정 결과 지도 (ItineraryMap)
+LoopMap 재사용 아님 — 경량 신규: 소스 1개(선택지 좌표 순서 GeoJSON LineString) + §13 3레이어(단색 primary) + draw-on, 번호 마커(원 28px primary 배경 white 숫자 700). 핀 hover/탭 = 장소 카드 팝업(§13 StopPopup 재사용). fitBounds(패딩 80) 1회. venues 좌표 없는 목업 픽 선택 시: 지도 대신 순서 리스트만 렌더 + "정확한 위치는 확정 후 표시" 안내(지어낸 좌표 금지).
+
+## §33 체크아웃·프로토타입 결제
+합계 = vehicles.js의 base[vehicleType] + (luggage? luggageFee:0) + perPerson*party — 전부 DRAFT 주석 값. "결제하기" → LoginGate → 확인 Dialog("프로토타입: 실제 결제가 이루어지지 않습니다" 고지 포함, Terms §2 문구와 동일 키) → createGtsBooking(api.js 목 확장은 이번엔 클라 목 데이터로만, api.js 수정 금지 원칙 유지 위해 `src/data/gts/api.js` 별도 목 창구 신설) → 성공 스탬프 → Ticket(GTS 모드: 일정 순서 리스트 + 하차 지점 원문).

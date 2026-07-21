@@ -1,3 +1,4 @@
+// DEPRECATED v4(IA §9.0) — 구 City Lines·Bag Delivery 잠정 퇴역: 라우트에서 제거됨. 삭제 금지, 재활용 예정.
 // 스토리 클립 · IA §2.5 블록 3: 차내에서 보게 될 사장님 스토리 미리보기.
 // 영상 있으면 VideoPlayer(자막 상시), 없으면 썸네일 + 요약 카드(CC_PROMPT_3 §3).
 // 모바일 가로 스크롤 / lg 3열(COMPONENTS C).

@@ -1,3 +1,4 @@
+// DEPRECATED v4(IA §9.0) — 구 City Lines·Bag Delivery 잠정 퇴역: 라우트에서 제거됨. 삭제 금지, 재활용 예정.
 // Loop(City Lines) · 시그니처 화면 v3.2(IA §8.3 · DESIGN §16.9):
 // 초기 지도 = 라인·정류장·셔틀 비노출 + POI 앵커만. 지도 좌상 라인 칩 3개(§24)가 유일한
 // 라인 진입점 · 칩 선택 시에만 draw-on·마커·셔틀 등장, 재클릭·Escape 해제.

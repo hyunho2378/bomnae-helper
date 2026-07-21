@@ -1,3 +1,4 @@
+// DEPRECATED v4(IA §9.0) — 구 City Lines·Bag Delivery 잠정 퇴역: 라우트에서 제거됨. 삭제 금지, 재활용 예정.
 // 시네마틱 라이브 라인 맵 · PATTERNS §4 골격 + §13 3레이어·draw-on + v3.2 §16.9·§23 수술.
 // v3.2 초기화(§16.9): 초기 라인·정류장·셔틀 전부 비노출(레이어 부재 · lazy 마운트).
 //   selectedLineId 선택 시에만 해당 라인 3레이어 draw-on + 마커 + 셔틀 등장, 해제 시 visibility 숨김.

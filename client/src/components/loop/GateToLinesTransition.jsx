@@ -1,3 +1,4 @@
+// DEPRECATED v4(IA §9.0) — 구 City Lines·Bag Delivery 잠정 퇴역: 라우트에서 제거됨. 삭제 금지, 재활용 예정.
 // Gate→Lines 전환 모핑 · v3.2 신설(PATTERNS §22 · IA §8.5.5 · COMPONENTS 존 C2).
 // /loop 진입 시 location.state?.transition === true면 Loop 페이지가 렌더.
 // 타임라인(rAF · §22 대안 구현: stroke-dashoffset 조합, spring 금지 · linear/ease만):

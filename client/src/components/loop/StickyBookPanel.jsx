@@ -1,3 +1,4 @@
+// DEPRECATED v4(IA §9.0) — 구 City Lines·Bag Delivery 잠정 퇴역: 라우트에서 제거됨. 삭제 금지, 재활용 예정.
 // 스티키 예약 패널 · v3.2 rev(IA §8.3.3): 캘린더는 좌측 본문(2개월 스프레드)으로 이동,
 // 이 패널은 "선택 중인 출발" = 라인명 · 날짜 · 회차 · 인원 Stepper · 합계 · CTA.
 // 선택 상태(URL 쿼리 동기·replace)는 LineDetail 소관 · 패널은 표시 + onPatch 콜백만.

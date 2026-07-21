@@ -1,3 +1,4 @@
+// DEPRECATED v4(IA §9.0) — 구 City Lines·Bag Delivery 잠정 퇴역: 라우트에서 제거됨. 삭제 금지, 재활용 예정.
 // 라인 미리보기 오버레이 · v3.1 신설(PATTERNS §14 그대로, IA §2.4.4):
 // "View line" 클릭 시 라우팅 없이 fixed inset-0 z-sheet: scrim(클릭 닫기) +
 // 데스크탑 우측 420px 글래스 패널(translateX 24px→0 + opacity spring, radius 좌측만 xl,

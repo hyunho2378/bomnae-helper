@@ -1,3 +1,4 @@
+// DEPRECATED v4(IA §9.0) — 구 City Lines·Bag Delivery 잠정 퇴역: 라우트에서 제거됨. 삭제 금지, 재활용 예정.
 // 셔틀 시뮬레이션 훅 · PATTERNS §13(v3.1 스무딩 수술):
 // 목표 좌표는 경로 누적거리 기반 등속 파라미터로 산출(정점 간 lerp · 정점 덜컥임 원인 제거),
 // 표시 좌표는 지수 추종(current += (target-current)*min(1, dt*3))으로 따라간다.

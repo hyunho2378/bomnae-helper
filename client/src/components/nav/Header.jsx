@@ -1,8 +1,7 @@
 // 헤더 v3.2(DESIGN §16.4 · visitkorea 스케일) · 전 라우트 불투명.
-// 높이 80(스크롤 64), 로고 22px 700 primary, 메뉴 17px 600 간격 32+.
-// 순서: About | Getting Here | Bag Delivery | City Lines(§16.7 표시명).
+// 높이 80 고정 — 스크롤 축소·글래스 전환 폐지(사용자 결정). 메뉴 17px 600 간격 32+.
+// 순서 v4(IA §9.1): About | Getting Here | Make GTS — Bag Delivery·City Lines 항목 삭제.
 // 모바일에도 상단 헤더 존재: 로고+LangMenu+로그인만 · 메뉴는 GlassDock 단일 소유(햄버거 금지).
-import { useEffect, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { User } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -15,46 +14,22 @@ import LogoMark from '../../assets/logo-mark.svg?react';
 const MENU = [
   { to: '/about', k: 'nav.about' },
   { to: '/gate', k: 'nav.gate' },
-  { to: '/hands-free', k: 'nav.handsfree' },
-  { to: '/loop', k: 'nav.loop' },
+  { to: '/gts', k: 'nav.gts' },
 ];
 
 export default function Header() {
-  const [scrolled, setScrolled] = useState(false);
   const { user, login, logout } = useAuth();
   const { t } = useLang();
 
-  useEffect(() => {
-    let raf = 0;
-    const onScroll = () => {
-      if (raf) return;
-      raf = requestAnimationFrame(() => {
-        raf = 0;
-        setScrolled(window.scrollY > 8);
-      });
-    };
-    setScrolled(window.scrollY > 8);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, []);
-
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-header transition-all duration-base ease-spring motion-reduce:transition-none ${
-        scrolled ? 'h-64 bg-glass shadow-sm backdrop-blur-glass' : 'h-80 bg-white'
-      }`}
-    >
+    <header className="fixed inset-x-0 top-0 z-header h-80 bg-white">
       <div className="mx-auto flex h-full w-full max-w-lg items-center justify-between px-16 md:px-24 lg:px-40 2xl:max-w-2xl 3xl:max-w-3xl">
         <Link to="/" aria-label={t('nav.home')} className="flex items-center gap-8">
           <LogoMark className="h-24 w-24 shrink-0 text-primary" aria-hidden="true" />
           {/* 모바일은 심볼만 — 워드마크 22px가 375px 폭 초과(사용자 결정) */}
-          {/* 이니셜 G·T·S만 primary, 나머지 ink(사용자 결정) */}
+          {/* 워드마크는 ink 단색 — 이니셜 색 분기 폐지(사용자 결정) */}
           <span className="hidden whitespace-nowrap font-display text-logo font-semibold tracking-display text-ink lg:inline">
-            <span className="text-primary">G</span>lobal <span className="text-primary">T</span>ourism{' '}
-            <span className="text-primary">S</span>ystem
+            Global Tourism System
           </span>
         </Link>
         {/* 데스크탑 전용 메뉴 · 모바일 내비는 GlassDock 단일 소유(§16.4) */}

@@ -1,3 +1,4 @@
+// DEPRECATED v4(IA §9.0) — 구 City Lines·Bag Delivery 잠정 퇴역: 라우트에서 제거됨. 삭제 금지, 재활용 예정.
 // Bag Delivery(/hands-free) · v3.1 최상위 페이지(IA §2.3) + v3.2 존 B2(§8.4).
 // 헤드라인 섹션(h1 + Optional 배지 + 서브 + 선택 사항 카피 + 3단계 미니 스트립) → lg+ 1fr_380px 2컬럼
 // (좌 설명·단계·FAQ 3개 / 우 폼 카드).

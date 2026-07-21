@@ -1,3 +1,4 @@
+// DEPRECATED v4(IA §9.0) — 구 City Lines·Bag Delivery 잠정 퇴역: 라우트에서 제거됨. 삭제 금지, 재활용 예정.
 // 라인 히어로 · v3.1 rev(IA §2.5.1): 중립 면(surface) + 캐릭터 이미지(콘텐츠로만) +
 // 라인명(Kanit Bold) + 소요·정류장 수·가격.
 // LineDetail 좌측 컬럼 안 카드(그리드 레이아웃 · 풀블리드 아님), 무보더(DESIGN §7).

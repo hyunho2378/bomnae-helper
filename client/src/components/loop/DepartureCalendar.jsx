@@ -1,3 +1,4 @@
+// DEPRECATED v4(IA §9.0) — 구 City Lines·Bag Delivery 잠정 퇴역: 라우트에서 제거됨. 삭제 금지, 재활용 예정.
 // 출발 캘린더 · v3.2 rev(PATTERNS §20 yountravel 2개월 스프레드 · IA §8.3.3):
 // lg+ 이번 달·다음 달 나란히(존 A2 공용 CalendarGrid 재사용), 모바일 1개월 + 월 전환.
 // 각 날짜 셀: 가격 인라인(caption 700 · CalendarGrid cellInfo.extra) + 상태 도트(원색+shadow.sm)

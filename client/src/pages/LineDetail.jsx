@@ -1,3 +1,4 @@
+// DEPRECATED v4(IA §9.0) — 구 City Lines·Bag Delivery 잠정 퇴역: 라우트에서 제거됨. 삭제 금지, 재활용 예정.
 // 라인 상세 · v3.2 rev(IA §8.3.3 yountravel 문법 이식 · PATTERNS §15·§20):
 // lg+ grid-cols-[1fr_380px] · 좌 = LineHero + 2개월 스프레드 캘린더(§20 · 회차 전부 펼침)
 // + StopStrip + StoryClips, 우 = 스티키 "선택 중인 출발" 패널(캘린더는 좌측으로 이동).

@@ -7,11 +7,11 @@ import LangSwap from '../../i18n/LangSwap';
 import Container from '../layout/Container';
 import LogoMark from '../../assets/logo-mark.svg?react';
 
+// v4(IA §9.1): 내비 3항목과 동일 세트 — 퇴역 라우트 링크 잔존 금지
 const EXPLORE = [
   { to: '/about', k: 'nav.about' },
   { to: '/gate', k: 'nav.gate' },
-  { to: '/hands-free', k: 'nav.handsfree' },
-  { to: '/loop', k: 'nav.loop' },
+  { to: '/gts', k: 'nav.gts' },
 ];
 
 export default function Footer() {

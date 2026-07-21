@@ -1,3 +1,4 @@
+// DEPRECATED v4(IA §9.0) — 구 City Lines·Bag Delivery 잠정 퇴역: 라우트에서 제거됨. 삭제 금지, 재활용 예정.
 // 라인 칩 · v3.2 신설(PATTERNS §24 · DESIGN §16.9 · COMPONENTS 존 C2):
 // 네이버지도 카테고리 필 방식. white pill h-40 + 좌측 라인 컬러 원 10px(원색+shadow.sm) +
 // 라벨 600 ink + shadow.md. 선택 = primary 배경 white 반전(라인 컬러 배경 금지 · 크롬 단일색).
