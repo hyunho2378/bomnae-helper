@@ -171,3 +171,39 @@ export const seedReviews = [
 ];
 
 export default seedReviews;
+
+// ============================================================
+// [G1] 서버 접근 계층(명세 5-②) · seedReviews export는 폴백·홈 스트립 계약으로 보존.
+// 서버 실패 시 호출부(Reviews.jsx)가 seedReviews 세션 메모리로 폴백한다.
+// ============================================================
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001';
+
+export async function fetchReviews(sort = 'latest') {
+  const res = await fetch(`${API_BASE}/api/reviews?sort=${sort === 'likes' ? 'likes' : 'latest'}`, {
+    credentials: 'include',
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const { reviews } = await res.json();
+  return reviews;
+}
+
+export async function postReview(payload) {
+  const res = await fetch(`${API_BASE}/api/reviews`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const { review } = await res.json();
+  return review;
+}
+
+export async function toggleLikeRemote(id) {
+  const res = await fetch(`${API_BASE}/api/reviews/${id}/like`, {
+    method: 'POST',
+    credentials: 'include',
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json(); // { liked, likes }
+}

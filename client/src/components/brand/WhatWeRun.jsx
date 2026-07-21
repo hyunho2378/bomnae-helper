@@ -7,9 +7,10 @@ import LangSwap from '../../i18n/LangSwap';
 import Section from '../layout/Section';
 
 const PILLARS = [
+  // [G1] 명세 5-④: 퇴역 라우트(/loop·/hands-free) 링크를 정식 라우트로 교정(리다이렉트 의존 제거)
   { key: 'brand.run.gate', to: '/gate', icon: Plane },
-  { key: 'brand.run.loop', to: '/loop', icon: Bus },
-  { key: 'brand.run.handsfree', to: '/hands-free', icon: Luggage },
+  { key: 'brand.run.loop', to: '/gts', icon: Bus },
+  { key: 'brand.run.handsfree', to: '/gts', icon: Luggage },
 ];
 
 export default function WhatWeRun() {

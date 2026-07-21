@@ -20,3 +20,6 @@ npm-debug.log*
 # 에디터
 .vscode/
 .idea/
+
+# TAGO ID 캐시(기동 시 재생성)
+server/cache/*.json

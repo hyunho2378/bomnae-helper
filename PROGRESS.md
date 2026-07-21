@@ -27,6 +27,15 @@
 | [D4] | 존 C4 BUILDER: setup 매칭(4케이스 규칙 일치·CarFront/Bus 실존 확인), build 3스텝(VenueGrid §30 — 2/3/4열·로테이션 중 선택 보존·cap 초과 자동 해제 없음·순서 배지), route ItineraryMap §32(번호핀·draw-on·fitBounds·목업 coord null 시 리스트 폴백), checkout §33(1뷰·하차 필수·프로토타입 Dialog·LoginGate·스탬프), Ticket GTS 모드, data/gts/api.js 목 창구(api.js 원본 미수정), gts 3언어 74키 |
 | [DR] | 검수: 임의 시각 정규식 신규 코드 0 / DEPRECATED 라이브 참조 0(주석·CSS 재사용 3건은 판정 무해) / 3언어 527키 동형 / HEX·localStorage·select·이모지·blur 신규·font-normal 전부 0 / 매트릭스 320·1280·3840 가로 스크롤 0·캡 1800·그리드 2→4열 / E2E: 게이트 양방향 + setup→build→route→checkout→ticket 전 구간 브라우저 통과 / gateRoutes.js 소비자 0 → DEPRECATED 주석 |
 
+### 서버 v1 (2026-07-21 · [G1] 커밋 대기)
+
+- 스키마 v4: users·gts_bookings·reviews(+title·seed_likes 최소 추가)·review_likes, migrate 2회 멱등 실증(Neon · reviews 12 유지), seed.sql은 클라 시드 문안 그대로 생성.
+- Auth: Google OAuth code 플로우(/api/auth/google 302 확인·tokeninfo 검증·users upsert·HMAC 서명 httpOnly 쿠키) + DEMO_MODE 기본(비로그인 쓰기 → demo@gts.ac.kr 귀속). 실OAuth 왕복은 사용자 수동 확인 항목(구글 콘솔 redirect_uri 등록 필요).
+- API: 예약 생성(총액 서버 재계산 — 조작값 99 → 85,000 실증)·코드 조회·리뷰 목록/게시/좋아요 토글(세션 키 unique·재요청 취소)·health.
+- TAGO: 시외버스 = 문서(docs/tago/...시외버스정보v1.1.docx) 근거 4오퍼레이션, 동서울(NAI0511601)·춘천(NAI2443501) 기동 시 이름 매칭·캐시(tago-ids.json)·당일 외 fallback. 열차 = probe-train.js 실호출 검증으로 1613000/TrainInfo + GetCtyCodeList/GetCtyAcctoTrainSttnList/GetStrtpntAlocFndTrainInfo 채택(청량리→남춘천 18건 샘플). serviceKey 재인코딩 금지(tago.js 원문 이어붙이기 · URLSearchParams 0건).
+- 클라 스왑: gts/api.js·reviews 접근 계층(+Reviews.jsx 배선부 — 사용자 승인·UI diff 0 증명)·RouteOptionCard LIVE 분기(용산→춘천 실배차 3편 브라우저 실증)·WhatWeRun 정식 라우트·.env.example(VITE_API_BASE). GTS 4페이지·Ticket·컨텍스트 diff 0 git 증명.
+- 브라우저 실증: 리뷰 13건 로드·좋아요·새로고침 생존 / 티켓 FZRQDV DB 복원(Van·Visa·85,000·하차 원문) / 플래너 LIVE+Est. 공존.
+
 ### v4.2 (2026-07-21 · [F1]~[FR])
 
 | 커밋 | 내용 |
@@ -137,7 +146,9 @@
 - [ ] GTS 실명 로컬 브랜드 추가 확보 — 목업 25슬롯(meal 11·foodspace 9·activity 5) 교체 + 실명 11곳 좌표 현장 검증 (`data/gts/venues.js`)
 - [ ] 결제 로고 8종 배치 — `client/public/pay/{applepay,alipay,visa,mastercard,paypal,amex,jcb,unionpay}.svg` 고정 파일명(§42 — 현재 onError 텍스트 폴백으로 동작)
 - [ ] 리뷰 실데이터 승격 — `data/reviews.js` mock 12건 → 서버 reviews·review_likes 테이블(§10.8 백엔드 체크리스트)
-- [ ] 카카오 REST 키(선택) — 현위치 주소명 라벨용 서버 프록시 `/api/geo/label`(§39 — 없으면 "현재 위치" 고정 라벨 유지)
+- [ ] 카카오 REST 키(선택) — 현위치 주소명 라벨용 서버 프록시 `/api/geo/label` 구현 완료(§39 — 키 없으면 fallback 응답·클라 "현재 위치" 고정 라벨 유지)
+- [ ] Google OAuth 실왕복 1회 수동 확인 — 구글 콘솔에 redirect_uri(`{SERVER_ORIGIN}/api/auth/google/callback`) 등록 후 /api/auth/google 진입(서버 302·콜백·쿠키는 구현 완료)
+- [ ] 열차정보 공식 활용가이드 PDF 확보 시 docs/tago/ 배치 — 현재 probe 실호출 검증 기반(문서 근거로 승격)
 
 ## 사고 이력 / 교훈
 

@@ -11,9 +11,51 @@ import RouteTimeline from './RouteTimeline';
 import { PlannerSwap } from './fieldOptions';
 import { computeLegTimes } from './planRoutes';
 
+// [G1] /api/transit live 분기(명세 5-③ · 분기 파일 1곳) — live면 실시각 편 표기, fallback이면 기존 추정 유지.
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001';
+// option.id = `${direction}-${from}-${to}`(planRoutes) → 허브 id 복원(허브 id에 '-' 포함 주의)
+const parseHubs = (option) => {
+  const rest = option.id.replace(/^(to|from)-/, '');
+  const m = rest.match(/^(.+)-(chuncheon-(?:station|terminal))$/);
+  if (!m) return null;
+  const [, hub, point] = m;
+  return option.direction === 'to' ? { from: hub, to: point } : { from: point, to: hub };
+};
+// live 지원 조합만 조회(§29 템플릿 중 단일 수단 직행): rail=용산·상봉↔춘천역 / bus=동서울↔춘천터미널
+const liveEndpoint = (option) => {
+  const hubs = parseHubs(option);
+  if (!hubs) return null;
+  const ids = [hubs.from, hubs.to];
+  if (option.kind === 'rail' && ids.every((id) => ['yongsan', 'sangbong', 'chuncheon-station'].includes(id)))
+    return { path: 'train', ...hubs };
+  if (option.kind === 'bus' && ids.every((id) => ['dongseoul', 'chuncheon-terminal'].includes(id)))
+    return { path: 'bus', ...hubs };
+  return null;
+};
+
 export default function RouteOptionCard({ option, departHHMM }) {
   const [revealed, setRevealed] = useState(false);
+  const [live, setLive] = useState(null); // { rows } — 서버 live 응답 시에만
   const cardRef = useRef(null);
+
+  // live 시각 조회 · fallback/실패/비지원 조합은 조용히 기존 추정 유지(라벨 불변)
+  useEffect(() => {
+    const ep = liveEndpoint(option);
+    if (!ep) return undefined;
+    const ac = new AbortController();
+    fetch(`${API_BASE}/api/transit/${ep.path}?from=${ep.from}&to=${ep.to}`, {
+      credentials: 'include',
+      signal: ac.signal,
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((json) => {
+        if (json?.source === 'live' && json.rows?.length) setLive(json);
+      })
+      .catch(() => {
+        /* fallback 유지 */
+      });
+    return () => ac.abort();
+  }, [option]);
   // §39 레그별 누적 시각 · departHHMM 미전달 방어(그 경우 시각 미표기)
   const times = departHHMM
     ? computeLegTimes(departHHMM, option.legs)
@@ -83,6 +125,33 @@ export default function RouteOptionCard({ option, departHHMM }) {
           times={times}
         />
       </div>
+      {/* [G1] live 배차 · TAGO 실시각(당일) — "LIVE"는 언어 불변 상태 라벨(§16.7 연출 카피 예외 선례),
+          시각·등급·요금은 API 데이터. fallback이면 이 블록 자체가 렌더되지 않는다(기존 추정 유지). */}
+      {live && (
+        <div className="mt-16 flex flex-col gap-8">
+          <span className="font-display text-caption font-semibold uppercase tracking-eyebrow text-primary">
+            LIVE
+          </span>
+          <ul className="flex flex-wrap gap-x-24 gap-y-4">
+            {live.rows.slice(0, 3).map((row) => (
+              <li key={`${row.depTime}-${row.arrTime}`} className="flex items-baseline gap-8">
+                <span className="font-display text-small font-semibold">
+                  {row.depTime} - {row.arrTime}
+                </span>
+                {(row.trainType || row.grade) && (
+                  <span className="text-caption font-medium text-inkSec">{row.trainType || row.grade}</span>
+                )}
+                {row.fare != null && (
+                  <span className="font-display text-caption font-medium text-inkSec">
+                    {'₩'}
+                    {row.fare.toLocaleString('en-US')}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </article>
   );
 }
