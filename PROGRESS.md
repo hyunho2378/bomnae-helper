@@ -27,7 +27,18 @@
 | [D4] | 존 C4 BUILDER: setup 매칭(4케이스 규칙 일치·CarFront/Bus 실존 확인), build 3스텝(VenueGrid §30 — 2/3/4열·로테이션 중 선택 보존·cap 초과 자동 해제 없음·순서 배지), route ItineraryMap §32(번호핀·draw-on·fitBounds·목업 coord null 시 리스트 폴백), checkout §33(1뷰·하차 필수·프로토타입 Dialog·LoginGate·스탬프), Ticket GTS 모드, data/gts/api.js 목 창구(api.js 원본 미수정), gts 3언어 74키 |
 | [DR] | 검수: 임의 시각 정규식 신규 코드 0 / DEPRECATED 라이브 참조 0(주석·CSS 재사용 3건은 판정 무해) / 3언어 527키 동형 / HEX·localStorage·select·이모지·blur 신규·font-normal 전부 0 / 매트릭스 320·1280·3840 가로 스크롤 0·캡 1800·그리드 2→4열 / E2E: 게이트 양방향 + setup→build→route→checkout→ticket 전 구간 브라우저 통과 / gateRoutes.js 소비자 0 → DEPRECATED 주석 |
 
-### v4.1 크래프트 패스 (2026-07-21 · [E1] 커밋 대기)
+### v4.2 (2026-07-21 · [F1]~[FR])
+
+| 커밋 | 내용 |
+|---|---|
+| [F1] | 존 A5 셸: 내비 4항목(About/Trip Planner/Tour Builder/Reviews)·/reviews 라우트·데모 로그인(DEMO_AUTH 플래그·게이트 통과 실증)·DRAFT 고지 전수 삭제(키 6종 동형 제거)·푸터 모토(BRAND §13)·GtsContext /gts 이탈 전체 리셋(실증) |
+| [F2] | 존 B5: 홈 재건(§10.2 — 스탯·라인·미니폼 삭제, 히어로 카피, CTA 페어 동일 44px 나란히, 진입 카드 2, HIW 재작성, 리뷰 스트립), 수직 2섹션 플래너, TimeWheel(§38 KST 디폴트·라이브 시계·키보드 즉시), computeLegTimes(§39 환승 10분 PLACEHOLDER·예상 라벨·자정 넘김), 데모 도착 시퀀스(§40 3초·To 전용·ARRIVAL_MODE 플래그 보존), gate 사전 -59/+20 |
+| [F3] | 존 C5: StepStage(§41 — 진행 바 폐지·scrim 0.7·글래스 1040/84vh·단일 선택 자동 전진·±24px 280ms easeInOut·Escape 뒤로), 스텝2 반반 분할, 페이지네이션 페어 전 그리드, 방문순서 세로 타임라인(§10.5), 결제 8종 그리드+카드 폼 빈 제출+월렛 2종 생략+onError 폴백(§42), 티켓 2컬럼·primary 단색 무보더·sticky 320·즉시 다운로드(§43), 리뷰 12시드(6언어·mock·실명 허용목록만)+정렬+좋아요+즉시 게시(§10.8), reviews 네임스페이스 3언어 |
+| [FR] | 검수: E2E 전 구간(홈→빌더→결제→티켓→리뷰) 브라우저 통과, grep(DRAFT UI 0·새로고침 라벨 0·share 0·이모지 0·스토리지 0·리뷰 실명 허용목록 내), 매트릭스 320/1280/3840(캡 1800·StepStage 1040 중앙·sticky 320·hScroll 0), About CtaBand /loop→/gts 수리 |
+
+- 미결(후속 세션): About WhatWeRun 3필러의 /loop·/hands-free 링크(리다이렉트 생존 — §14 About 반영 세션에서 재편 권장), Ticket 구 라인 분기 내 /loop 링크(보존 계약), BRAND §14 About 카피 반영 미실행(v4.2 실행 절차 밖).
+
+### v4.1 크래프트 패스 (2026-07-21 · [E1] 커밋 완료)
 
 - tokens.motion v4.1 동기화(easeOut/easeInOut/easeDrawer/spring + 120/180/160/280/360ms), tailwind 이징·지속 토큰 재편(ease-in 유틸리티 미생성), 구 320ms·ease-spring 전수 재매핑(시트→drawer/sheet, Dock 모핑·스탬프만 spring 존속).
 - §34: .pressable(Button·IconButton·Chip·캘린더 셀·LineCard·VenueGrid 카드) 120ms/0.97 + 팝 5면(FieldSelect·LangMenu·CalendarField·StopPopup·Dialog) origin-aware 0.97→1 진입·@starting-style·usePopExit 퇴장 역재생.
@@ -124,6 +135,9 @@
 - [ ] GTS 허브 소요시간(durMin 11건)·배차 실측 검증 (`data/gts/hubs.js` — 전건 PLACEHOLDER)
 - [ ] GTS 요금표 확정 (`data/gts/vehicles.js` — base/perPerson/luggageFee 5건 전부 DRAFT)
 - [ ] GTS 실명 로컬 브랜드 추가 확보 — 목업 25슬롯(meal 11·foodspace 9·activity 5) 교체 + 실명 11곳 좌표 현장 검증 (`data/gts/venues.js`)
+- [ ] 결제 로고 8종 배치 — `client/public/pay/{applepay,alipay,visa,mastercard,paypal,amex,jcb,unionpay}.svg` 고정 파일명(§42 — 현재 onError 텍스트 폴백으로 동작)
+- [ ] 리뷰 실데이터 승격 — `data/reviews.js` mock 12건 → 서버 reviews·review_likes 테이블(§10.8 백엔드 체크리스트)
+- [ ] 카카오 REST 키(선택) — 현위치 주소명 라벨용 서버 프록시 `/api/geo/label`(§39 — 없으면 "현재 위치" 고정 라벨 유지)
 
 ## 사고 이력 / 교훈
 

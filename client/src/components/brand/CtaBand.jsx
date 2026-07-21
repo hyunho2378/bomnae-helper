@@ -16,7 +16,8 @@ export default function CtaBand() {
             className="font-display text-h2 font-bold tracking-display"
           />
           <LangSwap k="brand.cta.sub" as="p" className="text-body font-medium text-inkSec" />
-          <Button as={Link} to="/loop" size="lg">
+          {/* [FR] v4.2: 퇴역 /loop 유도 제거 → Tour Builder 직행(리다이렉트 의존 금지) */}
+          <Button as={Link} to="/gts" size="lg">
             <LangSwap k="brand.cta.button" />
           </Button>
         </div>
