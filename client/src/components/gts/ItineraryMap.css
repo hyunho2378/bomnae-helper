@@ -1,0 +1,6 @@
+/* PATTERNS §32 번호 마커 명세값(28px 원) 한정 px 허용 · LoopMap.css와 동일 원칙
+   (지도 마커 수치는 명세 근거 주석과 함께 이 파일 한정).
+   색·타이포·그림자는 마커 엘리먼트의 tokens 클래스(bg-primary·text-white·font-bold·shadow-sm)가
+   담당하고, 이 파일은 치수·형태만 정의한다. */
+.gts-pin{display:flex;align-items:center;justify-content:center;width:28px;height:28px;
+  border-radius:50%;border:0;padding:0;cursor:pointer}

@@ -1,10 +1,15 @@
 // 티켓 · IA §2.7: navy 면 티켓 카드(라인 컬러 스트라이프, 예약 코드 6자 Kanit Bold,
 // 미팅포인트, 인원, 호스트, 차내 클립 1개, "2 lines left") + 공유(PATTERNS §7).
 // 미존재 bookingId는 EmptyState 렌더(라우트 이동 아님 · ROUTES §3).
+// v4(§33 · 존 C4): GTS 모드 분기 확장 — getGtsBooking에서 발견 시 GTS 내역(일정 순서 리스트 +
+// 하차 지점 원문 + 인원·차량) 렌더. 기존 라인 예약 티켓 로직은 그대로 보존.
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Share2 } from 'lucide-react';
 import { getBooking, getLine, getMeetingPoints, getStops } from '../data/api';
+import { getGtsBooking } from '../data/gts/api';
+import { venues } from '../data/gts/venues';
+import TriText from '../components/gts/TriText';
 // stories 데이터 · api.js에 접근자가 없어 직접 import(질문 목록 보고, 완료 보고 §5)
 import stories from '../data/stories';
 import { colors, fonts, lineColors } from '../tokens';
@@ -78,9 +83,95 @@ function TicketRow({ labelKey, children }) {
   );
 }
 
+// GTS 티켓 카드(§33) · navy 면 재사용 + primary 스트라이프. 일정 순서는 저장된 itinerary
+// (id 배열 · 순서 보존)를 venues 조회로 복원(조회 전용).
+function GtsTicketCard({ gts }) {
+  const entries = gts.itinerary.map((id) => venues.find((v) => v.id === id)).filter(Boolean);
+  return (
+    <Container>
+      <div className="mx-auto flex w-full max-w-dialog flex-col gap-32 pb-64 pt-96">
+        <LangSwap k="ticket.title" as="h1" className="text-h2 font-semibold" />
+
+        <article className="overflow-hidden rounded-lg bg-navy">
+          <div aria-hidden="true" className="h-8 bg-primary" />
+          <div className="flex flex-col gap-24 p-24 lg:p-32">
+            <div className="flex items-baseline justify-between gap-16">
+              <span className="font-display text-small font-semibold uppercase tracking-eyebrow text-white">
+                Global Tourism System
+              </span>
+              <LangSwap k={`gts.vehicle.${gts.vehicleType}`} className="text-small font-medium text-white" />
+            </div>
+            <div className="flex flex-col gap-4">
+              <LangSwap
+                k="ticket.codeLabel"
+                as="p"
+                className="text-caption font-medium uppercase tracking-eyebrow text-white"
+              />
+              <p className="font-display text-h1 font-bold tracking-display text-white">{gts.code}</p>
+            </div>
+            <dl className="grid grid-cols-2 gap-16">
+              <TicketRow labelKey="gts.checkout.partyLabel">
+                <span className="font-display">{gts.party}</span>
+              </TicketRow>
+              <TicketRow labelKey="gts.checkout.luggageLabel">
+                <LangSwap k={gts.luggage ? 'gts.checkout.luggageYes' : 'gts.checkout.luggageNo'} />
+              </TicketRow>
+              <TicketRow labelKey="gts.checkout.mealPlanLabel">
+                <LangSwap k={`gts.build.plan.${gts.mealPlan}`} />
+              </TicketRow>
+              <TicketRow labelKey="gts.ticket.dropoffLabel">
+                {/* 하차 지점 · 지오코딩 없는 사용자 원문 그대로(§9.6) */}
+                <span className="break-words">{gts.dropoffText}</span>
+              </TicketRow>
+            </dl>
+            {/* 일정 순서 리스트(§33) */}
+            <div className="flex flex-col gap-12">
+              <LangSwap
+                k="gts.ticket.orderTitle"
+                as="h2"
+                className="text-caption font-medium uppercase tracking-eyebrow text-white"
+              />
+              <ol className="flex flex-col gap-8">
+                {entries.map((venue, i) => (
+                  <li key={venue.id} className="flex items-center gap-12">
+                    <span
+                      aria-hidden="true"
+                      className="flex h-24 w-24 shrink-0 items-center justify-center rounded-pill bg-white font-display text-caption font-bold text-ink"
+                    >
+                      {i + 1}
+                    </span>
+                    <TriText text={venue.name} className="min-w-0 text-body font-semibold text-white" />
+                  </li>
+                ))}
+              </ol>
+            </div>
+            {/* navy 위 디바이더 · 기존 티켓과 동일(white 면 요소) */}
+            <div className="flex flex-col gap-16">
+              <div aria-hidden="true" className="h-px w-full bg-white" />
+              <div className="flex items-baseline justify-between">
+                <LangSwap k="gts.fare.total" className="text-small font-medium text-white" />
+                <span className="font-display text-h3 font-bold text-white">
+                  {'₩'}
+                  {gts.total.toLocaleString('en-US')}
+                </span>
+              </div>
+              <div className="flex items-center gap-8">
+                <span className="inline-flex items-center rounded-pill bg-yellow px-12 py-4 text-caption font-semibold text-ink">
+                  <LangSwap k="gts.draft" />
+                </span>
+                <LangSwap k="gts.draftNote" className="text-caption font-medium text-white" />
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </Container>
+  );
+}
+
 export default function Ticket() {
   const { bookingId } = useParams();
-  const [state, setState] = useState({ loading: true, booking: null, line: null, meetingPoint: null, story: null });
+  const [state, setState] = useState({ loading: true, booking: null, line: null, meetingPoint: null, story: null, gts: null });
   const { lang } = useLang();
   // v3.2 §8.3.3 빈 이미지 박스 0 · 클립 썸네일 로드 실패 시 박스 비렌더
   const [thumbFailed, setThumbFailed] = useState(false);
@@ -88,9 +179,15 @@ export default function Ticket() {
   useEffect(() => {
     let alive = true;
     (async () => {
+      // GTS 예약 우선 조회(§33 별도 목 창구) · 발견 시 GTS 모드
+      const gts = await getGtsBooking(bookingId);
+      if (gts) {
+        if (alive) setState({ loading: false, booking: null, line: null, meetingPoint: null, story: null, gts });
+        return;
+      }
       const booking = await getBooking(bookingId);
       if (!booking) {
-        if (alive) setState({ loading: false, booking: null, line: null, meetingPoint: null, story: null });
+        if (alive) setState({ loading: false, booking: null, line: null, meetingPoint: null, story: null, gts: null });
         return;
       }
       const [line, points, stops] = await Promise.all([
@@ -101,7 +198,7 @@ export default function Ticket() {
       const storyId = stops.find((s) => s.story_id)?.story_id ?? null;
       const story = stories.find((s) => s.id === storyId) ?? null;
       if (alive) {
-        setState({ loading: false, booking, line, meetingPoint: points[0], story });
+        setState({ loading: false, booking, line, meetingPoint: points[0], story, gts: null });
       }
     })();
     return () => {
@@ -109,7 +206,7 @@ export default function Ticket() {
     };
   }, [bookingId]);
 
-  const { loading, booking, line, meetingPoint, story } = state;
+  const { loading, booking, line, meetingPoint, story, gts } = state;
 
   if (loading) {
     return (
@@ -121,6 +218,9 @@ export default function Ticket() {
       </Container>
     );
   }
+
+  // GTS 모드(§33) · 라인 티켓 로직과 분기(기존 로직 보존)
+  if (gts) return <GtsTicketCard gts={gts} />;
 
   // 미존재 예약 · EmptyState 렌더(404 라우트 이동 아님, ROUTES §3)
   if (!booking) {

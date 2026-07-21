@@ -90,14 +90,18 @@ export default function StopPopup({ map, stop, onClose, onViewLine, onPointerEnt
           ))}
         </span>
       </span>
-      {/* View line 텍스트 버튼 · LinePreviewOverlay 오픈(페이지 이탈 없음 · IA §2.4) */}
-      <button
-        type="button"
-        onClick={() => onViewLineRef.current?.(stop.line_id)}
-        className="inline-flex min-h-44 w-fit items-center text-small font-semibold text-primary transition-colors duration-fast hover:text-ink"
-      >
-        <LangSwap k="loop.panel.viewLine" />
-      </button>
+      {/* View line 텍스트 버튼 · LinePreviewOverlay 오픈(페이지 이탈 없음 · IA §2.4)
+          v4(§32): onViewLine 미전달 시 비렌더 — GTS ItineraryMap 재사용 대응(라인 개념 없음),
+          기존 Loop 호출부는 항상 전달하므로 동작 불변 */}
+      {onViewLine && (
+        <button
+          type="button"
+          onClick={() => onViewLineRef.current?.(stop.line_id)}
+          className="inline-flex min-h-44 w-fit items-center text-small font-semibold text-primary transition-colors duration-fast hover:text-ink"
+        >
+          <LangSwap k="loop.panel.viewLine" />
+        </button>
+      )}
     </div>,
     container,
   );

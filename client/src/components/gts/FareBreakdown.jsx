@@ -1,0 +1,54 @@
+// 요금 구성 표시(IA §9.3 · PATTERNS §33) · data/gts/vehicles.js fares 조회 전용 + DRAFT 고지.
+// 다크패턴 금지(§16.10): 전 항목 + 합계 항상 펼침. setup 매칭 카드와 checkout 금액 내역이 공유.
+import { computeGtsTotal } from '../../data/gts/api';
+import { fares } from '../../data/gts/vehicles';
+import LangSwap from '../../i18n/LangSwap';
+
+function FareRow({ labelKey, children }) {
+  return (
+    <div className="flex items-baseline justify-between gap-16">
+      <LangSwap k={labelKey} className="text-small font-medium text-inkSec" />
+      <span className="font-display text-body font-semibold">{children}</span>
+    </div>
+  );
+}
+
+export default function FareBreakdown({ vehicle, luggage, party }) {
+  const fare = fares[vehicle];
+  const total = computeGtsTotal(vehicle, luggage, party);
+  return (
+    <div className="flex flex-col gap-12">
+      <FareRow labelKey="gts.fare.base">
+        {'₩'}
+        {fare.base.toLocaleString('en-US')}
+      </FareRow>
+      {/* 짐 보관 시에만 추가요금 행 노출(§9.3 실시간 구성) */}
+      {luggage && (
+        <FareRow labelKey="gts.fare.luggage">
+          {'₩'}
+          {fares.luggageFee.toLocaleString('en-US')}
+        </FareRow>
+      )}
+      <FareRow labelKey="gts.fare.perPerson">
+        {'₩'}
+        {fare.perPerson.toLocaleString('en-US')} × {party}
+      </FareRow>
+      {/* 수평 디바이더 · colors.line 허용 예외(Booking 요약 카드 선례) */}
+      <div aria-hidden="true" className="h-px w-full bg-line" />
+      <div className="flex items-baseline justify-between gap-16">
+        <LangSwap k="gts.fare.total" className="text-small font-semibold" />
+        <span className="font-display text-h3 font-bold text-primary">
+          {'₩'}
+          {total.toLocaleString('en-US')}
+        </span>
+      </div>
+      {/* DRAFT 고지 · 쨍한 원색 배지(yellow 면 + ink 텍스트 · §16.1) */}
+      <div className="flex items-center gap-8">
+        <span className="inline-flex items-center rounded-pill bg-yellow px-12 py-4 text-caption font-semibold text-ink">
+          <LangSwap k="gts.draft" />
+        </span>
+        <LangSwap k="gts.draftNote" className="text-caption font-medium text-inkSec" />
+      </div>
+    </div>
+  );
+}
