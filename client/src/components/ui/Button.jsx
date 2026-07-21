@@ -25,7 +25,7 @@ export default function Button({
   return (
     <Tag
       disabled={Tag === 'button' ? disabled : undefined}
-      className={`inline-flex h-48 items-center justify-center gap-8 rounded-pill font-semibold transition-colors duration-fast lg:h-44 ${VARIANTS[variant]} ${SIZES[size]} ${disabled ? 'pointer-events-none opacity-40' : ''}`}
+      className={`pressable inline-flex h-48 items-center justify-center gap-8 rounded-pill font-semibold lg:h-44 ${VARIANTS[variant]} ${SIZES[size]} ${disabled ? 'pointer-events-none opacity-40' : ''}`}
       {...rest}
     >
       {children}

@@ -66,8 +66,8 @@ export default function LinesPreview() {
                 opacity: revealed ? 1 : 0,
                 // 카드 리빌 0.96→1.0 · scale 화이트리스트 2/2 (PATTERNS §8, DESIGN §10)
                 transform: revealed ? 'none' : 'scale(0.96)',
-                // 240ms·60ms stagger(최대 4개) · PATTERNS §8 명세값, easing은 tokens.motion.ease
-                transition: `opacity 240ms ${motion.ease}, transform 240ms ${motion.ease}`,
+                // 240ms·60ms stagger(최대 4개) · PATTERNS §8 명세값, 진입 = easeOut(§17.2)
+                transition: `opacity 240ms ${motion.easeOut}, transform 240ms ${motion.easeOut}`,
                 transitionDelay: `${Math.min(i, 4) * 60}ms`,
               }}
             >

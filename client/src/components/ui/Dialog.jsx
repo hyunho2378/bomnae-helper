@@ -47,7 +47,8 @@ export default function Dialog({ open, onClose, title, children }) {
         aria-modal="true"
         tabIndex={-1}
         onKeyDown={onKeyDown}
-        className="relative w-full max-w-dialog rounded-xl bg-glass p-32 shadow-lg backdrop-blur-glass"
+        // §34 팝 진입 · 모달만 origin center 예외(0.97→1 + opacity)
+        className="pop-panel origin-center relative w-full max-w-dialog rounded-xl bg-glass p-32 shadow-lg backdrop-blur-glass"
       >
         <div className="absolute right-8 top-8">
           <IconButton icon={X} label="common.close" size={20} onClick={onClose} />

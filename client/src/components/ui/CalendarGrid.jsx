@@ -98,7 +98,7 @@ export default function CalendarGrid({ year, month, selected, onSelect, minDate,
               onFocus={() => setFocusDay(d)}
               onKeyDown={(e) => onKeyDown(e, d)}
               onClick={() => onSelect(dateStr)}
-              className={`flex min-h-40 flex-col items-center justify-start gap-4 rounded-sm py-4 transition-colors duration-fast ${
+              className={`pressable flex min-h-40 flex-col items-center justify-start gap-4 rounded-sm py-4 ${
                 isSelected
                   ? 'bg-primary text-white'
                   : disabled

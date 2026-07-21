@@ -36,7 +36,7 @@ export default function VenueGrid({ pool, pageSize = 8, selected, max, onToggle,
               type="button"
               onClick={() => onToggle(venue.id)}
               aria-pressed={isSelected}
-              className={`relative flex min-h-44 flex-col items-start gap-8 rounded-lg p-16 text-left shadow-sm transition-shadow duration-fast ${
+              className={`pressable relative flex min-h-44 flex-col items-start gap-8 rounded-lg p-16 text-left shadow-sm ${
                 venue.mock ? 'bg-surface' : 'bg-white'
               } ${isSelected ? 'ring-2 ring-primary' : 'hover:shadow-md'}`}
             >

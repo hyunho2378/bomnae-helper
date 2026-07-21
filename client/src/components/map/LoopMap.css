@@ -15,5 +15,11 @@
    background #fff = colors.bg / border-radius 16px = radius.lg /
    box-shadow = shadow.lg / padding 16px = spacing[4]. */
 .stop-popup .maplibregl-popup-content{background:#fff;border-radius:16px;
-  box-shadow:0 16px 48px rgba(20,23,46,0.18);padding:16px}
+  box-shadow:0 16px 48px rgba(20,23,46,0.18);padding:16px;
+  /* §34 팝 진입 · 마커 위 전개라 origin은 하단 중앙, 0.97→1 + opacity(scale(0) 금지) */
+  opacity:1;transform:scale(1);transform-origin:center bottom;
+  transition:opacity var(--dur-pop) var(--ease-out),transform var(--dur-pop) var(--ease-out)}
+@starting-style{
+  .stop-popup .maplibregl-popup-content{opacity:0;transform:scale(0.97)}
+}
 .stop-popup .maplibregl-popup-tip{border-top-color:#fff;border-bottom-color:#fff}

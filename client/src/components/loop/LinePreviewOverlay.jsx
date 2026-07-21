@@ -176,7 +176,7 @@ export default function LinePreviewOverlay({ line, stops, onClose }) {
           tabIndex={-1}
           onKeyDown={onKeyDown}
           // 420px = §14 패널 폭 명세값 / 72px = DESIGN §6 헤더 초기 높이 명세값(top·height 산식)
-          className={`absolute right-0 top-[72px] h-[calc(100%-72px)] w-[420px] overflow-y-auto rounded-l-xl bg-glass p-24 shadow-lg backdrop-blur-glass transition-all duration-base ease-spring motion-reduce:transition-none ${
+          className={`absolute right-0 top-[72px] h-[calc(100%-72px)] w-[420px] overflow-y-auto rounded-l-xl bg-glass p-24 shadow-lg backdrop-blur-glass transition-all duration-sheet ease-drawer motion-reduce:transition-none ${
             shown ? 'translate-x-0 opacity-100' : 'translate-x-24 opacity-0'
           }`}
         >

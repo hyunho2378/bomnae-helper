@@ -27,6 +27,17 @@
 | [D4] | 존 C4 BUILDER: setup 매칭(4케이스 규칙 일치·CarFront/Bus 실존 확인), build 3스텝(VenueGrid §30 — 2/3/4열·로테이션 중 선택 보존·cap 초과 자동 해제 없음·순서 배지), route ItineraryMap §32(번호핀·draw-on·fitBounds·목업 coord null 시 리스트 폴백), checkout §33(1뷰·하차 필수·프로토타입 Dialog·LoginGate·스탬프), Ticket GTS 모드, data/gts/api.js 목 창구(api.js 원본 미수정), gts 3언어 74키 |
 | [DR] | 검수: 임의 시각 정규식 신규 코드 0 / DEPRECATED 라이브 참조 0(주석·CSS 재사용 3건은 판정 무해) / 3언어 527키 동형 / HEX·localStorage·select·이모지·blur 신규·font-normal 전부 0 / 매트릭스 320·1280·3840 가로 스크롤 0·캡 1800·그리드 2→4열 / E2E: 게이트 양방향 + setup→build→route→checkout→ticket 전 구간 브라우저 통과 / gateRoutes.js 소비자 0 → DEPRECATED 주석 |
 
+### v4.1 크래프트 패스 (2026-07-21 · [E1] 커밋 대기)
+
+- tokens.motion v4.1 동기화(easeOut/easeInOut/easeDrawer/spring + 120/180/160/280/360ms), tailwind 이징·지속 토큰 재편(ease-in 유틸리티 미생성), 구 320ms·ease-spring 전수 재매핑(시트→drawer/sheet, Dock 모핑·스탬프만 spring 존속).
+- §34: .pressable(Button·IconButton·Chip·캘린더 셀·LineCard·VenueGrid 카드) 120ms/0.97 + 팝 5면(FieldSelect·LangMenu·CalendarField·StopPopup·Dialog) origin-aware 0.97→1 진입·@starting-style·usePopExit 퇴장 역재생.
+- §17.1: 키보드 개시 팝(ArrowDown/Enter/Escape/detail 0 클릭)은 pop-instant 무애니메이션 — 브라우저 검증(키보드 즉시 1/Escape 즉시 unmount/마우스 진입·역재생).
+- §35: Header·GlassDock .chrome(0.72+blur20 saturate180+빛 맺힘), 헤더 스크롤 엣지 페이드(마스크 점진 블러·스크롤 0 비표시), 접근성 3신호(motion/transparency/contrast) 분기.
+- §36: BottomSheet 드래그 물리(motion 1개 의존 신규) — 1:1·오프셋 존중·러버밴드·모멘텀 투영·속도 인계 스프링·재터치 인터럽트·reduced 크로스페이드. 판정 산식 node 4케이스 검증.
+- §17.5: 크기별 트래킹(-0.02/-0.01/0/+0.01)·행간(1.1/1.5) base 기본값, 전역 단일 letter-spacing 없음 확인.
+- 검수 도구 발견 사항: Tailwind @layer 내 @starting-style 내부 규칙 복제 버그(레이어 밖 배치로 수리), 임베디드 프리뷰의 rAF·scroll 이벤트 미발화는 환경 아티팩트로 판정(실기기 무관).
+- 미결: LinePreviewOverlay(DEPRECATED·미라우트)에는 §36 물리 미적용 — 재활성 시 BottomSheet 물리 재사용 전제. GTS 티켓 PNG 공유와 동일하게 재활성 세션 몫.
+
 ### v4 검수 판정·미결 기록
 - StopPopup 2줄 조건화(존 C4 보고): onViewLine 부재 시 버튼 비렌더 — Loop 호출부 영향 0 판정, 수용.
 - ArrivalCard가 From Chuncheon 탭에서도 렌더(구조 동형 우선, 존 B4 결정) — 의미상 To 전용이 맞는지 사용자 판단 대기.

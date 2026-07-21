@@ -11,7 +11,7 @@ export default function IconButton({ icon: Icon, label, size = 20, onClick }) {
       onClick={onClick}
       aria-label={text}
       title={text}
-      className="inline-flex h-44 w-44 items-center justify-center rounded-pill text-inkSec transition-colors duration-fast hover:text-ink"
+      className="pressable inline-flex h-44 w-44 items-center justify-center rounded-pill text-inkSec hover:text-ink"
     >
       <Icon size={size} aria-hidden="true" />
     </button>

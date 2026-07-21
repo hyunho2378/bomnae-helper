@@ -96,7 +96,7 @@ export default function GlassDock() {
             setOpen(false);
           }
         }}
-        className={`fixed left-1/2 z-dock -translate-x-1/2 overflow-hidden bg-glass shadow-dock backdrop-blur-glass transition-all duration-base ease-spring motion-reduce:transition-none lg:hidden ${
+        className={`chrome fixed left-1/2 z-dock -translate-x-1/2 overflow-hidden shadow-dock transition-all duration-sheet ease-spring motion-reduce:transition-none lg:hidden ${
           open ? 'max-w-dialog rounded-lg' : 'rounded-pill'
         }`}
         // v3.2 모바일 메뉴 깨짐 수리: 확장 시 폭이 접힘 필 폭에 갇혀 언어행이 넘치던 사고 ·
@@ -108,7 +108,7 @@ export default function GlassDock() {
       >
         {/* 접힘 시 visibility로 포커스·접근성 트리에서도 제외(높이 전환과 함께 지연 적용) */}
         <div
-          className={`grid transition-[grid-template-rows,visibility] duration-base ease-spring motion-reduce:transition-none ${
+          className={`grid transition-[grid-template-rows,visibility] duration-sheet ease-spring motion-reduce:transition-none ${
             open ? 'visible grid-rows-[1fr]' : 'invisible grid-rows-[0fr]'
           }`}
         >

@@ -76,3 +76,19 @@
 ## 11. CTA 밴드
 - EN h2: "Back the first line." sub: "Crowdfunding opens soon. Until then, ride the pilot." CTA: "See the lines" → /loop
 - KR h2: "첫 번째 라인의 후원자가 되어 주세요." sub: "크라우드펀딩이 곧 열립니다. 그전에는 파일럿에 탑승하세요." CTA: "라인 보러 가기" → /loop
+
+
+## 12. v4.2 Hero (Home 교체분)
+- EN h1: "Chuncheon, on your terms." sub: "One trip, zero missing links. Plan the ride in, then build your day inside."
+- KR h1: "춘천을, 당신의 방식대로." sub: "가는 길부터 하루 일정까지, 끊김 없는 한 번의 여행."
+- CTA: EN "Plan my route" / "Build my day" · KR "경로 찾기" / "코스 만들기"
+
+## 13. v4.2 푸터 모토 (브랜드 한 문장 교체)
+- EN: "Sightseeing on your terms for those seeking convenience and new experiences."
+- KR: "편리함과 새로운 경험을 찾는 이들을 위한, 당신의 방식대로의 여행."
+- TH: 의미역(기계 번역 초안 허용, 네이티브 검수 등재)
+
+## 14. v4.2 About 반영(원페이지 서머리 정합)
+- Value Proposition 한 줄: EN "Unlike public transit or taxis alone, GTS combines transport, multilingual guidance, luggage delivery and curated sightseeing into one simple service." / KR "대중교통이나 택시 단독과 달리, GTS는 이동·다국어 안내·수하물 배송·큐레이션 관광을 하나의 서비스로 묶습니다."
+- Business model 한 줄 교체: EN "A 10 to 15 percent commission on each service arranged through GTS. No ads, no data resale." / KR "GTS를 통해 성사되는 각 서비스에 10~15% 수수료를 받습니다. 광고와 데이터 판매는 없습니다."
+- Target 3세그먼트(요약 카드): 국제 관광객·교환학생 / 편의·개인화를 찾는 국내 여행자 / 가족·시니어.

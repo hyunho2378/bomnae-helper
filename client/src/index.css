@@ -3,6 +3,14 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* v4.1 모션 CSS 변수 · tokens.motion과 1:1 동기(§17.2) — §34·§35 기준 블록 전용 */
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --dur-press: 120ms;
+    --dur-pop: 180ms;
+    --dur-fast: 160ms;
+  }
+
   body {
     /* v3.2.1: 본문 기본 웨이트 400→500 상향(DESIGN §16.2) · 클래스 미지정 요소까지 일괄 적용 */
     @apply bg-bg font-body font-medium text-ink;
@@ -19,6 +27,24 @@
     @apply font-display;
   }
 
+  /* §17.5 크기별 타이포 트래킹·행간 기본값 · 전역 단일 letter-spacing 지정 금지.
+     base 레이어라 tracking-* 유틸리티(eyebrow 등)가 필요 지점에서 우선한다. */
+  body {
+    line-height: 1.5;
+  }
+  .text-display,
+  .text-h1 {
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  .text-h2,
+  .text-h3 {
+    letter-spacing: -0.01em;
+  }
+  .text-caption {
+    letter-spacing: 0.01em;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -32,6 +58,74 @@
 }
 
 @layer utilities {
+  /* §35 헤더·Dock 머티리얼 v4.1 기준 블록 · 0.72 white + blur20 saturate180 + 상단 빛 맺힘.
+     구 "상시 불투명 ≥0.92" 폐지(§17.4) — v3.0 사고 원인은 '완전 투명'이었고 머티리얼은 그 반대. */
+  .chrome {
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-top: 1px solid rgba(255, 255, 255, 0.4);
+  }
+  /* §35 스크롤 엣지 페이드 · 헤더 하단 12px, 경계선 대신 콘텐츠 겹침 지점만 점진 블러
+     (그라데이션 마스크 = §17.4 기능 예외). 표시 여부는 Header가 스크롤>0에서만 opacity로 */
+  .chrome-fade {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    mask-image: linear-gradient(to bottom, #000, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, #000, transparent);
+  }
+  /* §17.4 접근성 3신호 · reduced-transparency: 글래스 전면 불투명화 */
+  @media (prefers-reduced-transparency: reduce) {
+    .chrome,
+    .bg-glass {
+      background: #fff;
+    }
+    .chrome,
+    .backdrop-blur-glass,
+    .backdrop-blur-glassSoft,
+    .chrome-fade {
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    .chrome-fade {
+      display: none;
+    }
+  }
+  /* §17.4 접근성 3신호 · contrast: 불투명 + 명확한 경계선(무보더 원칙의 접근성 예외) */
+  @media (prefers-contrast: more) {
+    .chrome,
+    .bg-glass {
+      background: #fff;
+    }
+    .chrome,
+    .backdrop-blur-glass,
+    .backdrop-blur-glassSoft {
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    .chrome {
+      box-shadow: inset 0 -1px 0 #101114;
+    }
+    .chrome-fade {
+      display: none;
+    }
+  }
+
+  /* §34 프레스 피드백 · pointer-down 즉시 scale 0.97, 120ms easeOut(release 대기 금지).
+     hover 색·그림자 전환(§17.2 hover=ease)을 같은 선언에 병합 — transition 쇼트핸드가
+     transition-colors 유틸리티와 충돌하므로 .pressable 채택 시 transition-colors를 제거한다. */
+  .pressable {
+    transition:
+      transform var(--dur-press) var(--ease-out),
+      color var(--dur-fast) ease,
+      background-color var(--dur-fast) ease,
+      opacity var(--dur-fast) ease,
+      box-shadow var(--dur-fast) ease;
+  }
+  .pressable:active {
+    transform: scale(0.97);
+  }
+
   /* v3.2 스크롤바 비표시(PATTERNS §25 기준 블록) · 스크롤 기능·키보드는 유지 */
   .scroll-quiet {
     scrollbar-width: none;
@@ -40,4 +134,33 @@
   .scroll-quiet::-webkit-scrollbar {
     display: none;
   }
+}
+
+/* §34 팝 패널 진입 · 0.97→1 + opacity, durPop easeOut. scale(0) 시작 금지.
+   transform-origin은 컴포넌트가 트리거 기준으로 지정(모달만 center).
+   @starting-style 미지원 브라우저는 전환 없이 즉시 표시(무해 · §17.6).
+   주의: @layer utilities 안에 두면 Tailwind가 @starting-style 내부 규칙을
+   레이어 밖으로 복제해 opacity:0이 상시 적용된다 — 반드시 레이어 밖 유지. */
+.pop-panel {
+  opacity: 1;
+  transform: scale(1);
+  transition:
+    opacity var(--dur-pop) var(--ease-out),
+    transform var(--dur-pop) var(--ease-out);
+}
+@starting-style {
+  .pop-panel {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+/* §34 퇴장 = 진입 역재생 · usePopExit가 durPop 동안 부여 후 unmount. 닫히는 중 입력 차단 */
+.pop-panel-exit {
+  opacity: 0;
+  transform: scale(0.97);
+  pointer-events: none;
+}
+/* §17.1 키보드 개시 동작 무애니메이션 · 키보드로 연 팝은 전환 없이 즉시 최종 상태 */
+.pop-instant {
+  transition: none;
 }

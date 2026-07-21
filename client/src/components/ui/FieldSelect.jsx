@@ -6,10 +6,13 @@ import { useEffect, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import LangSwap from '../../i18n/LangSwap';
 import { useLang } from '../../i18n/LangContext';
+import usePopExit from './usePopExit';
 
 export default function FieldSelect({ label, value, placeholder, options, onChange }) {
   const { t } = useLang();
   const [open, setOpen] = useState(false);
+  const [instantPop, setInstantPop] = useState(false);
+  const { mounted: popMounted, closing: popClosing } = usePopExit(open, instantPop);
   const [highlight, setHighlight] = useState(0);
   const rootRef = useRef(null);
   const triggerRef = useRef(null);
@@ -36,20 +39,23 @@ export default function FieldSelect({ label, value, placeholder, options, onChan
     });
   }, [open, options, value]);
 
-  const pick = (id) => {
+  const pick = (id, viaKeyboard = false) => {
     onChange(id);
+    setInstantPop(viaKeyboard);
     setOpen(false);
     triggerRef.current?.focus();
   };
 
   const onKeyDown = (e) => {
     if (e.key === 'Escape') {
+      setInstantPop(true); // §17.1 키보드 개시 무애니메이션
       setOpen(false);
       triggerRef.current?.focus();
       return;
     }
     if (!open && (e.key === 'ArrowDown' || e.key === 'Enter')) {
       e.preventDefault();
+      setInstantPop(true);
       setOpen(true);
       return;
     }
@@ -64,7 +70,7 @@ export default function FieldSelect({ label, value, placeholder, options, onChan
       });
     } else if (e.key === 'Enter') {
       e.preventDefault();
-      pick(options[highlight].id);
+      pick(options[highlight].id, true);
     }
   };
 
@@ -76,7 +82,10 @@ export default function FieldSelect({ label, value, placeholder, options, onChan
         type="button"
         aria-haspopup="listbox"
         aria-expanded={open}
-        onClick={() => setOpen((v) => !v)}
+        onClick={(e) => {
+          setInstantPop(e.detail === 0); // detail 0 = 키보드 발화 클릭(§17.1)
+          setOpen((v) => !v);
+        }}
         className="flex w-full flex-col gap-4 rounded-md bg-surface p-16 text-left transition-shadow duration-fast focus:shadow-md"
       >
         <LangSwap k={label} className="text-caption font-medium text-inkMeta" />
@@ -90,13 +99,14 @@ export default function FieldSelect({ label, value, placeholder, options, onChan
         </span>
       </button>
 
-      {open && (
+      {popMounted && (
         <ul
           ref={listRef}
           role="listbox"
           aria-label={t(label)}
-          // 최대 높이 320px는 PATTERNS §11 명세값
-          className="absolute inset-x-0 top-full z-dialog mt-8 max-h-[320px] translate-y-0 overflow-y-auto rounded-lg bg-white p-8 opacity-100 shadow-md transition-all duration-fast motion-reduce:transition-none"
+          aria-hidden={popClosing || undefined}
+          // 최대 높이 320px는 PATTERNS §11 명세값 · §34 팝 진입 0.97→1(origin=트리거 하단 전개)
+          className={`pop-panel origin-top ${instantPop ? 'pop-instant' : ''} absolute inset-x-0 top-full z-dialog mt-8 max-h-[320px] overflow-y-auto rounded-lg bg-white p-8 shadow-md ${popClosing ? 'pop-panel-exit' : ''}`}
         >
           {options.map((option, i) => {
             const Icon = option.icon;
@@ -106,7 +116,7 @@ export default function FieldSelect({ label, value, placeholder, options, onChan
                   type="button"
                   role="option"
                   aria-selected={option.id === value}
-                  onClick={() => pick(option.id)}
+                  onClick={(e) => pick(option.id, e.detail === 0)}
                   onMouseEnter={() => setHighlight(i)}
                   className={`flex min-h-44 w-full items-center gap-12 rounded-sm px-12 text-left transition-colors duration-fast ${
                     highlight === i || option.id === value ? 'bg-surface' : ''

@@ -33,17 +33,32 @@ export default {
     zIndex: Object.fromEntries(
       Object.entries(tokens.z).map(([k, v]) => [k, String(v)]),
     ),
+    // v4.1(DESIGN §17.2): 진입·퇴장 out / 이동 in-out / 시트 drawer / 모멘텀 결과만 spring.
+    // DEFAULT는 hover·색 전환용 CSS ease. ease-in 단독 유틸리티는 생성하지 않는다(전면 금지).
     transitionTimingFunction: {
-      DEFAULT: tokens.motion.ease,
+      DEFAULT: 'ease',
+      out: tokens.motion.easeOut,
+      'in-out': tokens.motion.easeInOut,
+      drawer: tokens.motion.easeDrawer,
       spring: tokens.motion.spring,
     },
     transitionDuration: {
+      press: tokens.motion.durPress,
+      pop: tokens.motion.durPop,
       fast: tokens.motion.fast,
-      base: tokens.motion.base,
+      base: tokens.motion.dur,
+      sheet: tokens.motion.durSheet,
     },
     backdropBlur: { glass: tokens.blur.glass, glassSoft: tokens.blur.glassSoft },
-    // 자간 — DESIGN §4: display/h1 라틴 -0.01~-0.02em, eyebrow +0.08em
-    letterSpacing: { display: '-0.02em', eyebrow: '0.08em' },
+    // 자간 v4.1(DESIGN §17.5 크기별 + §17.4 글래스 텍스트) · 전역 단일값 지정 금지
+    letterSpacing: {
+      display: '-0.02em', // display·h1
+      tight: '-0.01em', // h2·h3
+      normal: '0', // 본문
+      caption: '0.01em', // caption 12~13px
+      glass: '0.01em', // 글래스 위 텍스트(§17.4)
+      eyebrow: '0.08em',
+    },
     // 컨테이너 캡 — tokens.containers(DESIGN §5) + Dialog 560(DESIGN §7)
     maxWidth: {
       none: 'none',

@@ -91,11 +91,17 @@ export const shadow = {
 // 중첩 blur 금지(글래스 위 글래스 없음).
 export const blur = { glass: '16px', glassSoft: '10px' };
 
+// v4.1 모션 체계 (skills 이식): 기본 UI = 강한 ease-out(오버슛 없음), 스프링(바운스)은 모멘텀 표면 전용
 export const motion = {
-  spring: 'cubic-bezier(0.32, 1.32, 0.5, 1)', // 320ms — Dock 모핑, 스탬프, 시트
-  ease: 'cubic-bezier(0.4, 0, 0.2, 1)',       // 일반 전환
-  base: '320ms',
+  easeOut: 'cubic-bezier(0.23, 1, 0.32, 1)',      // 진입·퇴장·기본값
+  easeInOut: 'cubic-bezier(0.77, 0, 0.175, 1)',   // 화면 내 이동·모핑
+  easeDrawer: 'cubic-bezier(0.32, 0.72, 0, 1)',   // 시트·드로어
+  spring: 'cubic-bezier(0.32,1.32,0.5,1)',        // 모멘텀 제스처 결과 전용(스탬프·Dock). 일반 UI 금지
+  durPress: '120ms',
+  durPop: '180ms',
   fast: '160ms',
+  dur: '280ms',        // v4.1: UI 상한 300ms 미만(구 320ms 폐지)
+  durSheet: '360ms',
 };
 
 export const z = { map: 0, content: 10, header: 40, dock: 50, sheet: 60, dialog: 70 };

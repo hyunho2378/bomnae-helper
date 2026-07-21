@@ -75,7 +75,7 @@ export default function LineCard({ line }) {
   return (
     <Link
       to={`/loop/${line.id}`}
-      className="block h-full overflow-hidden rounded-lg bg-white shadow-sm transition-all duration-fast hover:-translate-y-0.5 hover:shadow-md"
+      className="pressable block h-full overflow-hidden rounded-lg bg-white shadow-sm hover:-translate-y-0.5 hover:shadow-md"
     >
       <div className="flex flex-col gap-16 p-24">
         {/* v3.2 §16.1: 원색 컬러 도트 + shadow.sm(아이콘 배지·틴트 폐지) */}

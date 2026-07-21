@@ -5,6 +5,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLang } from '../../i18n/LangContext';
+import usePopExit from '../ui/usePopExit';
 import LangSwap from '../../i18n/LangSwap';
 import CalendarGrid from '../ui/CalendarGrid';
 import IconButton from '../ui/IconButton';
@@ -48,6 +49,8 @@ const parseDate = (str) => {
 export default function CalendarField({ label, value, placeholder, onChange }) {
   const { t } = useLang();
   const [open, setOpen] = useState(false);
+  const [instantPop, setInstantPop] = useState(false);
+  const { mounted: popMounted, closing: popClosing } = usePopExit(open, instantPop);
   const today = new Date();
   const todayStr = localDateId(today);
   // 표시 월 · 열 때 선택 월(없으면 이번 달)로 재정렬
@@ -76,7 +79,8 @@ export default function CalendarField({ label, value, placeholder, onChange }) {
     });
   }, [open]);
 
-  const toggle = () => {
+  const toggle = (e) => {
+    setInstantPop(e.detail === 0); // detail 0 = 키보드 발화 클릭(§17.1 무애니메이션)
     if (!open) {
       const base = value ? parseDate(value) : today;
       setView({ year: base.getFullYear(), month: base.getMonth() + 1 });
@@ -84,7 +88,8 @@ export default function CalendarField({ label, value, placeholder, onChange }) {
     setOpen((v) => !v);
   };
 
-  const close = () => {
+  const close = (viaKeyboard = false) => {
+    setInstantPop(viaKeyboard);
     setOpen(false);
     triggerRef.current?.focus();
   };
@@ -92,7 +97,7 @@ export default function CalendarField({ label, value, placeholder, onChange }) {
   const onKeyDown = (e) => {
     if (e.key === 'Escape' && open) {
       e.stopPropagation();
-      close();
+      close(true); // §17.1 키보드 개시 무애니메이션
     }
   };
 
@@ -137,13 +142,15 @@ export default function CalendarField({ label, value, placeholder, onChange }) {
         </span>
       </button>
 
-      {open && (
+      {popMounted && (
         <div
           ref={popRef}
           role="dialog"
           aria-label={t(label)}
+          aria-hidden={popClosing || undefined}
           // 팝 카드 폭 312px = §19 명세 유도값(셀 40px×7 + 카드 패딩 16×2) · <sm은 필드 폭 추종
-          className="absolute left-0 top-full z-dialog mt-8 w-full rounded-lg bg-white p-16 shadow-md sm:w-[312px]"
+          // §34 팝 진입 · 트리거(필드 좌측 하단 전개) 기준 origin-top-left
+          className={`pop-panel origin-top-left ${instantPop ? 'pop-instant' : ''} absolute left-0 top-full z-dialog mt-8 w-full rounded-lg bg-white p-16 shadow-md sm:w-[312px] ${popClosing ? 'pop-panel-exit' : ''}`}
         >
           <div className="flex items-center justify-between">
             <IconButton icon={ChevronLeft} label="common.calendar.prevMonth" size={20} onClick={() => move(-1)} />

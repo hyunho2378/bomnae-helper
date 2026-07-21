@@ -319,3 +319,68 @@ LoopMap 재사용 아님 — 경량 신규: 소스 1개(선택지 좌표 순서 
 
 ## §33 체크아웃·프로토타입 결제
 합계 = vehicles.js의 base[vehicleType] + (luggage? luggageFee:0) + perPerson*party — 전부 DRAFT 주석 값. "결제하기" → LoginGate → 확인 Dialog("프로토타입: 실제 결제가 이루어지지 않습니다" 고지 포함, Terms §2 문구와 동일 키) → createGtsBooking(api.js 목 확장은 이번엔 클라 목 데이터로만, api.js 수정 금지 원칙 유지 위해 `src/data/gts/api.js` 별도 목 창구 신설) → 성공 스탬프 → Ticket(GTS 모드: 일정 순서 리스트 + 하차 지점 원문).
+
+---
+
+# v4.1 신규 패턴 (skills 이식)
+
+## §34 프레스 피드백·진입 스케일 (scale 정책 4범주 구현)
+전 pressable(Button·IconButton·Chip·카드 링크·캘린더 셀):
+```css
+.pressable { transition: transform var(--dur-press) var(--ease-out); }
+.pressable:active { transform: scale(0.97); }
+```
+팝오버·드롭·FieldSelect 패널 진입: `opacity 0→1 + scale(0.97→1)` durPop easeOut, `transform-origin`은 트리거 기준(상/하 전개 방향에 따라 top/bottom + 트리거 수평 위치). 모달·Dialog만 center 유지. **scale(0) 시작은 어디에도 금지.** 퇴장은 진입 경로의 역재생(공간 일관성).
+
+## §35 헤더·Dock 머티리얼 v4.1
+```css
+.chrome {
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-top: 1px solid rgba(255,255,255,0.4); /* Dock: 빛 맺힘. Header는 border-bottom 대신 스크롤 엣지 페이드 */
+}
+@media (prefers-reduced-transparency: reduce) { .chrome { background:#fff; backdrop-filter:none; } }
+@media (prefers-contrast: more) { .chrome { background:#fff; backdrop-filter:none; box-shadow: inset 0 -1px 0 #101114; } }
+```
+스크롤 엣지: 헤더 하단에 `mask-image: linear-gradient(...)` 를 쓴 12px 페이드 오버레이 — 콘텐츠와 실제로 겹칠 때만(스크롤 0에선 비표시). 1px 경계선 금지 유지.
+
+## §36 시트 제스처 물리 (motion 패키지, BottomSheet·LinePreviewOverlay 한정)
+의존성: `motion` 1개 추가(`import { animate } from 'motion'` / React 훅은 `motion/react`). 다른 표면에 확산 금지.
+```js
+// 릴리즈 시: 속도 부호로 판정, 모멘텀 투영으로 목적지, 스프링에 속도 인계
+const project = (v, d = 0.998) => (v / 1000) * d / (1 - d);
+const dest = y + project(vy);
+const target = dest > sheetH * 0.5 ? sheetH : 0;   // 최근접 스냅
+animate(el, { y: target }, { type:'spring', bounce: 0.15, duration: 0.4, velocity: vy });
+// 드래그 중 상단 경계 러버밴드:
+const rubber = (over, dim, c=0.55) => (over * dim * c) / (dim + c * Math.abs(over));
+```
+pointerdown에서 setPointerCapture + 잡은 지점 오프셋 존중, pointermove 최근 이력으로 vy 산출, 드래그 중 1:1. 애니메이션 중 재터치 시 현재 표시값에서 재개(잠금 금지). reduced-motion: 드래그는 유지하되 릴리즈 애니메이션은 크로스페이드.
+
+## §37 모션 감사 절차 (검수 단계 의무)
+검수 세션은 `.claude/skills/review-animations/`(본문+STANDARDS.md)를 열어 그 기준으로 전 모션을 표로 감사한다: 대상 / 빈도 등급 / 목적 유효성 / 이징 / 지속 / scale 4범주 적합 / 인터럽트 가능 / reduced-* 3신호. 위반은 STANDARDS 수치를 인용해 수정. 신규 모션 제안은 find-animation-opportunities 기준으로 최대 3건까지만(과잉 금지).
+
+---
+
+# v4.2 신규 패턴
+
+## §38 TimeWheel (애플식 시각 휠)
+구조: 높이 180px 뷰포트에 시(0~23)·분(00~59) 두 컬럼, `overflow-y:auto; scroll-snap-type:y mandatory;` 항목 40px `scroll-snap-align:center`, 상하 패딩으로 중앙 정렬, 중앙 밴드 하이라이트(surface 면+선택 텍스트 700), 상·하 페이드 마스크. 스크롤 종료(scrollend 또는 100ms 디바운스) 시 중앙 항목 확정. 키보드 ↑↓ 지원, `role="listbox"`. 디폴트: `new Date().toLocaleString('en-US',{timeZone:'Asia/Seoul'})` 기반 현재 시·분으로 초기 스크롤. 폼 상단 라이브 시계: 1초 setInterval, "지금 한국은 14:32:05" 사전 키, 언마운트 clear. reduced-motion: 스냅 유지(스크롤은 사용자 구동이라 허용).
+
+## §39 레그 시각 계산·현재 위치 라벨
+`computeLegTimes(departHHMM, legs)`: 누적 = 출발 + Σ(durMin + transferBufferMin(기본 10, PLACEHOLDER)). 각 레그에 { departAt, arriveAt } 부여, 표기 "HH:MM 예상". 자정 넘김 +1일 표기. 시간표 조회 아님 — durMin 합산임을 "예상" 라벨로 상시 고지.
+현재 위치: `navigator.geolocation.getCurrentPosition`(외부 API 불요). 주소명: `KAKAO_REST_KEY` 존재 시 서버 프록시 `/api/geo/label?lat&lng` 경유(카카오 Local coord2address — 브라우저 직호출 금지, 키 노출 방지), 부재 시 "현재 위치" 고정 라벨.
+
+## §40 데모 도착 시퀀스
+플래너 To Chuncheon 결과 확정 이벤트 → `setTimeout(3000)` → Dialog(중앙): 상태라벨 "CHUNCHEON ARRIVAL"(Kanit) / h2 "춘천에 도착했습니다" / 본문 "나만의 여정을 예약하러 가볼까요?" / 주 CTA "코스 만들러 가기" → navigate('/gts') / 보조 "나중에" / Escape·닫기. 타이머는 결과 화면 이탈 시 clear, 세션당 1회(재검색 시 재발화 허용). 기존 §21 지오 감지 코드는 `ARRIVAL_MODE='demo'|'geo'` 플래그로 보존, 기본 demo.
+
+## §41 몰입 스텝 오버레이 (StepStage)
+`position:fixed inset:0 z-sheet` — scrim `rgba(10,12,20,0.7)` + 중앙 글래스 패널(blur 허용면 교체: 구 '지도 위 라인 카드' 슬롯 재배정, 최대 폭 1040px·높이 84vh 내부 스크롤 scroll-quiet). 상단: 스텝 라벨("1 / 3 · 식사 코스") + 진행 도트. 하단 중앙 고정 버튼 페어: [뒤로](secondary) [다음](primary) — 항상 이 위치, 첫 스텝 뒤로=플로우 나가기 확인. 스텝 전환: 나가는 패널 translateX(-24px)+opacity, 들어오는 패널 translateX(24px→0)+opacity, dur 280 easeInOut; reduced-motion 크로스페이드. 단일 선택 스텝은 카드 탭 → 120ms 프레스 피드백 후 자동 전진. 글래스 위 텍스트 ink 선명색(§17.4). Escape = 뒤로 1스텝(첫 스텝에선 나가기 확인).
+
+## §42 결제 수단·카드 폼
+파일 계약(사용자 배치, `client/public/pay/`): applepay.svg, alipay.svg, visa.svg, mastercard.svg, paypal.svg, amex.svg, jcb.svg, unionpay.svg — 이 8개 파일명 고정. 렌더는 `<img src="/pay/visa.svg" alt="Visa">`, 파일 부재 시 텍스트 라벨 폴백(깨진 이미지 금지: onError로 교체).
+그리드: lg 4열×2행 카드(white·shadow.sm·radius lg·프레스 피드백), 선택 = primary 2px 링(box-shadow). 선택 시 하단에 카드 폼 확장(easeOut 220): 카드번호(#### 4그룹 자동 포맷)·만료(MM/YY)·CVC·이름. **검증 없음** — 빈 채로 "Pay" 허용(프로토타입, Terms §2 고지 문구 폼 하단 caption 1줄). Pay → createGtsBooking → `navigate('/ticket/'+id, { replace:true })`. Apple Pay·Alipay 선택 시 카드 폼 생략하고 바로 Pay 버튼(월렛 시뮬레이션 카피 1줄).
+
+## §43 티켓 다운로드 직행
+기존 §7 canvas 렌더 재사용, 분기 변경: navigator.share 경유 제거 → 항상 `canvas.toBlob → URL.createObjectURL → <a download="gts-ticket-{code}.png">.click() → revokeObjectURL`. 버튼 라벨 "이미지 저장"(다운로드 아이콘). 티켓 카드: primary 단색 면·보더 0·white 텍스트·코드 Kanit Bold·라인 없이 GTS 일정 요약. 좌측 상세 패널: 예약번호/일정 타임라인(§28 문법)/인원·차량/하차 지점 원문/결제 수단/환불 규정(LEGAL terms §3 키 재사용)/이용 안내 3줄. lg+ 우측 티켓 `sticky top-24`, 폭 320px.

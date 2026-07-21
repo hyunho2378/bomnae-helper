@@ -36,10 +36,10 @@ export default function SuccessStamp({ line, children }) {
           reduced
             ? undefined
             : {
-                // scale 1.4→1.0 드롭 · 화이트리스트 1/2(PATTERNS §9 명세값)
+                // scale 1.4→1.0 드롭 · §17.3 범주 1(스탬프) · 스프링 허용 표면, §17.7 0.3~0.5s 구간
                 transform: landed ? 'scale(1)' : 'scale(1.4)',
                 opacity: landed ? 1 : 0,
-                transition: `transform ${motion.base} ${motion.spring}, opacity ${motion.base} ${motion.spring}`,
+                transition: `transform ${motion.durSheet} ${motion.spring}, opacity ${motion.durSheet} ${motion.spring}`,
               }
         }
       >
@@ -52,7 +52,8 @@ export default function SuccessStamp({ line, children }) {
             : {
                 // 착지 시점에 텍스트 페이드 인(PATTERNS §9)
                 opacity: landed ? 1 : 0,
-                transition: `opacity ${motion.fast} ${motion.ease} ${motion.base}`,
+                // 진입 페이드 = easeOut(§17.2) · 딜레이는 스탬프 착지(360ms)와 동기
+                transition: `opacity ${motion.fast} ${motion.easeOut} ${motion.durSheet}`,
               }
         }
       >

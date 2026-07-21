@@ -7,7 +7,7 @@ export default function Chip({ active = false, onClick, disabled = false, childr
       onClick={onClick}
       disabled={disabled}
       aria-pressed={active}
-      className={`inline-flex min-h-44 items-center justify-center rounded-pill px-16 text-caption font-medium transition-colors duration-fast ${
+      className={`pressable inline-flex min-h-44 items-center justify-center rounded-pill px-16 text-caption font-medium ${
         active ? 'bg-primary text-white' : 'bg-surface text-inkSec hover:text-ink'
       } ${disabled ? 'pointer-events-none opacity-40' : ''}`}
     >

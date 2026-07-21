@@ -41,7 +41,8 @@ export default function RouteOptionCard({ option }) {
         opacity: revealed ? 1 : 0,
         // 카드 리빌 0.96→1.0 · scale 화이트리스트(PATTERNS §8, DESIGN §10) · 240ms 명세값
         transform: revealed ? 'none' : 'scale(0.96)',
-        transition: `opacity 240ms ${motion.ease}, transform 240ms ${motion.ease}`,
+        // 진입 리빌 = easeOut(§17.2)
+        transition: `opacity 240ms ${motion.easeOut}, transform 240ms ${motion.easeOut}`,
       }}
       className="rounded-lg bg-white p-24 shadow-sm"
     >

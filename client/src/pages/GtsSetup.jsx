@@ -63,7 +63,7 @@ export default function GtsSetup() {
                 }`}
               >
                 <span
-                  className={`h-16 w-16 rounded-pill bg-white shadow-sm transition-transform duration-fast ${
+                  className={`h-16 w-16 rounded-pill bg-white shadow-sm transition-transform duration-fast ease-in-out ${
                     luggage ? 'translate-x-20' : ''
                   }`}
                 />
