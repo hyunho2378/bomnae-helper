@@ -61,6 +61,9 @@ export default {
     intro: "Land at Incheon or Gimpo, clear immigration, and compare the two ways into Chuncheon: rail or direct bus.",
     form: {
       terminal: "Arrival terminal",
+      // v3.2 §8.2.1: 출발지 필드(현재 위치 1옵션 + 공항 3개 병존) · Gate 플래너 전용 라벨
+      from: "From",
+      currentLocation: "Use my current location",
       date: "Arrival date",
       time: "Arrival time",
       submit: "Find my route",
@@ -118,15 +121,50 @@ export default {
       nextDay: "Next day",
       stepsHeading: "Step by step",
     },
-    handsfree: {
-      title: "Send your bags ahead. Travel with just your body.",
-      body: "Hands-free travel on the Japanese tebura (手ぶら観光) standard. Your luggage goes straight to your Chuncheon stay.",
-      cta: "Send my bags",
+    // v3.2 §8.5 도착 감지(ArrivalWatcher) · 문안은 IA §8.5 고정 카피의 EN 이식(줄표 금지)
+    arrival: {
+      card: {
+        offTitle: "Continue your journey after you arrive in Chuncheon?",
+        offDesc: "Once you arrive in Chuncheon, we check your location and let you know it is time to start the city leg.",
+        enable: "Turn on arrival check",
+        guide: "How location is used",
+        footnote: "We check only while this screen stays open",
+        waitingTitle: "Waiting for your arrival in Chuncheon",
+        disable: "Turn off arrival check",
+        outsideTitle: "You are still outside Chuncheon",
+        deniedTitle: "You can confirm arrival yourself, no location permission needed",
+        manual: "I have arrived in Chuncheon",
+        settings: "See location guidance again",
+        errorTitle: "We couldn't read your current location",
+        retry: "Check again",
+        arrivedTitle: "You have arrived in Chuncheon.",
+      },
+      explain: {
+        title: "We'll check your arrival",
+        body: "To let you know when it is time to start the city leg, we use your current location once you reach Chuncheon. Location is used only to confirm arrival.",
+        allow: "Allow location use",
+        later: "Maybe next time",
+        footnote: "You can turn off arrival check anytime in settings.",
+      },
+      modal: {
+        label: "CHUNCHEON ARRIVAL",
+        title: "You have arrived in Chuncheon.",
+        // IA §8.5.4는 "본문 2문장"만 지정(문장 미확정) · 최소 창작, 오케스트레이터 확인 대상
+        body: "The ride from the airport was the first leg. Now the city lines carry your journey inside Chuncheon.",
+        continue: "Continue the journey",
+        later: "Not right now",
+        footnote: "We use your current location to help you move and explore in the city.",
+      },
     },
   },
   handsfree: {
     title: "Send your bags ahead",
     intro: "Check your bags at the airport counter and they reach your Chuncheon accommodation first. An established luggage-delivery partner carries them. We run the Chuncheon booking layer.",
+    // v3.2 §8.4: Optional 배지(StatusBadge 문법) + 선택 사항 카피
+    optional: {
+      badge: "Optional",
+      note: "Every line can be ridden with or without your bags. This service is optional.",
+    },
     steps: {
       drop: {
         label: "Drop at airport",
@@ -134,7 +172,8 @@ export default {
       },
       carry: {
         label: "We carry to Chuncheon",
-        body: "The delivery partner drives your bags to Chuncheon while you ride in by rail, bus, or a Loop line.",
+        // v3.2 §16.7: 공급자 용어(Loop) 노출 폐지 · 사용자 언어(city line)로 교체
+        body: "The delivery partner drives your bags to Chuncheon while you ride in by rail, bus, or a city line.",
       },
       meet: {
         label: "Meet it at your stay",

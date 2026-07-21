@@ -1,7 +1,9 @@
-// 라우터 셸 · ROUTES.md §2 v3.1 구조 그대로.
+// 라우터 셸 · ROUTES.md §2 v3.1 구조 그대로(v3.2 라우트 신설 없음).
 // /hands-free·/about 승격, /pilot·/gate/hands-free는 replace 리다이렉트(구 링크 생존).
+// v3.2: ArrivalProvider 전역 배선(§8.5 도착 감지 · 라우트 이동에도 상태 유지 · IA §8.5, PATTERNS §21).
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import PageLayout from './components/layout/PageLayout';
+import { ArrivalProvider } from './context/ArrivalContext';
 import { AuthProvider } from './context/AuthContext';
 import { BookingProvider } from './context/BookingContext';
 import { LangProvider } from './i18n/LangContext';
@@ -23,7 +25,8 @@ export default function App() {
       <LangProvider>
         <AuthProvider>
           <BookingProvider>
-            <Routes>
+            <ArrivalProvider>
+              <Routes>
               <Route element={<PageLayout />}>
                 <Route path="/" element={<Home />} />
                 <Route path="/gate" element={<Gate />} />
@@ -39,7 +42,8 @@ export default function App() {
                 <Route path="/gate/hands-free" element={<Navigate to="/hands-free" replace />} />
                 <Route path="*" element={<NotFound />} />
               </Route>
-            </Routes>
+              </Routes>
+            </ArrivalProvider>
           </BookingProvider>
         </AuthProvider>
       </LangProvider>

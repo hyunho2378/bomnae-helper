@@ -1,7 +1,8 @@
-// Hands-Free · v3.1 최상위 페이지(IA §2.3, COMPONENTS v3.1 존 B 행).
-// 헤드라인 섹션(h1 + 서브 + 3단계 미니 스트립) → lg+ 1fr_380px 2컬럼
-// (좌 설명·단계·FAQ 3개 / 우 폼 카드). 라우트 갱신(/hands-free)은 오케스트레이터 담당.
-// 폼: Stepper 수하물 / FieldSelect 터미널·날짜(네이티브 select·date 제거) / 주소·이메일
+// Bag Delivery(/hands-free) · v3.1 최상위 페이지(IA §2.3) + v3.2 존 B2(§8.4).
+// 헤드라인 섹션(h1 + Optional 배지 + 서브 + 선택 사항 카피 + 3단계 미니 스트립) → lg+ 1fr_380px 2컬럼
+// (좌 설명·단계·FAQ 3개 / 우 폼 카드).
+// v3.2: 날짜 = CalendarField(§19 · 리스트 옵션 폐지), Optional 배지는 StatusBadge 문법(신규 status 키 아님).
+// 폼: Stepper 수하물 / FieldSelect 터미널 / CalendarField 날짜 / 주소·이메일
 // → 개당 요금 합계(DRAFT) → 확정 버튼에서만 LoginGate(Guest-first, ROUTES §3)
 // → createHandsFree → 접수 코드 화면.
 import { useState } from 'react';
@@ -15,10 +16,8 @@ import Button from '../components/ui/Button';
 import FieldSelect from '../components/ui/FieldSelect';
 import LoginGate from '../components/ui/LoginGate';
 import Stepper from '../components/ui/Stepper';
-import {
-  buildDateOptions,
-  buildTerminalOptions,
-} from '../components/gate/fieldOptions';
+import CalendarField from '../components/gate/CalendarField';
+import { buildTerminalOptions, localDateId } from '../components/gate/fieldOptions';
 import { createHandsFree } from '../data/api';
 
 const PRICE_PER_BAG = 25000; // DRAFT · 5일차 BM 검토 확정(IA §4)
@@ -35,10 +34,9 @@ const FAQ = ['1', '2', '3'];
 export default function HandsFree() {
   const { t } = useLang();
   const { user } = useAuth();
-  const dateOptions = buildDateOptions();
   const [bags, setBags] = useState(1);
   const [terminal, setTerminal] = useState('t1');
-  const [date, setDate] = useState(dateOptions[0].id);
+  const [date, setDate] = useState(localDateId(new Date()));
   const [address, setAddress] = useState('');
   const [email, setEmail] = useState('');
   const [errors, setErrors] = useState({});
@@ -73,14 +71,16 @@ export default function HandsFree() {
   };
 
   return (
-    <div className="pb-64 pt-48 lg:pt-128">
+    // v3.2 모바일 상단 헤더 80px 신설 → 모바일 상단 패딩 pt-96(lg 기존 유지)
+    <div className="pb-64 pt-96 lg:pt-128">
       <Container>
         {/* 접수 상태 변경 알림 영역 · DESIGN §14 aria-live polite */}
         <div aria-live="polite">
           {order ? (
             <div className="flex flex-col items-center gap-16 rounded-lg bg-white p-32 text-center shadow-sm">
               <BadgeCheck size={48} aria-hidden="true" className="text-primary" />
-              <LangSwap k="handsfree.success.title" as="h1" className="text-h2 font-semibold" />
+              {/* v3.2 §16.2: h1급 타이틀 = 700 */}
+              <LangSwap k="handsfree.success.title" as="h1" className="text-h2 font-bold" />
               <LangSwap
                 k="handsfree.success.codeLabel"
                 as="p"
@@ -100,9 +100,18 @@ export default function HandsFree() {
                 as="p"
                 className="text-caption font-medium uppercase tracking-eyebrow text-inkMeta"
               />
-              <LangSwap k="handsfree.title" as="h1" className="mt-8 text-h1 font-bold tracking-display" />
+              {/* 헤드라인 옆 Optional 배지 · StatusBadge 문법(pill + caption 500, §8.4) */}
+              <div className="mt-8 flex flex-wrap items-center gap-12">
+                <LangSwap k="handsfree.title" as="h1" className="text-h1 font-bold tracking-display" />
+                <LangSwap
+                  k="handsfree.optional.badge"
+                  className="inline-flex items-center rounded-pill bg-surface px-12 py-4 text-caption font-medium text-ink"
+                />
+              </div>
               {/* 기존 수하물 딜리버리 사업자 제휴 · 춘천 구간 예약 레이어(정직 표기, IA §2.3) */}
               <LangSwap k="handsfree.intro" as="p" className="mt-16 text-body text-inkSec" />
+              {/* 선택 사항 명시 카피 · IA §8.4 고정 문장 */}
+              <LangSwap k="handsfree.optional.note" as="p" className="mt-8 text-body text-inkSec" />
               <ul className="mt-24 flex flex-wrap gap-x-32 gap-y-12">
                 {STEPS.map(({ id, icon: Icon }) => (
                   <li key={id} className="flex min-h-44 items-center gap-8">
@@ -131,12 +140,12 @@ export default function HandsFree() {
                       onChange={setTerminal}
                     />
 
+                    {/* v3.2: 날짜 = CalendarField(§19) · 네이티브 date·리스트 옵션 미사용 */}
                     <div className={errors.date ? 'rounded-md ring-2 ring-spice' : ''}>
-                      <FieldSelect
+                      <CalendarField
                         label="gate.form.date"
                         value={date}
                         placeholder="gate.form.placeholders.date"
-                        options={dateOptions}
                         onChange={(id) => {
                           setDate(id);
                           setErrors((prev) => ({ ...prev, date: false }));
@@ -227,7 +236,8 @@ export default function HandsFree() {
 
                 {/* 좌측 설명 · 단계 · FAQ (IA §2.3.1 레이아웃) */}
                 <div className="lg:col-start-1 lg:row-start-1">
-                  <LangSwap k="handsfree.detail.title" as="h2" className="text-h2 font-semibold" />
+                  {/* v3.2 §16.2: h2 = 700 */}
+                  <LangSwap k="handsfree.detail.title" as="h2" className="text-h2 font-bold" />
                   <LangSwap k="handsfree.detail.body" as="p" className="mt-16 text-body text-inkSec" />
 
                   <ol className="mt-32 flex flex-col gap-24">
@@ -240,14 +250,15 @@ export default function HandsFree() {
                           <Icon size={24} className="text-primary" />
                         </span>
                         <span className="flex flex-col gap-4">
-                          <LangSwap k={`handsfree.steps.${id}.label`} as="h3" className="text-h3 font-medium" />
+                          {/* v3.2 §16.2: h3 = 600 */}
+                          <LangSwap k={`handsfree.steps.${id}.label`} as="h3" className="text-h3 font-semibold" />
                           <LangSwap k={`handsfree.steps.${id}.body`} as="p" className="text-small text-inkSec" />
                         </span>
                       </li>
                     ))}
                   </ol>
 
-                  <LangSwap k="handsfree.faq.title" as="h2" className="mt-48 text-h2 font-semibold" />
+                  <LangSwap k="handsfree.faq.title" as="h2" className="mt-48 text-h2 font-bold" />
                   <dl className="mt-16 flex flex-col gap-24">
                     {FAQ.map((n) => (
                       <div key={n}>

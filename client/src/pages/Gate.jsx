@@ -1,16 +1,21 @@
-// STUB 확장 · AGENT-2. 기준: IA §2.2, COMPONENTS.md 섹션 B, ROUTES §1(쿼리 ?terminal=&time=&date=).
-// 입력(GateForm, 쿼리 프리필) → 옵션 카드 2~3개 → 선택 시 단계별 리스트 → Hands-Free 크로스셀.
+// Getting Here(/gate) · AGENT-2 + v3.2 존 B2. 기준: IA §2.2 + §8.2, COMPONENTS v3.2 존 B2 행.
+// 입력(GateForm: 현재 위치 1옵션 + CalendarField) → 옵션 카드 → 단계별 리스트.
+// v3.2 §8.2.3: Hands-Free 크로스셀 카드 삭제(헤더 진입 일원화).
+// v3.2 §8.2.4: 도착 감지 상태 카드(ArrivalCard)가 플래너 결과 아래 위치.
+// ArrivalProvider는 App.jsx 전역 배선 전까지 이 페이지가 로컬로 감싼다
+// (전역 배선 후 자동 패스스루 · context/ArrivalContext.jsx 헤더 주석 참조).
 // 결과 영역은 aria-live="polite"(DESIGN §14 · 경로 결과 갱신 알림).
 import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useLang } from '../i18n/LangContext';
 import LangSwap from '../i18n/LangSwap';
 import Container from '../components/layout/Container';
+import ArrivalCard from '../components/gate/ArrivalCard';
 import GateForm from '../components/gate/GateForm';
 import GateJourney from '../components/gate/GateJourney';
-import HandsFreeCard from '../components/gate/HandsFreeCard';
 import RouteOptionCard from '../components/gate/RouteOptionCard';
 import RouteStepList from '../components/gate/RouteStepList';
+import { ArrivalProvider } from '../context/ArrivalContext';
 
 const TERMINALS = ['t1', 't2', 'gmp'];
 
@@ -39,58 +44,64 @@ export default function Gate() {
   const selected = options?.find((option) => option.id === selectedId);
 
   return (
-    <div className="pb-64 pt-48 lg:pt-128">
-      <Container>
-        <LangSwap
-          k="nav.gate"
-          as="p"
-          className="text-caption font-medium uppercase tracking-eyebrow text-inkMeta"
-        />
-        <LangSwap k="gate.title" as="h1" className="mt-8 text-h1 font-bold tracking-display" />
-        {/* v3.1: 텍스트 max-w 캡 해제(컨테이너가 폭 결정, DESIGN §13) */}
-        <LangSwap k="gate.intro" as="p" className="mt-16 text-body text-inkSec" />
+    <ArrivalProvider>
+      {/* v3.2 모바일 상단 헤더 80px 신설 → 모바일 상단 패딩 pt-96(lg 기존 유지) */}
+      <div className="pb-64 pt-96 lg:pt-128">
+        <Container>
+          <LangSwap
+            k="nav.gate"
+            as="p"
+            className="text-caption font-medium uppercase tracking-eyebrow text-inkMeta"
+          />
+          <LangSwap k="gate.title" as="h1" className="mt-8 text-h1 font-bold tracking-display" />
+          {/* v3.1: 텍스트 max-w 캡 해제(컨테이너가 폭 결정, DESIGN §13) */}
+          <LangSwap k="gate.intro" as="p" className="mt-16 text-body text-inkSec" />
 
-        {/* 헤드 카피 아래 GateJourney(IA §2.2.1) · 결과 옵션 카드 선택과 단일 state 동기 */}
-        <div className="mt-32">
-          <GateJourney mode={selectedId ?? 'rail'} />
-        </div>
+          {/* 헤드 카피 아래 GateJourney(IA §2.2.1) · 결과 옵션 카드 선택과 단일 state 동기 */}
+          <div className="mt-32">
+            <GateJourney mode={selectedId ?? 'rail'} />
+          </div>
 
-        <div className="mt-32">
-          <GateForm initial={initial} onResult={handleResult} />
-        </div>
+          <div className="mt-32">
+            <GateForm initial={initial} onResult={handleResult} />
+          </div>
 
-        <div aria-live="polite" className="mt-48">
-          {options && (
-            <>
-              <LangSwap k="gate.results.heading" as="h2" className="text-h2 font-semibold" />
-              {/* 첫 탑승 편 = 도착시각 + 입국수속 버퍼 60분 반영(IA §2.2, data/gateRoutes.js) */}
-              <p className="mt-8 text-small text-inkSec">{t('gate.results.buffer')}</p>
-              <div className="mt-24 grid gap-16 md:grid-cols-2 md:gap-24">
-                {options.map((option) => (
-                  <RouteOptionCard
-                    key={option.id}
-                    option={option}
-                    selected={option.id === selectedId}
-                    onSelect={() => setSelectedId(option.id)}
-                  />
-                ))}
-              </div>
-              {selected && (
-                <div className="mt-48">
-                  <LangSwap k="gate.results.stepsHeading" as="h3" className="text-h3 font-medium" />
-                  <div className="mt-24">
-                    <RouteStepList legs={selected.legs} />
-                  </div>
+          <div aria-live="polite" className="mt-48">
+            {options && (
+              <>
+                {/* v3.2 §16.2: h2 = 700 */}
+                <LangSwap k="gate.results.heading" as="h2" className="text-h2 font-bold" />
+                {/* 첫 탑승 편 = 도착시각 + 입국수속 버퍼 60분 반영(IA §2.2, data/gateRoutes.js) */}
+                <p className="mt-8 text-small text-inkSec">{t('gate.results.buffer')}</p>
+                <div className="mt-24 grid gap-16 md:grid-cols-2 md:gap-24">
+                  {options.map((option) => (
+                    <RouteOptionCard
+                      key={option.id}
+                      option={option}
+                      selected={option.id === selectedId}
+                      onSelect={() => setSelectedId(option.id)}
+                    />
+                  ))}
                 </div>
-              )}
-            </>
-          )}
-        </div>
+                {selected && (
+                  <div className="mt-48">
+                    {/* v3.2 §16.2: h3 = 600 */}
+                    <LangSwap k="gate.results.stepsHeading" as="h3" className="text-h3 font-semibold" />
+                    <div className="mt-24">
+                      <RouteStepList legs={selected.legs} />
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
 
-        <div className="mt-48">
-          <HandsFreeCard />
-        </div>
-      </Container>
-    </div>
+          {/* 도착 감지 상태 카드 · 플래너 결과 아래, 주 기능 방해 없는 위치(IA §8.2.4) */}
+          <div className="mt-48">
+            <ArrivalCard />
+          </div>
+        </Container>
+      </div>
+    </ArrivalProvider>
   );
 }
