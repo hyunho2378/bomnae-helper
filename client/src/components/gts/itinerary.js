@@ -11,6 +11,16 @@ export function itineraryIds({ mealPlan, meals, picks }) {
   return ids;
 }
 
+// [V3] itineraryIds 역파생 · Travel Log 템플릿(itinerary 전체 배열) → {meals, picks} 분리.
+// 순서 규칙의 역함수: 첫 항목 = 점심(플랜 有), 마지막 항목 = 저녁(lunchDinner), 나머지 = picks.
+export function splitItinerary(mealPlan, ids) {
+  const rest = [...ids];
+  const meals = [];
+  if (mealPlan !== 'none' && rest.length) meals.push(rest.shift());
+  if (mealPlan === 'lunchDinner' && rest.length) meals.push(rest.pop());
+  return { meals, picks: rest };
+}
+
 export function itineraryVenues(selection) {
   return itineraryIds(selection)
     .map((id) => venues.find((v) => v.id === id))

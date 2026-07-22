@@ -12,11 +12,12 @@ import { spacing } from '../../tokens';
 import LogoMark from '../../assets/logo-mark.svg?react';
 import { routeKeyFromPath } from '../layout/PageLayout';
 
-// v4(IA §9.1): About | Getting Here | Make GTS 3항목 — 헤더와 동일 세트
+// [V3] 5항목: About | Trip Planner | Tour Builder | Travel Log | Reviews — 헤더와 동일 세트
 const MENU = [
   { to: '/about', k: 'nav.about' },
   { to: '/gate', k: 'nav.gate' },
   { to: '/gts', k: 'nav.gts' },
+  { to: '/travel-log', k: 'nav.travelLog' },
   { to: '/reviews', k: 'nav.reviews' },
 ];
 

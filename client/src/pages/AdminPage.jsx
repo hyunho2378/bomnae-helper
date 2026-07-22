@@ -50,6 +50,7 @@ const payloadSummary = (step, payload = {}) => {
   if (step === 'route_confirm') return (payload.order ?? []).map((s) => s.name).join(' > ');
   if (step === 'pay_method') return payload.method ?? '';
   if (step === 'complete') return `code ${payload.code ?? ''}`;
+  if (step === 'log_template') return `from log ${payload.code ?? ''}`; // [V3]
   if (step === 'login') return payload.email ?? '';
   return '';
 };

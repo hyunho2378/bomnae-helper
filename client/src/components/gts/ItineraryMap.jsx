@@ -2,10 +2,12 @@
 // 소스 1개(선택 순서 LineString) + §13 3레이어(glow→casing→main · primary 단색) + draw-on(720ms,
 // reduced-motion 즉시 완성), 번호 마커 28px primary 원 + white 숫자 700(ItineraryMap.css 치수),
 // 핀 hover/탭 = StopPopup 재사용(§13 · hover 즉시 표시 + 200ms 유지 §16.9), fitBounds 패딩 80 1회.
-// 좌표 없는(목업) 픽은 페이지가 이 컴포넌트를 렌더하지 않는다(§32 리스트 폴백 · 좌표 지어내기 금지).
+// [V3] §32 리스트 폴백 폐지 — coord:null(목업)은 mockCoords 결정적 DEMO 좌표로 대체해
+//   어떤 조합에서도 라인을 항상 그린다(지시 [3] · 고지는 페이지 mockNotice 지속).
 import { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { venueCoord } from '../../data/gts/mockCoords';
 import { colors, map as M } from '../../tokens';
 import { useLang } from '../../i18n/LangContext';
 import Skeleton from '../ui/Skeleton';
@@ -41,10 +43,11 @@ const LAYERS = [
 ];
 
 // venue(데이터) → StopPopup stop 계약 어댑터(name_en/name_ko·stay_min · th는 en 폴백 v3.1 규칙)
+// [V3] 좌표는 venueCoord 경유(목업 = 결정적 DEMO 좌표)
 const toStop = (venue) => ({
   id: venue.id,
-  lng: venue.coord[0],
-  lat: venue.coord[1],
+  lng: venueCoord(venue)[0],
+  lat: venueCoord(venue)[1],
   name_en: venue.name.en,
   name_ko: venue.name.ko,
   preorder_en: venue.oneLine.en,
@@ -72,7 +75,7 @@ export default function ItineraryMap({ venues }) {
 
   useEffect(() => {
     if (!node.current) return undefined;
-    const coords = venues.map((venue) => venue.coord);
+    const coords = venues.map(venueCoord); // [V3] 목업 포함 항상 유효 좌표
     const map = new maplibregl.Map({
       container: node.current,
       style: M.styleUrl,
@@ -142,7 +145,7 @@ export default function ItineraryMap({ venues }) {
           setPopupStop(toStop(venue));
         });
         el.addEventListener('mouseleave', scheduleClose);
-        markers.push(new maplibregl.Marker({ element: el }).setLngLat(venue.coord).addTo(map));
+        markers.push(new maplibregl.Marker({ element: el }).setLngLat(venueCoord(venue)).addTo(map));
       });
 
       // fitBounds 1회 · 패딩 80(§32)

@@ -3,7 +3,8 @@
 //   노드 = 순번 원 28px primary + white 숫자 · 우측 장소명 + 2시간 슬롯 시각) · 지도와 병렬 배치.
 // 순서 = 점심 → 픽1 → 픽2 → 저녁(itinerary.js 공유 규칙). 시각은 정오 기점 stayMin(120) 누적의
 //   표기 전용(itinerarySchedule · 시각표 생성 아님 — 코드 주석 한정 §10.4).
-// 목업(coord null) 픽 포함 시 지도 대신 순서 리스트 + 안내(좌표 지어내기 금지 · §32).
+// [V3] §32 리스트 폴백 폐지 — 목업 포함 어떤 조합에서도 지도 라인 상시 렌더(mockCoords
+//   결정적 DEMO 좌표 · 지시 [3]). 목업 포함 시 mockNotice 고지는 유지(정확 위치 확정 후 표시).
 // 가드(§31): mealPlan 충족 && picks 2 — 미충족 시 build로 replace. 통과 시 route 경유 마킹.
 import { useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -43,17 +44,11 @@ export default function GtsRoute() {
           <LangSwap k="gts.route.title" as="h1" className="text-h1 font-bold tracking-display" />
         </div>
 
-        <div
-          className={`flex flex-col gap-24 ${
-            hasMock ? '' : 'lg:grid lg:grid-cols-[380px_1fr] lg:items-start lg:gap-12'
-          }`}
-        >
-          {/* 지도 · 목업 픽 포함 시 비렌더 = 리스트 폴백(§32) */}
-          {!hasMock && (
-            <div className="relative aspect-square overflow-hidden rounded-xl shadow-sm md:aspect-video">
-              <ItineraryMap venues={entries} />
-            </div>
-          )}
+        <div className="flex flex-col gap-24 lg:grid lg:grid-cols-[380px_1fr] lg:items-start lg:gap-12">
+          {/* 지도 · [V3] 목업 포함 상시 렌더(리스트 폴백 폐지 · mockCoords DEMO 좌표) */}
+          <div className="relative aspect-square overflow-hidden rounded-xl shadow-sm md:aspect-video">
+            <ItineraryMap venues={entries} />
+          </div>
 
           {/* 방문 순서 · §10.5 세로 타임라인(§28 문법) — 지도와 병렬 배치(lg 좌측) */}
           <section className="flex flex-col gap-12 rounded-xl bg-white p-24 shadow-sm lg:order-first">

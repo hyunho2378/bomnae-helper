@@ -11,6 +11,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bus, CarFront, Loader2 } from 'lucide-react';
 import CardForm from '../components/pay/CardForm';
+import ItineraryMap from '../components/gts/ItineraryMap';
 import PayMethodGrid from '../components/pay/PayMethodGrid';
 import { PAY_METHODS } from '../components/pay/payMethods';
 import FareBreakdown from '../components/gts/FareBreakdown';
@@ -47,7 +48,7 @@ export default function GtsCheckout() {
   const ok = useGtsGuard('checkout');
   const { user } = useAuth();
   const { t } = useLang();
-  const { party, luggage, vehicle, mealPlan, meals, picks, dropoffText, setDropoffText, trackStep } = useGts();
+  const { party, luggage, vehicle, mealPlan, meals, picks, dropoffText, travelDate, setDropoffText, trackStep } = useGts();
   const navigate = useNavigate();
   const [gateOpen, setGateOpen] = useState(false);
   const [payMethod, setPayMethod] = useState(null);
@@ -75,6 +76,7 @@ export default function GtsCheckout() {
       itinerary: entries.map((venue) => venue.id), // 순서 보존(§9.6 picks 순서 원칙)
       dropoffText: dropoffText.trim(), // 지오코딩 없음 · 원문 저장(§9.6)
       payMethod: method.id, // §42 결제 수단 문자열 저장 확장
+      travelDate, // [V3] 빌더 날짜 관통(서버 travel_date)
       total,
     });
     trackStep('complete', { code: booking.code ?? booking.id }); // [V1] 완주
@@ -118,8 +120,20 @@ export default function GtsCheckout() {
                 <Row labelKey="gts.checkout.mealPlanLabel">
                   <LangSwap k={`gts.build.plan.${mealPlan}`} className="font-semibold" />
                 </Row>
+                {/* [V3] 여행 날짜 · 셋업 CalendarField 값 관통 */}
+                {travelDate && (
+                  <Row labelKey="gts.checkout.dateLabel">
+                    <span className="font-display font-semibold">{travelDate}</span>
+                  </Row>
+                )}
               </dl>
             </section>
+
+            {/* [V3] 동선 미니맵 · 라인 상시 렌더(Travel Log 직행 플로우는 route를 안 거치므로
+                여기가 동선의 첫 시각 확인 지점 — mockCoords로 어떤 조합에도 그린다) */}
+            <div className="relative aspect-video overflow-hidden rounded-xl shadow-sm">
+              <ItineraryMap venues={entries} />
+            </div>
 
             {/* 방문 순서 리스트 · route와 동일 파생 규칙(§9.6) */}
             <section className="flex flex-col gap-12 rounded-xl bg-white p-24 shadow-sm">
@@ -182,6 +196,13 @@ export default function GtsCheckout() {
                 {submitting && (
                   <Loader2 size={16} aria-hidden="true" className="animate-spin motion-reduce:animate-none" />
                 )}
+              </Button>
+            </div>
+            {/* [V3] 수정하기 · 현재 선택(템플릿 포함)이 프리필된 채 build 스텝으로 복귀 —
+                StepStage 정상 동작(카운터·정원 규칙 유지 · Context 상태 그대로) */}
+            <div className="grid">
+              <Button variant="secondary" onClick={() => navigate('/gts/build')}>
+                <LangSwap k="gts.checkout.editCta" />
               </Button>
             </div>
           </aside>

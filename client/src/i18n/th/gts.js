@@ -21,6 +21,8 @@ export default {
     setup: {
       title: "สร้างวัน GTS ของคุณ",
       sub: "บอกจำนวนผู้เดินทาง แล้วเราจะจับคู่รถให้",
+      dateLabel: "วันเดินทาง",
+      datePlaceholder: "เลือกวันที่",
       partyLabel: "ผู้เดินทาง",
       luggageTitle: "ต้องการฝากกระเป๋าไหม",
       luggageBody: "ไม่บังคับ ข้ามได้ถ้าไม่มีกระเป๋าเดินทางหรือฝากไว้ที่ที่พักแล้ว",
@@ -89,6 +91,8 @@ export default {
       luggageYes: "รวมแล้ว",
       luggageNo: "ไม่ต้องการ",
       mealPlanLabel: "แผนมื้ออาหาร",
+      dateLabel: "วันเดินทาง",
+      editCta: "แก้ไขคอร์สของฉัน",
       orderTitle: "ลำดับการเยี่ยมชม",
       dropoffLabel: "จุดลงรถสุดท้าย",
       dropoffPlaceholder: "เช่น สถานีชุนชอน หรือที่พักของคุณ",

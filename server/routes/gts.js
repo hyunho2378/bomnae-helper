@@ -13,12 +13,14 @@ const makeCode = () =>
 
 router.post('/gts/bookings', async (req, res) => {
   try {
-    const { party, luggage, mealPlan, itinerary, dropoffText, payMethod } = req.body ?? {};
+    const { party, luggage, mealPlan, itinerary, dropoffText, payMethod, travelDate } = req.body ?? {};
     const p = Number(party);
     if (!Number.isInteger(p) || p < 1 || p > 12) return res.status(400).json({ error: 'party 1~12' });
     if (!['none', 'lunch', 'lunchDinner'].includes(mealPlan)) return res.status(400).json({ error: 'mealPlan' });
     if (!Array.isArray(itinerary) || !itinerary.length) return res.status(400).json({ error: 'itinerary' });
     if (!dropoffText || !String(dropoffText).trim()) return res.status(400).json({ error: 'dropoffText 필수' });
+    // [V3] 여행 날짜 · 선택값(YYYY-MM-DD) — 형식만 검증(당일 허용 · 과거 차단은 클라 캘린더 소유)
+    const tDate = typeof travelDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(travelDate) ? travelDate : null;
     const lug = Boolean(luggage);
     // 서버 재계산(§9.3 결정론 + 요금표) — 클라가 보낸 total·vehicleType은 무시
     const { vehicleType, total } = computeTotal(p, lug);
@@ -28,11 +30,11 @@ router.post('/gts/bookings', async (req, res) => {
       const code = makeCode();
       try {
         const { rows } = await pool.query(
-          `INSERT INTO gts_bookings (code, user_id, party, luggage, vehicle_type, meal_plan, picks, dropoff_text, pay_method, total)
-           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING code, created_at`,
-          [code, userId, p, lug, vehicleType, mealPlan, JSON.stringify(itinerary), String(dropoffText), payMethod ?? null, total],
+          `INSERT INTO gts_bookings (code, user_id, party, luggage, vehicle_type, meal_plan, picks, dropoff_text, pay_method, total, travel_date)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING code, created_at`,
+          [code, userId, p, lug, vehicleType, mealPlan, JSON.stringify(itinerary), String(dropoffText), payMethod ?? null, total, tDate],
         );
-        return res.status(201).json(toBooking({ ...req.body, code: rows[0].code, vehicleType, total, party: p, luggage: lug }));
+        return res.status(201).json(toBooking({ ...req.body, code: rows[0].code, vehicleType, total, party: p, luggage: lug, travelDate: tDate }));
       } catch (e) {
         if (e.code !== '23505') throw e; // unique 충돌만 재시도
       }
@@ -46,7 +48,11 @@ router.post('/gts/bookings', async (req, res) => {
 
 router.get('/gts/bookings/:code', async (req, res) => {
   const code = String(req.params.code).toUpperCase();
-  const { rows } = await pool.query('SELECT * FROM gts_bookings WHERE code = $1', [code]);
+  // [V3] travel_date는 to_char로 문자열 고정(pg DATE→Date 객체의 TZ 하루 시프트 방지)
+  const { rows } = await pool.query(
+    "SELECT *, to_char(travel_date, 'YYYY-MM-DD') AS travel_date_str FROM gts_bookings WHERE code = $1",
+    [code],
+  );
   if (!rows.length) return res.status(404).json({ error: 'not_found' });
   const b = rows[0];
   res.json(
@@ -60,6 +66,7 @@ router.get('/gts/bookings/:code', async (req, res) => {
       dropoffText: b.dropoff_text,
       payMethod: b.pay_method,
       total: b.total,
+      travelDate: b.travel_date_str, // [V3]
     }),
   );
 });
@@ -81,6 +88,7 @@ function toBooking(src) {
     dropoffText: src.dropoffText,
     payMethod: src.payMethod ?? null,
     total: src.total,
+    travelDate: src.travelDate ?? null, // [V3] 빌더 날짜 관통(체크아웃·티켓 표기)
   };
 }
 

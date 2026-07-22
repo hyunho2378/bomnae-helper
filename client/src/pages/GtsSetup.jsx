@@ -7,6 +7,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bus, CarFront } from 'lucide-react';
+import CalendarField from '../components/gate/CalendarField';
 import Container from '../components/layout/Container';
 import FareBreakdown from '../components/gts/FareBreakdown';
 import Button from '../components/ui/Button';
@@ -17,8 +18,14 @@ import LangSwap from '../i18n/LangSwap';
 
 const VEHICLE_ICON = { taxi: CarFront, van: Bus };
 
+// [V3] 오늘(로컬) YYYY-MM-DD · 당일 예약 허용 기준값
+const todayStr = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+
 export default function GtsSetup() {
-  const { party, luggage, vehicle, setParty, setLuggage, trackStep } = useGts();
+  const { party, luggage, vehicle, travelDate, logTemplate, setParty, setLuggage, setTravelDate, trackStep } = useGts();
   const navigate = useNavigate();
   const { t } = useLang();
 
@@ -26,6 +33,11 @@ export default function GtsSetup() {
   useEffect(() => {
     if (party == null) setParty(1);
   }, [party, setParty]);
+
+  // [V3] 여행 날짜 기본 = 오늘(당일 예약 허용 · 미조작 시에도 값 관통)
+  useEffect(() => {
+    if (travelDate == null) setTravelDate(todayStr());
+  }, [travelDate, setTravelDate]);
 
   const Icon = vehicle ? VEHICLE_ICON[vehicle] : CarFront;
 
@@ -60,6 +72,14 @@ export default function GtsSetup() {
 
         {/* 인원 + 짐 보관 · 우측 컬럼(lg) */}
         <section className="flex flex-col gap-24">
+          {/* [V3] 여행 날짜 · CalendarField(§19 · 오늘 링·과거 비활성·당일 허용) */}
+          <CalendarField
+            label="gts.setup.dateLabel"
+            value={travelDate}
+            placeholder="gts.setup.datePlaceholder"
+            onChange={setTravelDate}
+          />
+          <div aria-hidden="true" className="h-px w-full bg-line" />
           <Stepper value={party ?? 1} min={1} max={12} onChange={setParty} label="gts.setup.partyLabel" />
           {/* 수평 디바이더 · colors.line 허용 예외(Booking 요약 카드 선례) */}
           <div aria-hidden="true" className="h-px w-full bg-line" />
@@ -97,9 +117,10 @@ export default function GtsSetup() {
         <div className="flex justify-end lg:col-start-2">
           <Button
             onClick={() => {
-              // [V1] setup 완료 계측(비차단)
-              trackStep('setup', { party: party ?? 1, luggage, vehicle });
-              navigate('/gts/build');
+              // [V1] setup 완료 계측(비차단) · [V3] 날짜 포함
+              trackStep('setup', { party: party ?? 1, luggage, vehicle, travelDate });
+              // [V3] Travel Log 템플릿 적용 상태 = 인원 선택만 진행 → 체크아웃 직행
+              navigate(logTemplate ? '/gts/checkout' : '/gts/build');
             }}
           >
             <LangSwap k="gts.setup.cta" />

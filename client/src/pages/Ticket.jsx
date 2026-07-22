@@ -15,6 +15,7 @@ import { getBooking, getLine, getMeetingPoints, getStops } from '../data/api';
 import { getGtsBooking } from '../data/gts/api';
 import { venues } from '../data/gts/venues';
 import SuccessStamp from '../components/booking/SuccessStamp';
+import ItineraryMap from '../components/gts/ItineraryMap';
 import TriText from '../components/gts/TriText';
 import VisitTimeline from '../components/gts/VisitTimeline';
 import { itinerarySchedule } from '../components/gts/itinerary';
@@ -77,9 +78,14 @@ function drawGtsTicketPng(gts, entries) {
   ctx.fillText('GLOBAL TOURISM SYSTEM', 80, 120);
   ctx.font = `700 180px ${fonts.display}`;
   ctx.fillText(gts.code, 80, 320); // 코드 Kanit Bold(§43)
+  // [V3] 여행 날짜 관통 표기
+  if (gts.travelDate) {
+    ctx.font = `500 40px ${fonts.display}`;
+    ctx.fillText(gts.travelDate, 80, 384);
+  }
   ctx.font = `400 36px ${fonts.display}`;
   entries.slice(0, 4).forEach((venue, i) => {
-    ctx.fillText(`${i + 1}. ${venue.name.en}`, 80, 400 + i * 52); // GTS 일정 요약(§43)
+    ctx.fillText(`${i + 1}. ${venue.name.en}`, 80, 440 + i * 48); // GTS 일정 요약(§43)
   });
   return new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
 }
@@ -147,6 +153,12 @@ function GtsTicket({ gts }) {
                 <DetailRow labelKey="ticket.codeLabel">
                   <span className="font-display font-bold">{gts.code}</span>
                 </DetailRow>
+                {/* [V3] 여행 날짜 · 예약 저장값 관통 */}
+                {gts.travelDate && (
+                  <DetailRow labelKey="gts.checkout.dateLabel">
+                    <span className="font-display font-semibold">{gts.travelDate}</span>
+                  </DetailRow>
+                )}
                 <DetailRow labelKey="gts.checkout.partyLabel">
                   <span className="font-display font-semibold">{gts.party}</span>
                 </DetailRow>
@@ -170,6 +182,11 @@ function GtsTicket({ gts }) {
                 )}
               </dl>
             </section>
+
+            {/* [V3] 동선 미니맵 · 라인 상시 렌더(mockCoords — 어떤 조합에도 그린다) */}
+            <div className="relative aspect-video overflow-hidden rounded-xl shadow-sm">
+              <ItineraryMap venues={entries} />
+            </div>
 
             {/* 일정 타임라인 · §28 문법(VisitTimeline 공유) */}
             <section className="flex flex-col gap-12 rounded-xl bg-white p-24 shadow-sm">
@@ -218,6 +235,10 @@ function GtsTicket({ gts }) {
                 />
                 {/* 코드 Kanit Bold(§43) */}
                 <p className="font-display text-h1 font-bold tracking-display text-white">{gts.code}</p>
+                {/* [V3] 여행 날짜 */}
+                {gts.travelDate && (
+                  <p className="font-display text-small font-semibold text-white">{gts.travelDate}</p>
+                )}
               </div>
               {/* GTS 일정 요약(§43 · 라인 없음) */}
               <div className="flex flex-col gap-8">

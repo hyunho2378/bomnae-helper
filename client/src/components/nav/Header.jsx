@@ -13,10 +13,12 @@ import LangSwap from '../../i18n/LangSwap';
 import LangMenu from './LangMenu';
 import LogoMark from '../../assets/logo-mark.svg?react';
 
+// [V3] 5항목: About | Trip Planner | Tour Builder | Travel Log | Reviews
 const MENU = [
   { to: '/about', k: 'nav.about' },
   { to: '/gate', k: 'nav.gate' },
   { to: '/gts', k: 'nav.gts' },
+  { to: '/travel-log', k: 'nav.travelLog' },
   { to: '/reviews', k: 'nav.reviews' },
 ];
 

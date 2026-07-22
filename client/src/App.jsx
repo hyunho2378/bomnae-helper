@@ -21,6 +21,7 @@ import LegalTerms from './pages/LegalTerms';
 import NotFound from './pages/NotFound';
 import AdminPage from './pages/AdminPage'; // [V1] 헤더 링크 없음 · 직접 URL 진입만
 import Reviews from './pages/Reviews';
+import TravelLog from './pages/TravelLog'; // [V3] 발자취(공개 열람 · 템플릿 시작은 /gts 가드 경유)
 import Ticket from './pages/Ticket';
 
 export default function App() {
@@ -42,6 +43,7 @@ export default function App() {
                     <Route path="/gts/route" element={<RequireAuth><GtsRoute /></RequireAuth>} />
                     <Route path="/gts/checkout" element={<RequireAuth><GtsCheckout /></RequireAuth>} />
                     <Route path="/ticket/:bookingId" element={<Ticket />} />
+                    <Route path="/travel-log" element={<TravelLog />} />
                     <Route path="/reviews" element={<Reviews />} />
                     <Route path="/admin" element={<AdminPage />} />
                     <Route path="/about" element={<About />} />

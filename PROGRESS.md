@@ -27,6 +27,15 @@
 | [D4] | 존 C4 BUILDER: setup 매칭(4케이스 규칙 일치·CarFront/Bus 실존 확인), build 3스텝(VenueGrid §30 — 2/3/4열·로테이션 중 선택 보존·cap 초과 자동 해제 없음·순서 배지), route ItineraryMap §32(번호핀·draw-on·fitBounds·목업 coord null 시 리스트 폴백), checkout §33(1뷰·하차 필수·프로토타입 Dialog·LoginGate·스탬프), Ticket GTS 모드, data/gts/api.js 목 창구(api.js 원본 미수정), gts 3언어 74키 |
 | [DR] | 검수: 임의 시각 정규식 신규 코드 0 / DEPRECATED 라이브 참조 0(주석·CSS 재사용 3건은 판정 무해) / 3언어 527키 동형 / HEX·localStorage·select·이모지·blur 신규·font-normal 전부 0 / 매트릭스 320·1280·3840 가로 스크롤 0·캡 1800·그리드 2→4열 / E2E: 게이트 양방향 + setup→build→route→checkout→ticket 전 구간 브라우저 통과 / gateRoutes.js 소비자 0 → DEPRECATED 주석 |
 
+### Travel Log · 빌더 날짜 · 라인 상시 렌더 (2026-07-22 · [V3] 커밋 대기)
+
+- [1] /travel-log 신설(내비 5항목: About | Trip Planner | Tour Builder | Travel Log | Reviews · 헤더+Dock): 구 Loop 풀블리드 셸 재활용 + TravelLogMap(구 §13 지도 코드 재활용·개명 — 칩·정류장·셔틀 제거·다중 발자취 전용). 라인별 tokens.logShades(primary 명도 차등 단색 6종 · 그라데이션 0) · 카드 hover/탭 = 해당 라인 강조·타 라인 40% 감쇠 실측. 좌 카드 스택(모바일 하단 가로 스냅): 이니셜+국가(없으면 Traveler)·플랜·픽 이름·날짜·인원. GET /api/travel-logs = 실 로그 익명화 집계(최근 6) + 목업 시드 6(mock true) · 클라 오프라인 폴백 미러. 카드 CTA → applyLogTemplate(플랜·픽·동선 프리필+routeVisited+log_template 계측) → setup(인원만) → 체크아웃 직행 실측 · 체크아웃 "수정하기" → build 프리필 왕복(플랜 활성·1/1·2/2 순서 배지 보존 실측). Footer 숨김 분기 재사용.
+- [2] 셋업 여행 날짜: CalendarField(§19 재사용 · 오늘 기본·당일 허용·과거 비활성) → GtsContext.travelDate → gts_bookings.travel_date(멱등 ALTER · to_char 반환으로 TZ 시프트 방지) → 체크아웃 요약·티켓 상세/카드/PNG 관통 실측(생성·재조회 2026-07-25 왕복 정확).
+- [3] 라인 상시 렌더 수술: §32 "목업 = 리스트 폴백" 폐지 → data/gts/mockCoords.js 결정적 배치표(춘천 시내 고정 그리드 16점 · venue id 해시+결정적 지터 · // DEMO 좌표 · mockNotice 고지 유지). ItineraryMap coord 전면 venueCoord 경유 · route 상시 렌더 + 체크아웃·티켓 미니맵 신설(Travel Log 직행 플로우의 동선 첫 시각 확인 지점). 매트릭스 실측: lunchDinner+실1·목3(4핀 라인) / lunch+실명(템플릿 경유 체크아웃) / none+목2(2핀 라인) / Travel Log 발자취 6+ 동시 / 티켓 4핀 — 전부 라인 렌더 스크린샷 확보.
+- journey_events step 제약에 log_template 추가(DROP+ADD 멱등) · track.js·AdminPage 요약 동기 · DB 기록 2건 실측. 3언어 759키 동형 · 값 줄표 0.
+- 명세 밖 결정(보고): ①목업 시드는 DB가 아닌 서버 상수(users에 국가 컬럼이 없어 DB 경유로는 카드 명세 충족 불가 — 실 로그 국가는 Traveler 폴백) ②체크아웃·티켓 미니맵 신설(증상 문구가 전제 · Travel Log 직행 시 필수) ③날짜 기본값 오늘 ④구 Loop 파일 자체는 보존(코드 재활용·개명은 TravelLogMap로).
+- 환경 참고: 임베디드 프리뷰 rAF 서스펜션으로 MapLibre load가 안 와 검증 시 rAF 심 주입 — 실 브라우저 무관(기존 지도 전부 동일 조건).
+
 ### 장소 상세 확장 카드 (2026-07-22 · [V2] 커밋 대기)
 
 - FLIP 이식(포트폴리오 검증 기법): 돋보기(primary 원형 36 · ZoomIn 실존 확인 · absolute라 카드 높이 136/172 불변) → 원본 카드 rect 측정 → fixed inset-0 오버레이(z-sheet · 스크림 0→1 520ms)에서 승격 카드가 transform(translate+scale)만으로 center(scale min(vw·0.62/w, vh·0.82/h) · 520ms cubic-bezier(0.16,1,0.3,1)) → 좌 도킹(min(vw·0.34/w, vh·0.8/h) · 560ms) 연속 재생. 실측: 도킹 scale 1.7067 = 수식값 정확, 트랜지션 속성 transform·opacity 뿐(grep 0건), 총 1080ms ≤ 1.1s.

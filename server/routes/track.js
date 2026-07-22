@@ -6,7 +6,7 @@ const { readUserId } = require('../lib/session');
 
 const router = express.Router();
 
-const STEPS = new Set(['login', 'setup', 'meal_plan', 'meals', 'picks', 'route_confirm', 'pay_method', 'complete']);
+const STEPS = new Set(['login', 'setup', 'meal_plan', 'meals', 'picks', 'route_confirm', 'pay_method', 'complete', 'log_template']); // [V3] Travel Log 템플릿 적용
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 router.post('/track', async (req, res) => {

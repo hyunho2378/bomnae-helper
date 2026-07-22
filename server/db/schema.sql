@@ -65,3 +65,12 @@ CREATE TABLE IF NOT EXISTS journey_events (
 );
 CREATE INDEX IF NOT EXISTS journey_events_user_idx ON journey_events (user_id, created_at);
 CREATE INDEX IF NOT EXISTS journey_events_created_idx ON journey_events (created_at DESC);
+
+-- [V3] 빌더 여행 날짜(당일 허용 · 클라 CalendarField §19) — 멱등
+ALTER TABLE gts_bookings ADD COLUMN IF NOT EXISTS travel_date DATE;
+
+-- [V3] journey_events.step 에 log_template 추가(Travel Log 템플릿 적용 계측) —
+-- 인라인 CHECK 재정의: DROP 후 ADD(매 migrate 실행 시 동일 결과 · 멱등 효과)
+ALTER TABLE journey_events DROP CONSTRAINT IF EXISTS journey_events_step_check;
+ALTER TABLE journey_events ADD CONSTRAINT journey_events_step_check
+  CHECK (step IN ('login','setup','meal_plan','meals','picks','route_confirm','pay_method','complete','log_template'));

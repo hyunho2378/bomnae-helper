@@ -11,6 +11,7 @@ const reviewsRouter = require('./routes/reviews');
 const transitRouter = require('./routes/transit');
 const trackRouter = require('./routes/track'); // [V1]
 const adminRouter = require('./routes/admin'); // [V1]
+const travelLogsRouter = require('./routes/travelLogs'); // [V3]
 
 const app = express();
 app.set('trust proxy', 1); // Render 등 프록시 뒤 secure 쿠키
@@ -36,6 +37,7 @@ app.use('/api', reviewsRouter);
 app.use('/api', transitRouter);
 app.use('/api', trackRouter); // [V1] 여정 트래킹
 app.use('/api', adminRouter); // [V1] 관리자(requireAdmin 내장)
+app.use('/api', travelLogsRouter); // [V3] Travel Log 발자취
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, async () => {

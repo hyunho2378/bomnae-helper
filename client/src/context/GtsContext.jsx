@@ -4,6 +4,7 @@
 // 가드: build = party 필수 / route = mealPlan 충족 && picks 2 / checkout = route 경유.
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { splitItinerary } from '../components/gts/itinerary';
 import { matchVehicle } from '../data/gts/vehicles';
 
 // [V1] 여정 트래킹 · 비차단(실패해도 UX 진행 · 콘솔 경고만) — 서버 /api/track(로그인 필수)
@@ -19,6 +20,8 @@ const initial = {
   picks: [], // venue id, 합산 정확히 2(§9.4)
   dropoffText: '',
   routeVisited: false,
+  travelDate: null, // [V3] YYYY-MM-DD · 셋업 진입 시 오늘 기본(당일 예약 허용)
+  logTemplate: null, // [V3] Travel Log 템플릿 적용 시 로그 code — setup CTA가 체크아웃 직행 판단
 };
 
 // 플랜별 식사 픽 정원(§9.4 Step 1)
@@ -102,7 +105,28 @@ export function GtsProvider({ children }) {
 
   const setDropoffText = useCallback((dropoffText) => setState((s) => ({ ...s, dropoffText })), []);
   const markRouteVisited = useCallback(() => setState((s) => ({ ...s, routeVisited: true })), []);
+  const setTravelDate = useCallback((travelDate) => setState((s) => ({ ...s, travelDate })), []); // [V3]
   const reset = useCallback(() => setState(initial), []);
+
+  // [V3] Travel Log 템플릿 적용 · 로그의 식사 플랜·선택·동선을 그대로 프리필하고
+  //   routeVisited까지 마킹(로그 동선 = 확정 동선 → setup 인원 선택 후 체크아웃 직행 가드 성립).
+  //   /gts 이탈 리셋 정책은 그대로 — Travel Log → setup 진입은 "밖→안" 전이라 리셋 미발화(보존).
+  const applyLogTemplate = useCallback(
+    (log) => {
+      const { meals, picks } = splitItinerary(log.mealPlan, log.itinerary);
+      trackStep('log_template', { code: log.code }); // [V3] journey_events 계측
+      setState((s) => ({
+        ...initial,
+        travelDate: s.travelDate,
+        mealPlan: log.mealPlan,
+        meals,
+        picks,
+        routeVisited: true,
+        logTemplate: log.code,
+      }));
+    },
+    [trackStep],
+  );
 
   // 파생 차량(§9.3 결정론) — 저장 금지, party 미확정이면 null
   const vehicle = useMemo(
@@ -130,10 +154,12 @@ export function GtsProvider({ children }) {
       togglePick,
       setDropoffText,
       markRouteVisited,
+      setTravelDate,
+      applyLogTemplate,
       reset,
       trackStep,
     }),
-    [state, vehicle, mealPlanSatisfied, setParty, setLuggage, setMealPlan, toggleMeal, togglePick, setDropoffText, markRouteVisited, reset, trackStep],
+    [state, vehicle, mealPlanSatisfied, setParty, setLuggage, setMealPlan, toggleMeal, togglePick, setDropoffText, markRouteVisited, setTravelDate, applyLogTemplate, reset, trackStep],
   );
 
   return <GtsContext.Provider value={value}>{children}</GtsContext.Provider>;

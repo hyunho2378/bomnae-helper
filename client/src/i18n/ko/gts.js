@@ -22,6 +22,8 @@ export default {
     setup: {
       title: "나만의 GTS 하루 만들기",
       sub: "함께 가는 인원을 알려 주세요. 차량은 저희가 맞춰 드립니다.",
+      dateLabel: "여행 날짜",
+      datePlaceholder: "날짜를 선택하세요",
       partyLabel: "인원",
       luggageTitle: "짐 보관이 필요한가요?",
       luggageBody: "선택 사항입니다. 캐리어가 없거나 숙소에 두고 왔다면 꺼 두세요.",
@@ -90,6 +92,8 @@ export default {
       luggageYes: "포함",
       luggageNo: "필요 없음",
       mealPlanLabel: "식사 플랜",
+      dateLabel: "여행 날짜",
+      editCta: "코스 수정하기",
       orderTitle: "방문 순서",
       dropoffLabel: "최종 하차 지점",
       dropoffPlaceholder: "예: 춘천역, 숙소 주소",

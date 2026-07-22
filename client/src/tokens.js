@@ -30,6 +30,10 @@ export const lineColors = {
   lake: colors.primary,     // Lake/Culture Line: 소양강스카이워크 → 화동2571 → 공지천
 };
 
+// [V3] Travel Log 발자취 라인 · primary(#0073EC) 계열 명도 차등 단색 시리즈.
+// 라인별 1색(그라데이션 금지 · DESIGN §16.1 원색 원칙) — 로그 수 > 6이면 modulo 순환.
+export const logShades = ['#0073EC', '#0A4A99', '#4D9FF3', '#063B76', '#2166C4', '#77B7F5'];
+
 export const fonts = {
   // v3.2: 본문 Pretendard → SUIT Variable 교체(라틴 회색조·얇음 문제). Kanit은 디스플레이·숫자·태국어.
   display: `'Kanit','SUIT Variable',sans-serif`,
@@ -123,7 +127,7 @@ export const map = {
 };
 
 const tokens = {
-  colors, lineColors, fonts, weights, typeScale, spacing,
+  colors, lineColors, logShades, fonts, weights, typeScale, spacing,
   breakpoints, containers, radius, shadow, blur, motion, z, map,
 };
 export default tokens;

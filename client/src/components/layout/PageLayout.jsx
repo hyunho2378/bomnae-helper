@@ -14,6 +14,7 @@ export function routeKeyFromPath(pathname) {
   if (pathname === '/gts/build') return 'gtsBuild';
   if (pathname === '/gts/route') return 'gtsRoute';
   if (pathname === '/gts/checkout') return 'gtsCheckout';
+  if (pathname === '/travel-log') return 'travelLog'; // [V3]
   if (pathname === '/hands-free' || pathname === '/gate/hands-free') return 'handsfree';
   if (pathname === '/loop') return 'loop';
   if (/^\/loop\/[^/]+\/book\/?$/.test(pathname)) return 'booking';
@@ -30,8 +31,8 @@ export default function PageLayout() {
   const { pathname } = useLocation();
   const { t } = useLang();
   const routeKey = routeKeyFromPath(pathname);
-  // v4: /loop 퇴역으로 Footer 숨김 대상 없음(분기 메커니즘은 보존 — BUILDER가 §9.5에서 필요 시 보고 후 사용)
-  const hideFooter = false;
+  // [V3] /travel-log = 풀블리드 지도(구 /loop 셸 재활용) — 보존해 둔 Footer 숨김 분기 재사용
+  const hideFooter = pathname === '/travel-log';
 
   // 페이지 title · "Global Tourism System · {meta.title.*}" (ROUTES §4)
   useEffect(() => {

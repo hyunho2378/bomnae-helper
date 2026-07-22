@@ -22,6 +22,8 @@ export default {
     setup: {
       title: "Make your GTS day",
       sub: "Tell us who is coming and we will match your ride.",
+      dateLabel: "Travel date",
+      datePlaceholder: "Select a date",
       partyLabel: "Travelers",
       luggageTitle: "Need luggage storage?",
       luggageBody: "Optional. Skip this if you travel without a carrier or left your bags at your stay.",
@@ -90,6 +92,8 @@ export default {
       luggageYes: "Included",
       luggageNo: "Not needed",
       mealPlanLabel: "Meal plan",
+      dateLabel: "Travel date",
+      editCta: "Edit my day",
       orderTitle: "Visit order",
       dropoffLabel: "Final drop off point",
       dropoffPlaceholder: "e.g. Chuncheon Station, your stay address",

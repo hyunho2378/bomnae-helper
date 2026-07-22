@@ -4,6 +4,7 @@
 // 서버 실패(네트워크·5xx) 시 기존 in-memory 목으로 폴백(데모 오프라인 보장 · 명세 5-①).
 // 총액은 서버가 재계산해 내려준다(클라 계산값은 표시용 · 신뢰 금지 — 서버 services/fares.js).
 // ============================================================
+import { TRAVEL_LOG_SEEDS } from './travelLogSeeds';
 import { fares } from './vehicles';
 
 // VITE_API_BASE 미설정 시 로컬 서버(개발 기본) — client/.env.example 참조
@@ -43,6 +44,18 @@ export async function createGtsBooking(payload) {
     const booking = { id: code, code, kind: 'gts', status: 'confirmed', ...payload };
     gtsBookings.set(code, booking);
     return booking;
+  }
+}
+
+// [V3] Travel Log 발자취 조회 — 서버 집계(실 로그 + 시드) · 실패 시 클라 시드 미러 폴백(오프라인 데모)
+export async function getTravelLogs() {
+  try {
+    const res = await fetch(`${API_BASE}/api/travel-logs`, { credentials: 'include' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    return Array.isArray(data.logs) && data.logs.length ? data.logs : TRAVEL_LOG_SEEDS;
+  } catch {
+    return TRAVEL_LOG_SEEDS;
   }
 }
 
