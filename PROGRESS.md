@@ -35,6 +35,7 @@
 - E2E(세션 쿠키 시뮬): 8스텝 여정 → participants 집계(complete·TEST01·67.3s·스텝별 payload/소요) 대시보드 렌더 확인. 실 구글 왕복은 OAuth 화면 진입(state 포함·returnTo 비노출)까지 자동 검증 — 실계정 로그인은 사용자 확인 필요(자격 증명 입력 불가).
 - cross-origin 쿠키: sameSite none/secure(prod)·lax(로컬)·trust proxy 코드 증명. Privacy §2·§3 연구 기록 조항 3언어 + LEGAL_COPY.md. 3언어 652키 동형.
 - 미결: /admin의 Dock 라벨이 "Not found"로 표기(routeKey 미등록 — 관리자 존재 위장에 부합해 의도 유지).
+- OAuth 콜백 duplicate key(users_email_key) 근본 수리: upsert를 이메일 기준(ON CONFLICT (email) · lower() 정규화)으로 교체 + 같은 sub가 다른 이메일 행에 잔류 시 선행 분리(행 보존·참조 유지). 콜백 catch는 reason 코드 로깅·응답({error:'oauth_failed', reason}) — 토큰·시크릿 비로깅. 실제 함수 호출 검증: 기존 행 갱신·연속 재로그인·신규 삽입(대문자→lower)·sub 이동 전부 통과, DB 중복·고아 행 없음 확인(병합 불필요).
 
 ### v4.4 수리 3건 + About 정밀 전사 (2026-07-22 · [I1])
 

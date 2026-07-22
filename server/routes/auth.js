@@ -60,10 +60,26 @@ router.get('/auth/google', (req, res) => {
   res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params}`);
 });
 
+// [V1-fix] 유저 upsert를 이메일 기준으로 교체(users_email_key 충돌 근본 수리) · 저장·비교 모두 lower() 정규화.
+// google_sub 유니크와의 상호작용: 같은 sub가 다른 이메일 행에 남아 있으면 선행 UPDATE로 그 행의 sub만 분리(NULL) —
+// 행 삭제 금지(예약·이벤트 user_id 참조 보존), 다음 upsert가 이메일 행에 sub를 재연결.
+const oauthError = (reason, message) => Object.assign(new Error(message || reason), { reason });
+
+async function upsertOAuthUser({ sub, email, name, picture }) {
+  await pool.query('UPDATE users SET google_sub = NULL WHERE google_sub = $1 AND email <> lower($2)', [sub, email]);
+  const { rows } = await pool.query(
+    `INSERT INTO users (google_sub, email, name, avatar) VALUES ($1, lower($2), $3, $4)
+     ON CONFLICT (email) DO UPDATE SET google_sub = EXCLUDED.google_sub, name = EXCLUDED.name, avatar = EXCLUDED.avatar
+     RETURNING *`,
+    [sub, email, name || email, picture || null],
+  );
+  return rows[0];
+}
+
 router.get('/auth/google/callback', async (req, res) => {
   try {
     const { code } = req.query;
-    if (!code) return res.status(400).json({ error: 'code 없음' });
+    if (!code) throw oauthError('no_code', 'code 없음');
     const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -76,26 +92,23 @@ router.get('/auth/google/callback', async (req, res) => {
       }),
     });
     const token = await tokenRes.json();
-    if (!token.id_token) throw new Error(token.error_description || 'id_token 없음');
+    if (!token.id_token) throw oauthError('token_exchange', token.error_description || token.error || 'id_token 없음');
     // id_token 검증은 구글 tokeninfo 위임(경량 · 라이브러리 추가 금지)
     const infoRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${token.id_token}`);
     const info = await infoRes.json();
-    if (info.aud !== process.env.GOOGLE_CLIENT_ID) throw new Error('aud 불일치');
-    const { rows } = await pool.query(
-      `INSERT INTO users (google_sub, email, name, avatar) VALUES ($1, $2, $3, $4)
-       ON CONFLICT (google_sub) DO UPDATE SET email = EXCLUDED.email, name = EXCLUDED.name, avatar = EXCLUDED.avatar
-       RETURNING id`,
-      [info.sub, info.email, info.name || info.email, info.picture || null],
-    );
-    setUserCookie(res, rows[0].id);
+    if (info.aud !== process.env.GOOGLE_CLIENT_ID) throw oauthError('aud_mismatch', 'aud 불일치');
+    const user = await upsertOAuthUser(info);
+    setUserCookie(res, user.id);
     // [V1] returnTo 복귀(+login=1 마커 — 클라가 login 트래킹 1회 발화)
     const returnTo = decodeState(req.query.state) || '/';
     const base = process.env.CLIENT_ORIGIN || '';
     const sep = returnTo.includes('?') ? '&' : '?';
     res.redirect(`${base}${returnTo}${sep}login=1`);
   } catch (e) {
-    console.error('[auth] 콜백 실패:', e.message);
-    res.status(500).json({ error: 'oauth_failed' });
+    // 원인 삼키기 금지: 로그 = 단계 코드 + err.message(시크릿·토큰 없음), 응답 = 짧은 reason 코드만
+    const reason = e.reason || (e.code ? `db_${e.code}` : 'unknown');
+    console.error('[auth] 콜백 실패:', reason, '-', e.message);
+    res.status(e.reason === 'no_code' ? 400 : 500).json({ error: 'oauth_failed', reason });
   }
 });
 
@@ -115,4 +128,4 @@ router.post('/logout', (req, res) => {
   res.json({ ok: true });
 });
 
-module.exports = { router, resolveUserId, DEMO_MODE };
+module.exports = { router, resolveUserId, DEMO_MODE, upsertOAuthUser };
