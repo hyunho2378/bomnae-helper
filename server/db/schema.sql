@@ -74,3 +74,19 @@ ALTER TABLE gts_bookings ADD COLUMN IF NOT EXISTS travel_date DATE;
 ALTER TABLE journey_events DROP CONSTRAINT IF EXISTS journey_events_step_check;
 ALTER TABLE journey_events ADD CONSTRAINT journey_events_step_check
   CHECK (step IN ('login','setup','meal_plan','meals','picks','route_confirm','pay_method','complete','log_template'));
+
+-- [V4] ID/PIN 계정 병행 · 구글 유저(email 有)와 ID 유저(username+pin) 공존 — 전부 멱등.
+--   email NOT NULL 해제: ID 유저는 email NULL 허용(구글 유저는 여전히 값 有).
+--   username UNIQUE(부분 인덱스 아님 · NULL 다중 허용은 표준 UNIQUE 동작) · pin_hash = bcrypt 문자열만.
+ALTER TABLE users ADD COLUMN IF NOT EXISTS username TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS pin_hash TEXT;
+ALTER TABLE users ALTER COLUMN email DROP NOT NULL;
+
+-- [V5-frictionless] 검증용 무마찰 결제: 하차 지점 미입력 허용 → dropoff_text NULL 저장 가능(멱등).
+--   pay_method는 이미 nullable. 재필수화는 서버 REQUIRE_DROPOFF/REQUIRE_PAYMETHOD env로 복원(스키마 불변).
+ALTER TABLE gts_bookings ALTER COLUMN dropoff_text DROP NOT NULL;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'users_username_key') THEN
+    ALTER TABLE users ADD CONSTRAINT users_username_key UNIQUE (username);
+  END IF;
+END $$;

@@ -89,8 +89,9 @@ export default function Header() {
                 type="button"
                 aria-haspopup="menu"
                 aria-expanded={menuOpen}
-                aria-label={user.email}
-                title={user.email}
+                // [V4] ID/PIN 유저는 email null → username 폴백(@id)로 식별 표기
+                aria-label={user.email || `@${user.username}`}
+                title={user.email || `@${user.username}`}
                 onClick={(e) => {
                   setInstantPop(e.detail === 0);
                   setMenuOpen((v) => !v);
@@ -107,7 +108,7 @@ export default function Header() {
                   aria-hidden={menuClosing || undefined}
                   className={`pop-panel origin-top-right ${instantPop ? 'pop-instant' : ''} absolute right-0 top-full z-dialog mt-8 flex w-max flex-col rounded-md bg-white p-8 shadow-md ${menuClosing ? 'pop-panel-exit' : ''}`}
                 >
-                  <p className="px-12 py-8 text-caption font-medium text-inkMeta">{user.email}</p>
+                  <p className="px-12 py-8 text-caption font-medium text-inkMeta">{user.email || `@${user.username}`}</p>
                   {/* 관리자 전용 · 서버 판정(/api/me isAdmin)만 신뢰 — 비관리자는 DOM에도 미렌더(존재 비노출).
                       라벨은 관리자 내부 도구라 영어 하드카피(AdminPage와 동일 예외) */}
                   {user.isAdmin && (

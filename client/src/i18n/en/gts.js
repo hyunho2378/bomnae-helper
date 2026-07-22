@@ -97,6 +97,7 @@ export default {
       orderTitle: "Visit order",
       dropoffLabel: "Final drop off point",
       dropoffPlaceholder: "e.g. Chuncheon Station, your stay address",
+      dropoffOptional: "Optional. Leave blank if you are not sure yet.",
       dropoffRequired: "Enter your drop off point to continue",
       priceTitle: "Price breakdown",
       payCta: "Pay",
@@ -118,6 +119,8 @@ export default {
       // §43 좌측 상세 패널(존 C5) · 환불 규정은 legal.terms.s3 재사용(신규 창작 금지)
       detailsTitle: "Booking details",
       payMethodLabel: "Payment method",
+      dropoffNone: "Not specified",
+      payNone: "Not selected",
       guideTitle: "Good to know",
       guide1: "Show your ticket code to the driver when you board.",
       guide2: "Each stop runs as a 2 hour slot and your driver keeps the schedule.",

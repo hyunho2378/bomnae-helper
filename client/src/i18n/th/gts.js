@@ -96,6 +96,7 @@ export default {
       orderTitle: "ลำดับการเยี่ยมชม",
       dropoffLabel: "จุดลงรถสุดท้าย",
       dropoffPlaceholder: "เช่น สถานีชุนชอน หรือที่พักของคุณ",
+      dropoffOptional: "ไม่บังคับ เว้นว่างได้หากยังไม่แน่ใจ",
       dropoffRequired: "กรอกจุดลงรถเพื่อดำเนินการต่อ",
       priceTitle: "รายละเอียดราคา",
       payCta: "ชำระเงิน",
@@ -117,6 +118,8 @@ export default {
       // §43 좌측 상세 패널(존 C5) · 환불 규정은 legal.terms.s3 재사용(신규 창작 금지)
       detailsTitle: "รายละเอียดการจอง",
       payMethodLabel: "วิธีการชำระเงิน",
+      dropoffNone: "ไม่ได้ระบุ",
+      payNone: "ไม่ได้เลือก",
       guideTitle: "ข้อควรรู้",
       guide1: "แสดงรหัสตั๋วให้คนขับเมื่อขึ้นรถ",
       guide2: "แต่ละที่ใช้เวลาช่วงละ 2 ชั่วโมง และคนขับจะช่วยรักษาตารางเวลา",

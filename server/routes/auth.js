@@ -135,15 +135,63 @@ router.get('/auth/google/callback', async (req, res) => {
   }
 });
 
-const { isAdminEmail } = require('../lib/admin');
+const bcrypt = require('bcryptjs');
+const { isAdminUser } = require('../lib/admin');
+
+// [V4] ID/PIN 등록 · username(영문 소문자+숫자 4자 이상) + PIN(6자 이상) · 이름 선택.
+//   PIN은 bcrypt 해시로만 저장(평문 금지) · username 중복 409 · 성공 시 즉시 세션 발급.
+const USERNAME_RE = /^[a-z0-9]{4,}$/;
+router.post('/auth/register', async (req, res) => {
+  try {
+    const { username, pin, name } = req.body ?? {};
+    if (typeof username !== 'string' || !USERNAME_RE.test(username)) return res.status(400).json({ error: 'bad_username' });
+    if (typeof pin !== 'string' || pin.length < 6) return res.status(400).json({ error: 'bad_pin' });
+    const pinHash = await bcrypt.hash(pin, 10);
+    const displayName = typeof name === 'string' && name.trim() ? name.trim() : username;
+    let rows;
+    try {
+      ({ rows } = await pool.query(
+        `INSERT INTO users (username, pin_hash, name) VALUES ($1, $2, $3) RETURNING id, email, name, avatar, username`,
+        [username, pinHash, displayName],
+      ));
+    } catch (e) {
+      if (e.code === '23505') return res.status(409).json({ error: 'username_taken' }); // unique 충돌
+      throw e;
+    }
+    setUserCookie(res, rows[0].id);
+    return res.status(201).json({ user: { ...rows[0], isAdmin: isAdminUser(rows[0]) } });
+  } catch (e) {
+    console.error('[auth] register 실패:', e.message); // PIN·해시 비로깅
+    return res.status(500).json({ error: 'register_failed' });
+  }
+});
+
+// [V4] ID/PIN 로그인 · bcrypt 비교 · 실패 시 존재 여부 비노출(일반 오류 단일 문구).
+router.post('/auth/login', async (req, res) => {
+  try {
+    const { username, pin } = req.body ?? {};
+    if (typeof username !== 'string' || typeof pin !== 'string') return res.status(400).json({ error: 'bad_request' });
+    const { rows } = await pool.query('SELECT id, email, name, avatar, username, pin_hash FROM users WHERE username = $1', [username]);
+    const u = rows[0];
+    // 계정 부재도 bcrypt 비교를 수행(타이밍·존재 노출 완화) · 실패는 전부 동일 401
+    const ok = u && u.pin_hash ? await bcrypt.compare(pin, u.pin_hash) : await bcrypt.compare(pin, '$2a$10$invalidinvalidinvalidinvalidinvalidinvalidinvalidinv');
+    if (!u || !ok) return res.status(401).json({ error: 'invalid_credentials' });
+    setUserCookie(res, u.id);
+    const { pin_hash, ...safe } = u; // 해시 응답 제거
+    return res.json({ user: { ...safe, isAdmin: isAdminUser(safe) } });
+  } catch (e) {
+    console.error('[auth] login 실패:', e.message);
+    return res.status(500).json({ error: 'login_failed' });
+  }
+});
 
 router.get('/me', async (req, res) => {
   const uid = readUserId(req);
   if (!uid) return res.json({ user: null, demoMode: DEMO_MODE });
-  const { rows } = await pool.query('SELECT id, email, name, avatar FROM users WHERE id = $1', [uid]);
+  const { rows } = await pool.query('SELECT id, email, name, avatar, username FROM users WHERE id = $1', [uid]);
   const user = rows[0] ?? null;
-  // isAdmin은 불리언만(관리자 목록 비노출) — 클라 RequireAdmin 가드용
-  res.json({ user: user ? { ...user, isAdmin: isAdminEmail(user.email) } : null, demoMode: DEMO_MODE });
+  // isAdmin은 불리언만(관리자 목록 비노출) — 이메일·유저네임 두 경로 반영([V4])
+  res.json({ user: user ? { ...user, isAdmin: isAdminUser(user) } : null, demoMode: DEMO_MODE });
 });
 
 router.post('/logout', (req, res) => {

@@ -37,7 +37,9 @@ router.get('/admin/events', requireAdmin, async (req, res) => {
     where = 'WHERE e.created_at > $1';
   }
   const { rows } = await pool.query(
-    `SELECT e.id, e.step, e.payload, e.duration_ms, e.created_at, u.email
+    // [V4] ID/PIN 유저는 email null → username(@id) 폴백으로 타임라인 식별
+    `SELECT e.id, e.step, e.payload, e.duration_ms, e.created_at,
+            coalesce(u.email, '@' || u.username) AS email
      FROM journey_events e JOIN users u ON u.id = e.user_id
      ${where}
      ORDER BY e.created_at DESC

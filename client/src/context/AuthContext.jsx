@@ -53,6 +53,29 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
+  // [V4] ID/PIN 인증 후 공통 처리 · 성공 시 user 세팅 + login 트래킹 1회(구글 ?login=1과 동형)
+  //   returnTo는 SPA 내부라 페이지 이동 없이 호출부가 navigate로 복귀(구글은 전체 이동이라 서버 state 필요).
+  const finishIdAuth = async (path, body) => {
+    const res = await fetch(`${API_BASE}${path}`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) return { ok: false, error: data.error || 'error' };
+    setUser(data.user ?? null);
+    if (data.user) {
+      fetch(`${API_BASE}/api/track`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId: crypto.randomUUID(), step: 'login', payload: { username: data.user.username }, durationMs: null }),
+      }).catch(() => console.warn('[track] login 전송 실패(무시)'));
+    }
+    return { ok: true, user: data.user };
+  };
+
   const value = useMemo(
     () => ({
       user,
@@ -65,6 +88,9 @@ export function AuthProvider({ children }) {
         }
         window.location.href = `${API_BASE}/api/auth/google?returnTo=${encodeURIComponent(returnTo)}`;
       },
+      // [V4] ID/PIN — {ok, error?} 반환(모달이 오류 문구 표시), 성공 시 user 즉시 반영
+      loginWithId: (username, pin) => finishIdAuth('/api/auth/login', { username, pin }),
+      register: (username, pin, name) => finishIdAuth('/api/auth/register', { username, pin, name }),
       logout: async () => {
         try {
           await fetch(`${API_BASE}/api/logout`, { method: 'POST', credentials: 'include' });

@@ -27,6 +27,43 @@
 | [D4] | 존 C4 BUILDER: setup 매칭(4케이스 규칙 일치·CarFront/Bus 실존 확인), build 3스텝(VenueGrid §30 — 2/3/4열·로테이션 중 선택 보존·cap 초과 자동 해제 없음·순서 배지), route ItineraryMap §32(번호핀·draw-on·fitBounds·목업 coord null 시 리스트 폴백), checkout §33(1뷰·하차 필수·프로토타입 Dialog·LoginGate·스탬프), Ticket GTS 모드, data/gts/api.js 목 창구(api.js 원본 미수정), gts 3언어 74키 |
 | [DR] | 검수: 임의 시각 정규식 신규 코드 0 / DEPRECATED 라이브 참조 0(주석·CSS 재사용 3건은 판정 무해) / 3언어 527키 동형 / HEX·localStorage·select·이모지·blur 신규·font-normal 전부 0 / 매트릭스 320·1280·3840 가로 스크롤 0·캡 1800·그리드 2→4열 / E2E: 게이트 양방향 + setup→build→route→checkout→ticket 전 구간 브라우저 통과 / gateRoutes.js 소비자 0 → DEPRECATED 주석 |
 
+### 검증용 무마찰 결제 (2026-07-22 · 커밋 [V5] feat: frictionless checkout for validation 대기)
+
+- 목적: 외국인 사용성 검증 완주율 저하 방지 — 하차 지점·결제 수단 두 필수값을 선택 없이 통과.
+- [1] 하차 지점: 필수 제거(미입력 Pay 활성). 미입력 시 서버·트래킹에 빈문자 아닌 null 저장(schema dropoff_text NOT NULL 해제·멱등), 티켓 상세 "Not specified"(3언어). 입력 시 기존대로 원문. 체크아웃에 "선택 입력" 안내 캡션 추가.
+- [2] 결제 수단: 미선택 Pay 활성. null 저장, 티켓 "Not selected"(3언어). 그리드는 선택 가능 유지(강제 없음), 카드 폼 빈 제출 유지.
+- [3] Pay 게이팅 재점검: dropoff·pay_method·카드입력 어느 것도 Pay 미차단 — 로그인만 유지(RequireAuth 라우트 가드 + onPay LoginGate 폴백). dropoff 필수 사유 문구는 REQUIRE_DROPOFF 시에만 렌더(기본 미표시).
+- [4] 트래킹 정합: complete payload에 dropoffProvided·payMethodProvided(bool) 기록. 관리자 Overview에 스탯 2개 추가(Dropoff skipped % / Payment skipped % · 완주자 중 flag 보유분의 false 비율 · grid 4→6장).
+- [5] 회귀 방지: 서버 env REQUIRE_DROPOFF/REQUIRE_PAYMETHOD(기본 false) · 클라 GtsCheckout 모듈 상수(기본 false). true 시 필수 검증·비활성·사유 문구 복원.
+- 검증(실측): 둘 다 미선택 → Pay 활성 → 예약 QC7XFB/2QXNTV 생성(dropoffText·payMethod 모두 null 저장·재조회 확인) → 티켓 "Not specified"/"Not selected" 스크린샷 → complete payload {dropoffProvided:false, payMethodProvided:false} DB 기록 → 관리자 6스탯(Dropoff/Payment skipped 100%) 렌더. 서버 REQUIRE_* true 재기동 → dropoff/payMethod 누락 각각 400·둘 다 있으면 201(재필수화 복원). 780키×3 동형·줄표 0. 빌드 통과.
+- 로그인 게이팅: /gts/* 는 RequireAuth로 감싸져 비로그인은 체크아웃 도달 불가(LoginGate) — "로그인 없을 때만 Pay 막힘" 구조로 충족.
+- 커밋 라벨 주의: 사용자가 지정한 [V5]는 직전 mockup 실좌표 작업(아래 섹션)에도 임시로 붙어 있었음(둘 다 미커밋). 커밋 분리 여부는 사용자 확인 필요.
+
+### mockup1.md 실명·실좌표 venues.js 반영 (2026-07-22 · [V5] 커밋 대기)
+
+- mockup1.md에 Restaurant 1~6 섹션 추가(맨 위 · 목업 순서 meal→food→activity) + 앱 반영: venues.js의 제네릭 목업 슬롯 20곳(meal 1~6·food 12~20·activity 21~25)을 사용자 제공 실명으로 교체(mock:false). meal 7~11만 제네릭 유지. 최종 카운트 meal 7실+5목 / food 12실 / activity 12실 · 중복 id 0 · 실명 전원 좌표 보유.
+- 좌표는 지어내지 않고 실측: 네이버 링크는 place redirect의 lat/lng(9곳), 구글맵 링크·무링크 식당은 인앱 브라우저로 열어 URL !3d!4d(정확) 또는 og:image static map center(1곳=춘천백일칼국수, verify) 추출(11곳). 전 좌표 춘천 권역(lng 127.6~127.85 · lat 37.7~37.98) 범위 내 확인. 주석에 출처(네이버/구글맵) 표기.
+- 검증: 빌더 식사 스텝에 실명 카드(Baekil Kalguksu·Hoeyeongru·Saemto·1.5 Dakgalbi·Todam…) 노출 · Hoeyeongru+Earth17+Makguksu 3픽 → /gts/route 지도가 실제 춘천 위치(시내·동면·율문리)에 핀·라인 렌더 스크린샷. 빌드 통과.
+- 명세 밖 결정(보고): ①"전부 반영" = mockup1.md 20곳 전체로 해석(6 식당만 아님) ②회영루 원문 "gun"→"restaurant" 정정 ③th는 en 폴백(네이티브 검수 대기 · 파일 th-초안 정책) ④oneLine ko는 신규 번역 ⑤**activity 23 'Chuncheon Makguksu Museum'은 기존 실명 venue 'makguksu-museum'(막국수체험박물관)과 동일 장소 — 현재 둘 다 유지(코드 주석 [V5-주의] 플래그). 하나만 남기고 기존 좌표를 실측값으로 교체할지 사용자 확인 필요.** ⑥할루시네이션 방지 계약 헤더를 [V5] 예외(사용자 제공 실명+실측 좌표)로 갱신.
+- 사용자 준비물: makguksu 중복 정리 결정, th 네이티브 표기, 신규 20곳 상세(VENUE_DETAILS) 미보유 → 돋보기 상세는 "Coming soon" 폴백(원하면 별도 이식), 춘천백일칼국수 좌표 현장 verify.
+
+### ID/PIN 계정 · 관리자 확장 · 대시보드 정리 · 히어로 재구축 (2026-07-22 · [V4] 커밋 대기)
+
+- [1] 계정 병행: users 확장(멱등 — username TEXT UNIQUE nullable, pin_hash TEXT, email NOT NULL 해제). POST /api/auth/register(username 영문 소문자+숫자 4자+·PIN 6자+·이름 선택 · bcrypt 해시 저장 · 중복 409 · 성공 즉시 세션) / POST /api/auth/login(bcrypt 비교 · 실패 존재 여부 비노출 단일 401). 로그인 모달 개편: 단일 글래스 Modal에 [Log In | Sign Up] 탭(대문자 소형 라벨·하단 인디케이터 슬라이드 §17 easeOut) · 두 탭 공통 Continue with Google → "or" → ID/PIN 폼 · 오류 3언어. returnTo는 구글과 동일(ID/PIN은 SPA navigate).
+- [2] 관리자 시드: migrate 멱등 삽입 username "minwoo"/PIN "mardoto!02"(bcrypt)/name "Minwoo". 판별 확장 ADMIN_USERNAMES 폴백('minwoo') + isAdminUser(이메일 OR 유저네임 소문자 비교) — /api/me isAdmin·requireAdmin 두 경로 반영. 아바타 Dashboard 항목 동일(새 탭).
+- [3] 대시보드 정리: Overview에서 Participants 테이블 뷰 제거(요약 스탯 4 + Live timeline만 · 사이드바 2항목 유지) · 서버 /api/admin/participants는 스탯 집계 재사용 위해 유지. ParticipantRow·ChevronDown 고아 제거.
+- [4] 히어로 CTA 최종 재구축: 기존 래퍼·개별 클래스 전면 삭제 → Button 프리미티브 2개(primary/secondary)를 공통 flex 래퍼(gap-12·items-stretch) 하나로 · 개별 margin·width·height·transform·클래스 0. Button secondary 보더 = ring(box-shadow inset)로 교체(border-box라도 콘텐츠 폭 불식 · 치수 완전 동일) · whitespace-nowrap은 컴포넌트 base로 승격(개별 부여 아님).
+- ID/PIN 유저 email null 대응: 헤더 아바타·타임라인은 @username 폴백(Header·AdminPage·admin.js events coalesce).
+- 검증(실측): register 201·중복 409·형식 400 / login 200·오답401·부재401(동일 문구) / 모달 UI 가입(requestSubmit)→세션→닫힘 / ID/PIN E2E 여정 login→setup→meal_plan→picks→route_confirm→pay_method→complete 전부 DB 기록(user 41·예약 4GSAMK) / minwoo 로그인→isAdmin true→아바타 Dashboard(target=_blank rel=noopener)→/admin 렌더(스탯 4·Participants 테이블 부재) / 비관리자(tester01) /admin = 404 위장·Dashboard 항목 부재 / PIN 평문 0건(DB 13인 전원 bcrypt $2·로그 0). 3언어 777키 동형·줄표 0.
+- 히어로 CTA 측정표(getBoundingClientRect · top·height):
+  | 폭 | Plan my route (primary) | Build my day (secondary) | top 일치 | height 일치 |
+  |---|---|---|---|---|
+  | 1280 | top 452 · h 44 | top 452 · h 44 | ✅ 0 | ✅ 0 |
+  | 768 | top 625.27 · h 48 | top 625.27 · h 48 | ✅ 0 | ✅ 0 |
+  | 390 | top 435.68 · h 48 | top 495.68 · h 48 | 접힘(2행) | ✅ 0 |
+  · 390에서는 두 버튼 내용 폭 합(≈391px)이 가용 폭(≈358px)을 초과해 flex-wrap으로 세로 접힘(§18 무가로스크롤 계약 — docScrollWidth=clientWidth 확인). 접혀도 left 동일(16)·height 동일. 한 행 유지가 필요하면 보고 요청.
+- 명세 밖 결정(보고): ①bcrypt는 네이티브 컴파일 회피 위해 bcryptjs(순수 JS · 표준 $2 해시 호환) 채택 ②minwoo/시드 유저는 email null → 아바타·타임라인 @username 폴백 신설 ③히어로 secondary는 전역 규격대로 투명+ring(사진 위 가독은 구 white-pill 대비 낮음 — 지시의 무래퍼·색만차이 규격 우선) ④검증 과정에서 테스트 계정·예약이 dev DB에 누적(대시보드 스탯 반영 · 시연 전 정리 원하면 요청).
+
 ### Travel Log · 빌더 날짜 · 라인 상시 렌더 (2026-07-22 · [V3] 커밋 대기)
 
 - [1] /travel-log 신설(내비 5항목: About | Trip Planner | Tour Builder | Travel Log | Reviews · 헤더+Dock): 구 Loop 풀블리드 셸 재활용 + TravelLogMap(구 §13 지도 코드 재활용·개명 — 칩·정류장·셔틀 제거·다중 발자취 전용). 라인별 tokens.logShades(primary 명도 차등 단색 6종 · 그라데이션 0) · 카드 hover/탭 = 해당 라인 강조·타 라인 40% 감쇠 실측. 좌 카드 스택(모바일 하단 가로 스냅): 이니셜+국가(없으면 Traveler)·플랜·픽 이름·날짜·인원. GET /api/travel-logs = 실 로그 익명화 집계(최근 6) + 목업 시드 6(mock true) · 클라 오프라인 폴백 미러. 카드 CTA → applyLogTemplate(플랜·픽·동선 프리필+routeVisited+log_template 계측) → setup(인원만) → 체크아웃 직행 실측 · 체크아웃 "수정하기" → build 프리필 왕복(플랜 활성·1/1·2/2 순서 배지 보존 실측). Footer 숨김 분기 재사용.

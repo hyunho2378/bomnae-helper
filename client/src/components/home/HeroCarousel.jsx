@@ -59,25 +59,17 @@ export default function HeroCarousel() {
             className="font-display text-display font-bold tracking-display text-white"
           />
           <LangSwap k="home.hero.sub" as="p" className="mt-16 text-h2 font-medium text-white" />
-          {/* CTA 페어 재구축 · 두 버튼은 동일 컴포넌트(Button size="lg")로 대칭 · 차이는 라벨·variant·목적지뿐.
-              래퍼가 배치를 소유(flex gap-12 items-stretch): 개별 버튼에 margin·width·align 금지 → 크기는 컴포넌트,
-              폭은 내용 기반, 높이는 stretch로 항상 동일. box-border라 secondary 1.5px 보더는 안쪽(높이 불변).
-              secondary white 배경은 래퍼 pill이 제공(전역 secondary=투명 유지 · 사진·스크림 위 가독). */}
-          {/* whitespace-nowrap: flex 축소맞춤이 LangSwap 셀을 min-content(공백 있는 EN이 CJK 폭으로 붕괴)로
-              줄여 라벨이 2줄 래핑되던 사고 수리 — 각 언어가 최장 1줄 폭을 확보해 높이 동일 보장(래핑 0). */}
-          {/* flex-wrap: LangSwap는 폭을 최장 언어(태국어)로 고정 → 두 버튼이 좁은 폭(390 등)에서 한 줄에
-              안 들어가면 가로 스크롤 대신 세로로 접힘. 접혀도 각 버튼 높이·좌측 정렬·무래핑 유지. */}
+          {/* [V4] CTA 페어 최종 재구축 · Button 프리미티브 2개를 공통 flex 래퍼 하나로 렌더.
+              래퍼가 배치를 소유(gap-12 · items-stretch) · 개별 버튼에 margin·width·height·transform·개별 클래스 0.
+              차이는 라벨·variant·목적지뿐 — variant는 padding·height·radius·font 공유, secondary 보더는
+              ring(box-shadow inset)이라 치수 불변(Button.jsx). flex-wrap: 좁은 폭에서 가로 스크롤 대신 세로 접힘. */}
           <div className="mt-32 flex w-fit flex-wrap items-stretch gap-12">
-            <span className="grid">
-              <Button as={Link} to="/gate" size="lg">
-                <LangSwap k="home.hero.ctaGate" className="whitespace-nowrap" />
-              </Button>
-            </span>
-            <span className="grid rounded-pill bg-white">
-              <Button as={Link} to="/gts" variant="secondary" size="lg">
-                <LangSwap k="home.hero.ctaBuild" className="whitespace-nowrap" />
-              </Button>
-            </span>
+            <Button as={Link} to="/gate" variant="primary" size="lg">
+              <LangSwap k="home.hero.ctaGate" />
+            </Button>
+            <Button as={Link} to="/gts" variant="secondary" size="lg">
+              <LangSwap k="home.hero.ctaBuild" />
+            </Button>
           </div>
         </div>
       </Container>

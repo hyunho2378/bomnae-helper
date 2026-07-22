@@ -6,6 +6,11 @@ const { resolveUserId } = require('./auth');
 
 const router = express.Router();
 
+// [V5-frictionless] 회귀 방지 플래그(기본 false = 무마찰) · 운영 전환 시 env로 재필수화.
+//   REQUIRE_DROPOFF=true → 하차 지점 미입력 400 / REQUIRE_PAYMETHOD=true → 결제 수단 미선택 400.
+const REQUIRE_DROPOFF = process.env.REQUIRE_DROPOFF === 'true';
+const REQUIRE_PAYMETHOD = process.env.REQUIRE_PAYMETHOD === 'true';
+
 // 6자 코드 · 클라 data/gts/api.js와 동일 규칙(혼동 문자 제외)
 const CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 const makeCode = () =>
@@ -18,7 +23,12 @@ router.post('/gts/bookings', async (req, res) => {
     if (!Number.isInteger(p) || p < 1 || p > 12) return res.status(400).json({ error: 'party 1~12' });
     if (!['none', 'lunch', 'lunchDinner'].includes(mealPlan)) return res.status(400).json({ error: 'mealPlan' });
     if (!Array.isArray(itinerary) || !itinerary.length) return res.status(400).json({ error: 'itinerary' });
-    if (!dropoffText || !String(dropoffText).trim()) return res.status(400).json({ error: 'dropoffText 필수' });
+    // [V5-frictionless] 하차 지점 · 미입력이면 null 저장(빈 문자열 아님) · REQUIRE_DROPOFF 시에만 필수
+    const dropoff = typeof dropoffText === 'string' && dropoffText.trim() ? dropoffText.trim() : null;
+    if (REQUIRE_DROPOFF && !dropoff) return res.status(400).json({ error: 'dropoffText 필수' });
+    // [V5-frictionless] 결제 수단 · 미선택이면 null · REQUIRE_PAYMETHOD 시에만 필수
+    const payMethodValue = typeof payMethod === 'string' && payMethod ? payMethod : null;
+    if (REQUIRE_PAYMETHOD && !payMethodValue) return res.status(400).json({ error: 'payMethod 필수' });
     // [V3] 여행 날짜 · 선택값(YYYY-MM-DD) — 형식만 검증(당일 허용 · 과거 차단은 클라 캘린더 소유)
     const tDate = typeof travelDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(travelDate) ? travelDate : null;
     const lug = Boolean(luggage);
@@ -32,9 +42,9 @@ router.post('/gts/bookings', async (req, res) => {
         const { rows } = await pool.query(
           `INSERT INTO gts_bookings (code, user_id, party, luggage, vehicle_type, meal_plan, picks, dropoff_text, pay_method, total, travel_date)
            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING code, created_at`,
-          [code, userId, p, lug, vehicleType, mealPlan, JSON.stringify(itinerary), String(dropoffText), payMethod ?? null, total, tDate],
+          [code, userId, p, lug, vehicleType, mealPlan, JSON.stringify(itinerary), dropoff, payMethodValue, total, tDate],
         );
-        return res.status(201).json(toBooking({ ...req.body, code: rows[0].code, vehicleType, total, party: p, luggage: lug, travelDate: tDate }));
+        return res.status(201).json(toBooking({ ...req.body, code: rows[0].code, vehicleType, total, party: p, luggage: lug, dropoffText: dropoff, payMethod: payMethodValue, travelDate: tDate }));
       } catch (e) {
         if (e.code !== '23505') throw e; // unique 충돌만 재시도
       }

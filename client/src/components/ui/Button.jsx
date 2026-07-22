@@ -3,9 +3,11 @@
 //   · hover 8% 틴트는 §16.8이 허용한 상호작용 피드백 예외(스케일상 /10 스텝 적용)
 // ghost: 흐름 전진 텍스트 버튼. 폭은 텍스트+패딩으로 결정(§16.8 · 임의 고정폭 금지).
 // v3.2 §16.1: navy는 티켓 면 전용 · hover는 elevation/불투명도 피드백으로 대체([CR] 수정)
+// [V4] secondary 1.5px 보더 = ring(box-shadow inset)로 구현 — border-box라도 콘텐츠 폭을 먹지 않아
+//   primary와 padding·height·radius·font·박스 치수가 완전 동일(색만 차이). 히어로 CTA 대칭 담보.
 const VARIANTS = {
   primary: 'bg-primary text-white hover:shadow-md',
-  secondary: 'border-1.5 border-primary bg-transparent text-primary hover:bg-primary/10',
+  secondary: 'bg-transparent text-primary ring-1.5 ring-inset ring-primary hover:bg-primary/10',
   ghost: 'bg-transparent text-primary hover:opacity-80',
 };
 
@@ -25,7 +27,7 @@ export default function Button({
   return (
     <Tag
       disabled={Tag === 'button' ? disabled : undefined}
-      className={`pressable inline-flex h-48 items-center justify-center gap-8 rounded-pill font-semibold lg:h-44 ${VARIANTS[variant]} ${SIZES[size]} ${disabled ? 'pointer-events-none opacity-40' : ''}`}
+      className={`pressable inline-flex h-48 items-center justify-center gap-8 whitespace-nowrap rounded-pill font-semibold lg:h-44 ${VARIANTS[variant]} ${SIZES[size]} ${disabled ? 'pointer-events-none opacity-40' : ''}`}
       {...rest}
     >
       {children}

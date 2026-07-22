@@ -28,6 +28,11 @@ import LangSwap from '../i18n/LangSwap';
 
 const VEHICLE_ICON = { taxi: CarFront, van: Bus };
 
+// [V5-frictionless] 검증용 무마찰: 하차 지점·결제 수단 미선택이어도 Pay 활성(완주율 저하 방지).
+//   회귀 방지 플래그(기본 false) — true로 되돌리면 필수 검증·비활성 사유 복원(서버 REQUIRE_* env와 짝).
+const REQUIRE_DROPOFF = false;
+const REQUIRE_PAYMETHOD = false;
+
 // 요약 행 · Booking 단일 확인 페이지 Row 선례(라벨 caption + 값 우측)
 function Row({ labelKey, children }) {
   return (
@@ -63,9 +68,11 @@ export default function GtsCheckout() {
   const method = PAY_METHODS.find((m) => m.id === payMethod) ?? null;
 
   // §42: 카드 입력값은 저장하지 않는다(검증 없음 · 빈 제출 허용) — 수단 문자열만 예약에 저장
+  // [V5-frictionless] 하차·결제 수단 모두 선택적 · 미선택이면 null 저장
   const submit = async () => {
     setSubmitting(true);
-    trackStep('pay_method', { method: method.id }); // [V1] 결제 수단 확정
+    const dropoffValue = dropoffText.trim() || null;
+    trackStep('pay_method', { method: method?.id ?? null }); // [V1] 결제 수단(미선택 null)
     const booking = await createGtsBooking({
       party,
       luggage,
@@ -74,12 +81,17 @@ export default function GtsCheckout() {
       meals,
       picks,
       itinerary: entries.map((venue) => venue.id), // 순서 보존(§9.6 picks 순서 원칙)
-      dropoffText: dropoffText.trim(), // 지오코딩 없음 · 원문 저장(§9.6)
-      payMethod: method.id, // §42 결제 수단 문자열 저장 확장
+      dropoffText: dropoffValue, // [V5] 미입력이면 null(빈 문자열 아님)
+      payMethod: method?.id ?? null, // [V5] 미선택이면 null
       travelDate, // [V3] 빌더 날짜 관통(서버 travel_date)
       total,
     });
-    trackStep('complete', { code: booking.code ?? booking.id }); // [V1] 완주
+    // [V5] 검증 계측: 사람들이 이 두 단계를 건너뛰는가(대시보드 스킵 비율 소스)
+    trackStep('complete', {
+      code: booking.code ?? booking.id,
+      dropoffProvided: !!dropoffValue,
+      payMethodProvided: !!method,
+    });
     // 성공 인터스티셜 없음 · 티켓 직행(§42 replace) — 스탬프는 Ticket 진입 시 1회(§43)
     navigate(`/ticket/${booking.id}`, { replace: true });
   };
@@ -153,10 +165,11 @@ export default function GtsCheckout() {
               </ol>
             </section>
 
-            {/* 최종 하차 지점 · 텍스트 필수(§9.6) */}
+            {/* 최종 하차 지점 · [V5] 선택 입력(무마찰) — 미입력이면 null 저장·티켓 "Not specified" */}
             <section className="flex flex-col gap-12 rounded-xl bg-white p-24 shadow-sm">
               <label className="flex flex-col gap-8">
                 <LangSwap k="gts.checkout.dropoffLabel" as="span" className="text-h3 font-semibold" />
+                <LangSwap k="gts.checkout.dropoffOptional" className="text-caption font-medium text-inkMeta" />
                 <input
                   type="text"
                   value={dropoffText}
@@ -165,15 +178,18 @@ export default function GtsCheckout() {
                   className="h-48 rounded-md bg-surface px-16 text-body focus:ring-2 focus:ring-primary"
                 />
               </label>
-              <div aria-live="polite">
-                {!dropoffOk && (
-                  <LangSwap
-                    k="gts.checkout.dropoffRequired"
-                    as="p"
-                    className="text-small font-medium text-spice"
-                  />
-                )}
-              </div>
+              {/* [V5] 사유 문구는 재필수화(REQUIRE_DROPOFF) 시에만 — 기본 무마찰이라 미표시 */}
+              {REQUIRE_DROPOFF && (
+                <div aria-live="polite">
+                  {!dropoffOk && (
+                    <LangSwap
+                      k="gts.checkout.dropoffRequired"
+                      as="p"
+                      className="text-small font-medium text-spice"
+                    />
+                  )}
+                </div>
+              )}
             </section>
 
             {/* §42 결제 수단 그리드 8종 + 카드 폼/월렛 카피 */}
@@ -190,8 +206,13 @@ export default function GtsCheckout() {
           <aside className="flex flex-col gap-24 rounded-xl bg-white p-24 shadow-md lg:sticky lg:top-24">
             <LangSwap k="gts.checkout.priceTitle" as="h2" className="text-h3 font-semibold" />
             <FareBreakdown vehicle={vehicle} luggage={luggage} party={party} />
+            {/* [V5] Pay 게이팅: dropoff·pay_method·카드입력 어느 것도 막지 않음 · 로그인만 유지(실명 기록 목적).
+                재필수화 플래그 true일 때만 해당 필드가 다시 Pay를 막는다. */}
             <div className="grid">
-              <Button disabled={!dropoffOk || !method || submitting} onClick={onPay}>
+              <Button
+                disabled={submitting || (REQUIRE_DROPOFF && !dropoffOk) || (REQUIRE_PAYMETHOD && !method)}
+                onClick={onPay}
+              >
                 <LangSwap k="gts.checkout.payCta" />
                 {submitting && (
                   <Loader2 size={16} aria-hidden="true" className="animate-spin motion-reduce:animate-none" />

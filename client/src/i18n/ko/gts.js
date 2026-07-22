@@ -97,6 +97,7 @@ export default {
       orderTitle: "방문 순서",
       dropoffLabel: "최종 하차 지점",
       dropoffPlaceholder: "예: 춘천역, 숙소 주소",
+      dropoffOptional: "선택 입력입니다. 정하지 않았다면 비워 두세요.",
       dropoffRequired: "하차 지점을 입력하면 결제할 수 있어요",
       priceTitle: "금액 내역",
       payCta: "결제하기",
@@ -118,6 +119,8 @@ export default {
       // §43 좌측 상세 패널(존 C5) · 환불 규정은 legal.terms.s3 재사용(신규 창작 금지)
       detailsTitle: "예약 상세",
       payMethodLabel: "결제 수단",
+      dropoffNone: "지정 안 함",
+      payNone: "선택 안 함",
       guideTitle: "이용 안내",
       guide1: "탑승할 때 기사님께 티켓 코드를 보여 주세요.",
       guide2: "각 장소는 2시간 슬롯으로 진행되며 기사님이 일정을 지켜 드립니다.",

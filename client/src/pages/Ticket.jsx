@@ -172,14 +172,21 @@ function GtsTicket({ gts }) {
                   />
                 </DetailRow>
                 <DetailRow labelKey="gts.ticket.dropoffLabel">
-                  {/* 하차 지점 · 지오코딩 없는 사용자 원문 그대로(§9.6) */}
-                  <span className="break-words font-semibold">{gts.dropoffText}</span>
+                  {/* 하차 지점 · 원문 그대로 · [V5] 미입력이면 "Not specified"(3언어) */}
+                  {gts.dropoffText ? (
+                    <span className="break-words font-semibold">{gts.dropoffText}</span>
+                  ) : (
+                    <LangSwap k="gts.ticket.dropoffNone" className="font-semibold text-inkMeta" />
+                  )}
                 </DetailRow>
-                {payLabel && (
-                  <DetailRow labelKey="gts.ticket.payMethodLabel">
+                {/* [V5] 결제 수단 항상 표기 · 미선택이면 "Not selected" */}
+                <DetailRow labelKey="gts.ticket.payMethodLabel">
+                  {payLabel ? (
                     <span className="font-semibold">{payLabel}</span>
-                  </DetailRow>
-                )}
+                  ) : (
+                    <LangSwap k="gts.ticket.payNone" className="font-semibold text-inkMeta" />
+                  )}
+                </DetailRow>
               </dl>
             </section>
 
