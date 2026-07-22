@@ -17,7 +17,7 @@ import LangSwap from '../i18n/LangSwap';
 
 export default function GtsRoute() {
   const ok = useGtsGuard('route');
-  const { mealPlan, meals, picks, markRouteVisited } = useGts();
+  const { mealPlan, meals, picks, markRouteVisited, trackStep } = useGts();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -70,7 +70,13 @@ export default function GtsRoute() {
               }))}
             />
             <div className="flex flex-wrap items-center gap-12 pt-8">
-              <Button onClick={() => navigate('/gts/checkout')}>
+              <Button
+                onClick={() => {
+                  // [V1] 방문 순서 확정 계측
+                  trackStep('route_confirm', { order: entries.map((v) => ({ id: v.id, name: v.name.en })) });
+                  navigate('/gts/checkout');
+                }}
+              >
                 <LangSwap k="gts.route.proceed" />
               </Button>
               <Button variant="secondary" onClick={() => navigate('/gts/build')}>

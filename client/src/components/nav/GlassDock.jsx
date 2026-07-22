@@ -43,7 +43,7 @@ export default function GlassDock() {
   const dockRef = useRef(null);
   const touchY = useRef(null);
   const { pathname } = useLocation();
-  const { user, login, logout } = useAuth();
+  const { user, login, logout } = useAuth(); // [V1] login(pathname) = OAuth 직행(모바일 Dock 문법)
   const { lang, setLang, t } = useLang();
   const routeKey = routeKeyFromPath(pathname);
 
@@ -162,7 +162,7 @@ export default function GlassDock() {
               ) : (
                 <button
                   type="button"
-                  onClick={login}
+                  onClick={() => login(pathname)}
                   className="flex min-h-44 items-center whitespace-nowrap px-8 text-small font-medium text-primary"
                 >
                   <LangSwap k="nav.login" />

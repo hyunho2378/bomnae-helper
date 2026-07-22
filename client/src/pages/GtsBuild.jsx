@@ -50,7 +50,7 @@ function Counter({ n, max }) {
 export default function GtsBuild() {
   const ok = useGtsGuard('build');
   const navigate = useNavigate();
-  const { mealPlan, meals, picks, setMealPlan, toggleMeal, togglePick } = useGts();
+  const { mealPlan, meals, picks, setMealPlan, toggleMeal, togglePick, trackStep } = useGts();
   const [step, setStep] = useState('plan');
   const [capNotice, setCapNotice] = useState(false);
   const autoRef = useRef(0);
@@ -71,12 +71,20 @@ export default function GtsBuild() {
   // 정원 초과 시 자동 해제 금지 · 안내만(§9.4) — 수용되면 안내 해제
   const guarded = (toggle) => (id) => setCapNotice(!toggle(id));
 
+  // [V1] 선택 벤처 id·이름 요약(계측 payload)
+  const venueSummary = (ids) =>
+    ids.map((id) => {
+      const v = venues.find((x) => x.id === id);
+      return { id, name: v?.name.en ?? id };
+    });
+
   // §41 단일 선택 스텝: 카드 탭 → 프레스 피드백 120ms(tokens durPress) 후 자동 전진
   const onPlanSelect = (plan) => {
     setMealPlan(plan);
     clearTimeout(autoRef.current);
     autoRef.current = setTimeout(() => {
       setCapNotice(false);
+      trackStep('meal_plan', { plan }); // [V1] 자동 전진도 스텝 완료
       setStep(plan === 'none' ? 'picks' : 'meals');
     }, parseInt(motion.durPress, 10));
   };
@@ -97,9 +105,16 @@ export default function GtsBuild() {
 
   const onNext = () => {
     setCapNotice(false);
-    if (step === 'plan') setStep(mealPlan === 'none' ? 'picks' : 'meals');
-    else if (step === 'meals') setStep('picks');
-    else navigate('/gts/route');
+    if (step === 'plan') {
+      trackStep('meal_plan', { plan: mealPlan }); // [V1]
+      setStep(mealPlan === 'none' ? 'picks' : 'meals');
+    } else if (step === 'meals') {
+      trackStep('meals', { selections: venueSummary(meals) }); // [V1]
+      setStep('picks');
+    } else {
+      trackStep('picks', { selections: venueSummary(picks) }); // [V1]
+      navigate('/gts/route');
+    }
   };
   const onBack = () => {
     setCapNotice(false);

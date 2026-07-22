@@ -47,7 +47,7 @@ export default function GtsCheckout() {
   const ok = useGtsGuard('checkout');
   const { user } = useAuth();
   const { t } = useLang();
-  const { party, luggage, vehicle, mealPlan, meals, picks, dropoffText, setDropoffText } = useGts();
+  const { party, luggage, vehicle, mealPlan, meals, picks, dropoffText, setDropoffText, trackStep } = useGts();
   const navigate = useNavigate();
   const [gateOpen, setGateOpen] = useState(false);
   const [payMethod, setPayMethod] = useState(null);
@@ -64,6 +64,7 @@ export default function GtsCheckout() {
   // §42: 카드 입력값은 저장하지 않는다(검증 없음 · 빈 제출 허용) — 수단 문자열만 예약에 저장
   const submit = async () => {
     setSubmitting(true);
+    trackStep('pay_method', { method: method.id }); // [V1] 결제 수단 확정
     const booking = await createGtsBooking({
       party,
       luggage,
@@ -76,6 +77,7 @@ export default function GtsCheckout() {
       payMethod: method.id, // §42 결제 수단 문자열 저장 확장
       total,
     });
+    trackStep('complete', { code: booking.code ?? booking.id }); // [V1] 완주
     // 성공 인터스티셜 없음 · 티켓 직행(§42 replace) — 스탬프는 Ticket 진입 시 1회(§43)
     navigate(`/ticket/${booking.id}`, { replace: true });
   };
@@ -186,7 +188,7 @@ export default function GtsCheckout() {
         </div>
       </div>
 
-      <LoginGate open={gateOpen} onClose={() => setGateOpen(false)} onSuccess={submit} />
+      <LoginGate open={gateOpen} onClose={() => setGateOpen(false)} returnTo="/gts" />
     </Container>
   );
 }

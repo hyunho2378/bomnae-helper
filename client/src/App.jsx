@@ -3,6 +3,7 @@
 // GtsProvider 전역 배선(§31 — 스텝 상태는 라우트 이동에도 유지, 새로고침 시 setup부터).
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import PageLayout from './components/layout/PageLayout';
+import RequireAuth from './components/ui/RequireAuth'; // [V1]
 import { ArrivalProvider } from './context/ArrivalContext';
 import { AuthProvider } from './context/AuthContext';
 import { BookingProvider } from './context/BookingContext';
@@ -18,6 +19,7 @@ import Home from './pages/Home';
 import LegalPrivacy from './pages/LegalPrivacy';
 import LegalTerms from './pages/LegalTerms';
 import NotFound from './pages/NotFound';
+import AdminPage from './pages/AdminPage'; // [V1] 헤더 링크 없음 · 직접 URL 진입만
 import Reviews from './pages/Reviews';
 import Ticket from './pages/Ticket';
 
@@ -34,13 +36,14 @@ export default function App() {
                     <Route path="/" element={<Home />} />
                     <Route path="/gate" element={<Gate />} />
                     {/* /gts = setup(IA §9.1 "(=setup)") · /gts/setup도 동일 화면 정식 경로 */}
-                    <Route path="/gts" element={<GtsSetup />} />
-                    <Route path="/gts/setup" element={<GtsSetup />} />
-                    <Route path="/gts/build" element={<GtsBuild />} />
-                    <Route path="/gts/route" element={<GtsRoute />} />
-                    <Route path="/gts/checkout" element={<GtsCheckout />} />
+                    <Route path="/gts" element={<RequireAuth><GtsSetup /></RequireAuth>} />
+                    <Route path="/gts/setup" element={<RequireAuth><GtsSetup /></RequireAuth>} />
+                    <Route path="/gts/build" element={<RequireAuth><GtsBuild /></RequireAuth>} />
+                    <Route path="/gts/route" element={<RequireAuth><GtsRoute /></RequireAuth>} />
+                    <Route path="/gts/checkout" element={<RequireAuth><GtsCheckout /></RequireAuth>} />
                     <Route path="/ticket/:bookingId" element={<Ticket />} />
                     <Route path="/reviews" element={<Reviews />} />
+                    <Route path="/admin" element={<AdminPage />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/legal/privacy" element={<LegalPrivacy />} />
                     <Route path="/legal/terms" element={<LegalTerms />} />

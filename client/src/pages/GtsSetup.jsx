@@ -18,7 +18,7 @@ import LangSwap from '../i18n/LangSwap';
 const VEHICLE_ICON = { taxi: CarFront, van: Bus };
 
 export default function GtsSetup() {
-  const { party, luggage, vehicle, setParty, setLuggage } = useGts();
+  const { party, luggage, vehicle, setParty, setLuggage, trackStep } = useGts();
   const navigate = useNavigate();
   const { t } = useLang();
 
@@ -95,7 +95,13 @@ export default function GtsSetup() {
 
         {/* [H2-10] CTA · 우측 컬럼 바로 아래 우측 정렬(고아 좌측 버튼 금지) */}
         <div className="flex justify-end lg:col-start-2">
-          <Button onClick={() => navigate('/gts/build')}>
+          <Button
+            onClick={() => {
+              // [V1] setup 완료 계측(비차단)
+              trackStep('setup', { party: party ?? 1, luggage, vehicle });
+              navigate('/gts/build');
+            }}
+          >
             <LangSwap k="gts.setup.cta" />
           </Button>
         </div>

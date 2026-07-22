@@ -10,7 +10,13 @@
 EN: Bomnae Helper is a prototype service operated by Team 5 of the 2026 STATION C Glocal Solverthon in Chuncheon, Republic of Korea. Contact: official@bomnaehelper.ac.kr
 KR: 봄내 헬퍼는 2026 STATION C 글로컬 솔버톤(춘천) Team 5가 운영하는 프로토타입 서비스입니다. 문의: official@bomnaehelper.ac.kr
 
-### 2. What we collect / 수집하는 정보
+#### [V1] 연구 기록 조항(Privacy §2·§3에 반영)
+EN §2 append: "When you are signed in, your selections inside this prototype (party size, chosen venues, visit order, payment method label) and the time spent on each step are also recorded."
+EN §3 append: "Recorded selections and step timings are used for service improvement research. You can request deletion of these records through the contact above."
+KR §2 append: "로그인한 상태에서는 이 프로토타입 안에서의 선택 항목(인원, 선택 장소, 방문 순서, 결제 수단 표기)과 단계별 소요 시간도 저장됩니다."
+KR §3 append: "저장된 선택 항목과 단계별 소요 시간은 서비스 개선 연구 목적으로 사용됩니다. 삭제 요청은 위 연락처로 가능합니다."
+
+## 2. What we collect / 수집하는 정보
 EN: When you sign in with Google, we receive your name, email address and profile image reference from Google. When you reserve a seat we store your booking details: line, date, departure time and party size. When you request Hands-Free we additionally store your arrival terminal, bag count and the address of your stay in Chuncheon. We do not collect payment card numbers in this prototype. We do not use advertising trackers, and we do not store data in your browser's local storage.
 KR: 구글 로그인 시 구글로부터 이름, 이메일 주소, 프로필 이미지 참조를 전달받습니다. 좌석 예약 시 라인, 날짜, 출발 회차, 인원 등 예약 정보를 저장합니다. 핸즈프리 신청 시 도착 터미널, 수하물 개수, 춘천 숙소 주소를 추가로 저장합니다. 본 프로토타입은 결제카드 번호를 수집하지 않습니다. 광고 트래커를 사용하지 않으며, 브라우저 로컬 스토리지에 정보를 저장하지 않습니다.
 

@@ -2,13 +2,14 @@
 // 높이 80 고정 — 스크롤 축소·글래스 전환 폐지(사용자 결정). 메뉴 17px 600 간격 32+.
 // 순서 v4(IA §9.1): About | Getting Here | Make GTS — Bag Delivery·City Lines 항목 삭제.
 // 모바일에도 상단 헤더 존재: 로고+LangMenu+로그인만 · 메뉴는 GlassDock 단일 소유(햄버거 금지).
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { User } from 'lucide-react';
+import LoginGate from '../ui/LoginGate';
+import LogoutConfirm from '../ui/LogoutConfirm';
+import usePopExit from '../ui/usePopExit';
 import { useAuth } from '../../context/AuthContext';
 import { useLang } from '../../i18n/LangContext';
 import LangSwap from '../../i18n/LangSwap';
-import IconButton from '../ui/IconButton';
 import LangMenu from './LangMenu';
 import LogoMark from '../../assets/logo-mark.svg?react';
 
@@ -20,8 +21,24 @@ const MENU = [
 ];
 
 export default function Header() {
-  const { user, login, logout } = useAuth();
+  const { user } = useAuth();
   const { t } = useLang();
+  // [V1] 비로그인 Sign in → 글래스 로그인 모달 / 아바타 → 팝 메뉴 → 로그아웃 확인 모달
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [logoutOpen, setLogoutOpen] = useState(false);
+  const [instantPop, setInstantPop] = useState(false);
+  const { mounted: menuMounted, closing: menuClosing } = usePopExit(menuOpen, instantPop);
+  const menuRootRef = useRef(null);
+
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+    const onDown = (e) => {
+      if (!menuRootRef.current?.contains(e.target)) setMenuOpen(false);
+    };
+    document.addEventListener('pointerdown', onDown);
+    return () => document.removeEventListener('pointerdown', onDown);
+  }, [menuOpen]);
   // §35 스크롤 엣지 페이드 표시용 boolean · 헤더 치수는 스크롤과 무관하게 80px 고정(사용자 결정 유지)
   const [scrolled, setScrolled] = useState(false);
 
@@ -65,19 +82,52 @@ export default function Header() {
         <div className="flex items-center gap-8">
           <LangMenu />
           {user ? (
+            <div ref={menuRootRef} className="relative">
+              <button
+                type="button"
+                aria-haspopup="menu"
+                aria-expanded={menuOpen}
+                aria-label={user.email}
+                title={user.email}
+                onClick={(e) => {
+                  setInstantPop(e.detail === 0);
+                  setMenuOpen((v) => !v);
+                }}
+                className="flex h-44 w-44 items-center justify-center"
+              >
+                <span className="flex h-32 w-32 items-center justify-center rounded-pill bg-primary text-small font-semibold text-white">
+                  {user.name[0]}
+                </span>
+              </button>
+              {menuMounted && (
+                <div
+                  role="menu"
+                  aria-hidden={menuClosing || undefined}
+                  className={`pop-panel origin-top-right ${instantPop ? 'pop-instant' : ''} absolute right-0 top-full z-dialog mt-8 flex w-max flex-col rounded-md bg-white p-8 shadow-md ${menuClosing ? 'pop-panel-exit' : ''}`}
+                >
+                  <p className="px-12 py-8 text-caption font-medium text-inkMeta">{user.email}</p>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setLogoutOpen(true); // [V1] 확인 모달 경유
+                    }}
+                    className="flex min-h-44 w-full items-center rounded-sm px-12 text-left text-small font-semibold text-ink transition-colors duration-fast hover:bg-surface"
+                  >
+                    <LangSwap k="nav.logout" />
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
             <button
               type="button"
-              onClick={logout}
-              aria-label={t('nav.logout')}
-              title={t('nav.logout')}
-              className="flex h-44 w-44 items-center justify-center"
+              onClick={() => setLoginOpen(true)}
+              className="pressable flex min-h-44 items-center rounded-pill px-16 text-small font-semibold text-primary"
             >
-              <span className="flex h-32 w-32 items-center justify-center rounded-pill bg-primary text-small font-semibold text-white">
-                {user.name[0]}
-              </span>
+              <LangSwap k="nav.login" />
             </button>
-          ) : (
-            <IconButton icon={User} label="nav.login" size={20} onClick={login} />
           )}
         </div>
       </div>
@@ -88,6 +138,8 @@ export default function Header() {
           scrolled ? 'opacity-100' : 'opacity-0'
         }`}
       />
+      <LoginGate open={loginOpen} onClose={() => setLoginOpen(false)} returnTo={window.location.pathname} />
+      <LogoutConfirm open={logoutOpen} onClose={() => setLogoutOpen(false)} />
     </header>
   );
 }

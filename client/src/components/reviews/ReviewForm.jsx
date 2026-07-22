@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { Star } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import LoginGate from '../ui/LoginGate';
 import { useLang } from '../../i18n/LangContext';
 import LangSwap from '../../i18n/LangSwap';
 import Button from '../ui/Button';
@@ -22,6 +23,7 @@ const initialsOf = (name) =>
 
 export default function ReviewForm({ onPost }) {
   const { user } = useAuth();
+  const [gateOpen, setGateOpen] = useState(false); // [V1] 리뷰 작성 = 로그인 필요 지점
   const { t, lang } = useLang();
   const [rating, setRating] = useState(5);
   const [body, setBody] = useState('');
@@ -31,6 +33,12 @@ export default function ReviewForm({ onPost }) {
   const canPost = body.trim().length > 0 && courseId != null;
 
   const submit = (e) => {
+    // [V1] 비로그인 → 글래스 로그인 모달(returnTo=/reviews · OAuth 복귀 후 재작성)
+    if (!user) {
+      e.preventDefault();
+      setGateOpen(true);
+      return;
+    }
     e.preventDefault();
     if (!canPost) return;
     const countryText = country.trim();
@@ -40,7 +48,7 @@ export default function ReviewForm({ onPost }) {
       lang,
       title: null,
       body: body.trim(),
-      initials: initialsOf(user?.name ?? 'Demo Traveler'),
+      initials: initialsOf(user?.name ?? 'Guest'),
       // 국적은 사용자 원문 그대로(자동 번역 없음) — 3언어 표기 동일
       country: countryText ? { en: countryText, ko: countryText, th: countryText } : null,
       courseKey: `reviews.course.${courseId}`,
@@ -118,6 +126,7 @@ export default function ReviewForm({ onPost }) {
           <LangSwap k="reviews.form.submit" />
         </Button>
       </div>
+      <LoginGate open={gateOpen} onClose={() => setGateOpen(false)} returnTo="/reviews" />
     </form>
   );
 }

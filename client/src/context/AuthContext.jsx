@@ -1,23 +1,80 @@
-import { createContext, useContext, useMemo, useState } from 'react';
+// [V1] 실 OAuth 기본 · 데모 폐지(DEMO_AUTH 플래그 자체는 보존 — 시연 복귀용).
+// user = 서버 /api/me(httpOnly 세션 쿠키) 로드 · login(returnTo) = 서버 OAuth로 전체 이동
+// (returnTo는 서버가 HMAC state로 보존 — 클라 쿼리 노출 금지) · logout = POST + 상태 클리어.
+// OAuth 복귀(?login=1) 감지 시 journey 'login' 트래킹 1회 발화 후 쿼리 정리.
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
-// PHASE 1 목 구현 · PHASE 3에서 서버 연동으로 내부만 교체(인터페이스 불변, COMPONENTS A1).
-// v4.2(§10.6): 기본 상태 = 데모 유저 로그인됨 — 로그인 게이트 전부 통과.
-// 실 OAuth 복원 시 DEMO_AUTH=false 로 되돌리면 초기 비로그인 + 게이트 동작 복구.
-const DEMO_AUTH = true;
-const demoUser = { name: 'Demo Traveler', email: 'demo@gts.ac.kr' };
+const DEMO_AUTH = false; // [V1] 기본 false · 시연 복귀 시 true(서버 DEMO_MODE=true와 페어)
+const demoUser = { name: 'Demo Traveler', email: 'demo@gts.ac.kr', isAdmin: false };
+
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(DEMO_AUTH ? demoUser : null);
+  const [ready, setReady] = useState(DEMO_AUTH);
+  const loginTracked = useRef(false);
+
+  // 세션 복원 · 실패(서버 다운)해도 게스트로 진행(비차단)
+  useEffect(() => {
+    if (DEMO_AUTH) return undefined;
+    let alive = true;
+    fetch(`${API_BASE}/api/me`, { credentials: 'include' })
+      .then((r) => r.json())
+      .then((d) => {
+        if (!alive) return;
+        setUser(d.user ?? null);
+        setReady(true);
+        // OAuth 복귀 마커 → login 트래킹 1회(비차단) + 쿼리 정리
+        const url = new URL(window.location.href);
+        if (d.user && url.searchParams.get('login') === '1' && !loginTracked.current) {
+          loginTracked.current = true;
+          url.searchParams.delete('login');
+          window.history.replaceState({}, '', url.pathname + url.search + url.hash);
+          fetch(`${API_BASE}/api/track`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              sessionId: crypto.randomUUID(),
+              step: 'login',
+              payload: { email: d.user.email },
+              durationMs: null,
+            }),
+          }).catch(() => console.warn('[track] login 전송 실패(무시)'));
+        }
+      })
+      .catch(() => {
+        if (alive) setReady(true); // 서버 부재 — 게스트 유지(플로우 무중단)
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const value = useMemo(
     () => ({
       user,
-      login: () => setUser(DEMO_AUTH ? demoUser : { name: 'Guest', email: 'guest@bomnae.example' }),
-      logout: () => setUser(null),
+      ready,
+      // returnTo = 내부 경로(서버 state 보존) — OAuth 전체 페이지 이동
+      login: (returnTo = window.location.pathname) => {
+        if (DEMO_AUTH) {
+          setUser(demoUser);
+          return;
+        }
+        window.location.href = `${API_BASE}/api/auth/google?returnTo=${encodeURIComponent(returnTo)}`;
+      },
+      logout: async () => {
+        try {
+          await fetch(`${API_BASE}/api/logout`, { method: 'POST', credentials: 'include' });
+        } catch {
+          /* 서버 부재여도 로컬 상태는 클리어 */
+        }
+        setUser(null);
+      },
     }),
-    [user],
+    [user, ready],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

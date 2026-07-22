@@ -61,6 +61,12 @@ export default {
     loginGate: {
       title: "Sign in to confirm",
       google: "Continue with Google",
+      noSignup: "No sign-up needed",
+      consent: "By signing in you agree that your selections in this prototype are recorded for research.",
+      logoutTitle: "Sign out?",
+      logoutBody: "You can sign back in anytime with Google.",
+      logoutConfirm: "Sign out",
+      logoutCancel: "Stay signed in",
     },
     notFound: {
       title: "This stop doesn't exist.",

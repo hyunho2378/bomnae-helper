@@ -6,6 +6,9 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { useLocation, useNavigate } from 'react-router-dom';
 import { matchVehicle } from '../data/gts/vehicles';
 
+// [V1] 여정 트래킹 · 비차단(실패해도 UX 진행 · 콘솔 경고만) — 서버 /api/track(로그인 필수)
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001';
+
 const GtsContext = createContext(null);
 
 const initial = {
@@ -29,14 +32,37 @@ export function GtsProvider({ children }) {
   const [state, setState] = useState(initial);
   const { pathname } = useLocation();
   const wasInFlow = useRef(false);
+  // [V1] 세션·스텝 계측 — sessionId는 플로우 진입 시 생성, lastStepAt은 직전 track 이후 경과(duration)
+  const sessionIdRef = useRef(null);
+  const lastStepAtRef = useRef(0);
 
   // v4.2 §10.4 상태 리셋 정책: /gts/* 밖으로 이탈하면 하차 텍스트 포함 전체 초기화.
   // 플로우 내부 이동은 보존. 결제 직행(/ticket)도 이탈 — 예약 스냅샷은 data/gts/api 저장분이 소유.
   useEffect(() => {
     const inFlow = pathname.startsWith('/gts');
+    if (!wasInFlow.current && inFlow) {
+      // [V1] 플로우 진입 — 트래킹 세션 시작
+      sessionIdRef.current = crypto.randomUUID();
+      lastStepAtRef.current = performance.now();
+    }
     if (wasInFlow.current && !inFlow) setState(initial);
     wasInFlow.current = inFlow;
   }, [pathname]);
+
+  // [V1] 스텝 완료 계측 · 비차단 — duration = 직전 스텝 완료 이후 경과
+  const trackStep = useCallback((step, payload = {}) => {
+    const now = performance.now();
+    const durationMs = lastStepAtRef.current ? Math.round(now - lastStepAtRef.current) : null;
+    lastStepAtRef.current = now;
+    const sessionId = sessionIdRef.current ?? crypto.randomUUID();
+    sessionIdRef.current = sessionId;
+    fetch(`${API_BASE}/api/track`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId, step, payload, durationMs }),
+    }).catch(() => console.warn(`[track] ${step} 전송 실패(무시)`));
+  }, []);
 
   const setParty = useCallback((party) => setState((s) => ({ ...s, party })), []);
   const setLuggage = useCallback((luggage) => setState((s) => ({ ...s, luggage })), []);
@@ -105,8 +131,9 @@ export function GtsProvider({ children }) {
       setDropoffText,
       markRouteVisited,
       reset,
+      trackStep,
     }),
-    [state, vehicle, mealPlanSatisfied, setParty, setLuggage, setMealPlan, toggleMeal, togglePick, setDropoffText, markRouteVisited, reset],
+    [state, vehicle, mealPlanSatisfied, setParty, setLuggage, setMealPlan, toggleMeal, togglePick, setDropoffText, markRouteVisited, reset, trackStep],
   );
 
   return <GtsContext.Provider value={value}>{children}</GtsContext.Provider>;

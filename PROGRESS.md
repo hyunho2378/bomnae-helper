@@ -27,6 +27,15 @@
 | [D4] | 존 C4 BUILDER: setup 매칭(4케이스 규칙 일치·CarFront/Bus 실존 확인), build 3스텝(VenueGrid §30 — 2/3/4열·로테이션 중 선택 보존·cap 초과 자동 해제 없음·순서 배지), route ItineraryMap §32(번호핀·draw-on·fitBounds·목업 coord null 시 리스트 폴백), checkout §33(1뷰·하차 필수·프로토타입 Dialog·LoginGate·스탬프), Ticket GTS 모드, data/gts/api.js 목 창구(api.js 원본 미수정), gts 3언어 74키 |
 | [DR] | 검수: 임의 시각 정규식 신규 코드 0 / DEPRECATED 라이브 참조 0(주석·CSS 재사용 3건은 판정 무해) / 3언어 527키 동형 / HEX·localStorage·select·이모지·blur 신규·font-normal 전부 0 / 매트릭스 320·1280·3840 가로 스크롤 0·캡 1800·그리드 2→4열 / E2E: 게이트 양방향 + setup→build→route→checkout→ticket 전 구간 브라우저 통과 / gateRoutes.js 소비자 0 → DEPRECATED 주석 |
 
+### 검증 스프린트 (2026-07-22 · [V1] 커밋 대기)
+
+- 인증: DEMO_AUTH·DEMO_MODE 기본 false(플래그 보존·env 토글), 헤더 Sign in → 글래스 로그인 모달(구글 G SVG·No sign-up·연구 동의 3언어·소셜 1종), /gts/* = RequireAuth(비로그인 모달·닫으면 홈), 리뷰 작성 가드, returnTo = OAuth state HMAC(쿼리 비노출·내부 경로 검증), 아바타 팝 메뉴 → 로그아웃 확인 모달.
+- 트래킹: journey_events(멱등 migrate) + GtsContext 계측(sessionId uuid·스텝 duration) + POST /api/track(로그인 필수 401) — setup/meal_plan/meals/picks/route_confirm/pay_method/complete + login(OAuth 복귀 마커). 비차단 검증: /api/track 전면 실패 상태에서 setup→build→meals 전진 실측.
+- 관리자: ADMIN_EMAILS 3인 폴백(env 우선·소문자 비교 — 대문자 판별 통과 실측), requireAdmin(비로그인 401/비관리자 403 curl 증명), /admin = DAH RequireAdmin(비관리자·비로그인 404 위장 실측·헤더 링크 없음), civic useApi 폴링 15s + Refresh, Overview(스탯 4·행 확장 스텝 리스트)·Live timeline(신규 유입 1s 내 상단 삽입+플래시 1회 실측). 문자열 영어 하드카피(내부 도구 예외 주석).
+- E2E(세션 쿠키 시뮬): 8스텝 여정 → participants 집계(complete·TEST01·67.3s·스텝별 payload/소요) 대시보드 렌더 확인. 실 구글 왕복은 OAuth 화면 진입(state 포함·returnTo 비노출)까지 자동 검증 — 실계정 로그인은 사용자 확인 필요(자격 증명 입력 불가).
+- cross-origin 쿠키: sameSite none/secure(prod)·lax(로컬)·trust proxy 코드 증명. Privacy §2·§3 연구 기록 조항 3언어 + LEGAL_COPY.md. 3언어 652키 동형.
+- 미결: /admin의 Dock 라벨이 "Not found"로 표기(routeKey 미등록 — 관리자 존재 위장에 부합해 의도 유지).
+
 ### v4.4 수리 3건 + About 정밀 전사 (2026-07-22 · [I1])
 
 - 수리: ① /gts/build lg 1280×800 3스텝 내부 스크롤 0(패딩 32·카드 lg 136·gap 12 — 스크롤 대신 크기 축소, over 0 실측) ② 헤더 시각 간격 포렌식 — LangSwap 겹침 유령 폭(0~44px)이 원인, 내비 단일 언어 렌더로 [60,76,49]→[32,32,32] 오차 0(언어 전환 시 내비 폭 변동 트레이드오프 보고) ③ 데모 도착 8초.

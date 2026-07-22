@@ -59,6 +59,12 @@ export default {
     loginGate: {
       title: "로그인하고 확정하기",
       google: "Google로 계속하기",
+      noSignup: "가입 절차가 없습니다",
+      consent: "로그인하면 이 프로토타입에서의 선택 항목이 연구 목적으로 기록되는 데 동의하게 됩니다.",
+      logoutTitle: "로그아웃할까요?",
+      logoutBody: "언제든 Google로 다시 로그인할 수 있습니다.",
+      logoutConfirm: "로그아웃",
+      logoutCancel: "로그인 유지",
     },
     notFound: {
       title: "존재하지 않는 정류장입니다.",

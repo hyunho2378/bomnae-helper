@@ -52,3 +52,16 @@ CREATE TABLE IF NOT EXISTS review_likes (
 
 CREATE INDEX IF NOT EXISTS idx_gts_bookings_code ON gts_bookings(code);
 CREATE INDEX IF NOT EXISTS idx_reviews_created ON reviews(created_at DESC);
+
+-- [V1] 여정 트래킹 · 검증 스프린트(증거 엔진)
+CREATE TABLE IF NOT EXISTS journey_events (
+  id          SERIAL PRIMARY KEY,
+  user_id     INTEGER NOT NULL REFERENCES users(id),
+  session_id  UUID NOT NULL,
+  step        TEXT NOT NULL CHECK (step IN ('login','setup','meal_plan','meals','picks','route_confirm','pay_method','complete')),
+  payload     JSONB NOT NULL DEFAULT '{}',
+  duration_ms INTEGER,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS journey_events_user_idx ON journey_events (user_id, created_at);
+CREATE INDEX IF NOT EXISTS journey_events_created_idx ON journey_events (created_at DESC);
