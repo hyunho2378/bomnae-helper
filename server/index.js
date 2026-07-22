@@ -5,7 +5,7 @@ const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 
-const { router: authRouter } = require('./routes/auth');
+const { router: authRouter, clientOrigin } = require('./routes/auth');
 const gtsRouter = require('./routes/gts');
 const reviewsRouter = require('./routes/reviews');
 const transitRouter = require('./routes/transit');
@@ -15,7 +15,8 @@ const adminRouter = require('./routes/admin'); // [V1]
 const app = express();
 app.set('trust proxy', 1); // Render 등 프록시 뒤 secure 쿠키
 
-const allowed = new Set(['http://localhost:5173', process.env.CLIENT_ORIGIN].filter(Boolean));
+// [V1-fix3] env 원값 대신 정규화된 clientOrigin — env 오염('ttps://…') 시 CORS도 함께 깨지던 사고 방어
+const allowed = new Set(['http://localhost:5173', clientOrigin].filter(Boolean));
 app.use(
   cors({
     origin: (origin, cb) => cb(null, !origin || allowed.has(origin)),

@@ -35,6 +35,7 @@
 - E2E(세션 쿠키 시뮬): 8스텝 여정 → participants 집계(complete·TEST01·67.3s·스텝별 payload/소요) 대시보드 렌더 확인. 실 구글 왕복은 OAuth 화면 진입(state 포함·returnTo 비노출)까지 자동 검증 — 실계정 로그인은 사용자 확인 필요(자격 증명 입력 불가).
 - cross-origin 쿠키: sameSite none/secure(prod)·lax(로컬)·trust proxy 코드 증명. Privacy §2·§3 연구 기록 조항 3언어 + LEGAL_COPY.md. 3언어 652키 동형.
 - 미결: /admin의 Dock 라벨이 "Not found"로 표기(routeKey 미등록 — 관리자 존재 위장에 부합해 의도 유지).
+- 성공 리다이렉트 'ttps://…' 스킴 소실 수리: 코드 전수 점검 결과 서버에 앞 글자 자르는 지점 없음 — 원인 = Render CLIENT_ORIGIN env 값 자체 오염(붙여넣기 소실). 방어: clientOrigin 정규화(trim·끝 슬래시·스킴 불완전 시 https 재조립) + 기동 base 로그 + res.redirect 직전 최종 URL 1회 로그. 오염 입력 5종(ttps/tps/공백+슬래시/스킴 누락/localhost http) 실측 전부 정상.
 - OAuth token_exchange 수리: redirect_uri 단일 고정 — SERVER_ORIGIN env(trim·끝 슬래시 제거) 우선, 미설정 시 로컬호스트 외 https 강제(프록시 뒤 http 조립 사고 방지 · 인가·교환 동일 함수). 기동 시 "OAuth redirect_uri = …" 1회 로그(콘솔 등록값 문자 대조용). CLIENT_SECRET trim(공백·줄바꿈 = invalid_client). trust proxy 확인. 실측: 미설정/설정(공백+슬래시 오염 입력) 양 모드 조립 정확.
 - OAuth 콜백 duplicate key(users_email_key) 근본 수리: upsert를 이메일 기준(ON CONFLICT (email) · lower() 정규화)으로 교체 + 같은 sub가 다른 이메일 행에 잔류 시 선행 분리(행 보존·참조 유지). 콜백 catch는 reason 코드 로깅·응답({error:'oauth_failed', reason}) — 토큰·시크릿 비로깅. 실제 함수 호출 검증: 기존 행 갱신·연속 재로그인·신규 삽입(대문자→lower)·sub 이동 전부 통과, DB 중복·고아 행 없음 확인(병합 불필요).
 

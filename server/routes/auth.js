@@ -19,11 +19,19 @@ const serverOrigin = (req) => {
   return `${proto}://${host}`;
 };
 const redirectUri = (req) => `${serverOrigin(req)}/api/auth/google/callback`;
+// [V1-fix3] CLIENT_ORIGIN 정규화 — env 붙여넣기에서 스킴 앞 글자가 소실된 값('ttps://…')이
+// 성공 리다이렉트 base 로 그대로 이어붙어 깨지던 사고 방어: trim·끝 슬래시 제거 + 스킴 불완전 시 https 재조립.
+const clientOrigin = (() => {
+  const raw = (process.env.CLIENT_ORIGIN || '').trim().replace(/\/$/, '');
+  if (!raw || /^https?:\/\//.test(raw)) return raw;
+  return `https://${raw.replace(/^[a-z]*:?\/\//i, '')}`;
+})();
 // 기동 시 1회 출력 — 구글 콘솔 등록값과 문자 단위 대조용(시크릿 아님)
 console.log(
   '[auth] OAuth redirect_uri =',
   envOrigin ? `${envOrigin}/api/auth/google/callback` : '(SERVER_ORIGIN 미설정 — 요청 host 기반 · 로컬호스트 외 https 강제)',
 );
+console.log('[auth] 성공 리다이렉트 base =', clientOrigin || '(CLIENT_ORIGIN 미설정 — 상대 경로 리다이렉트)');
 
 // 데모 유저 upsert · 클라 AuthContext demoUser(demo@gts.ac.kr)와 동일 정체
 async function ensureDemoUser() {
@@ -115,9 +123,10 @@ router.get('/auth/google/callback', async (req, res) => {
     setUserCookie(res, user.id);
     // [V1] returnTo 복귀(+login=1 마커 — 클라가 login 트래킹 1회 발화)
     const returnTo = decodeState(req.query.state) || '/';
-    const base = process.env.CLIENT_ORIGIN || '';
     const sep = returnTo.includes('?') ? '&' : '?';
-    res.redirect(`${base}${returnTo}${sep}login=1`);
+    const dest = `${clientOrigin}${returnTo}${sep}login=1`;
+    console.log('[auth] 성공 리다이렉트 =', dest); // 스킴 온전성 확인용(시크릿 없음)
+    res.redirect(dest);
   } catch (e) {
     // 원인 삼키기 금지: 로그 = 단계 코드 + err.message(시크릿·토큰 없음), 응답 = 짧은 reason 코드만
     const reason = e.reason || (e.code ? `db_${e.code}` : 'unknown');
@@ -142,4 +151,4 @@ router.post('/logout', (req, res) => {
   res.json({ ok: true });
 });
 
-module.exports = { router, resolveUserId, DEMO_MODE, upsertOAuthUser };
+module.exports = { router, resolveUserId, DEMO_MODE, upsertOAuthUser, clientOrigin };
