@@ -9,6 +9,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import StepStage from '../components/gts/StepStage';
+import VenueDetail from '../components/gts/VenueDetail';
 import VenueGrid from '../components/gts/VenueGrid';
 import Container from '../components/layout/Container';
 import { mealCap, useGts, useGtsGuard } from '../context/GtsContext';
@@ -53,6 +54,8 @@ export default function GtsBuild() {
   const { mealPlan, meals, picks, setMealPlan, toggleMeal, togglePick, trackStep } = useGts();
   const [step, setStep] = useState('plan');
   const [capNotice, setCapNotice] = useState(false);
+  // [V2] 장소 상세 오버레이 · { venue, rect(FLIP 시작점), instant(키보드 개시), kind(meal|pick — 토글 대상 풀) }
+  const [detail, setDetail] = useState(null);
   const autoRef = useRef(0);
 
   // 풀은 조회 전용(venues.js 값 수정 금지) · 참조 고정으로 VenueGrid 페이지 리셋 방지
@@ -70,6 +73,9 @@ export default function GtsBuild() {
 
   // 정원 초과 시 자동 해제 금지 · 안내만(§9.4) — 수용되면 안내 해제
   const guarded = (toggle) => (id) => setCapNotice(!toggle(id));
+
+  // [V2] 돋보기 → 상세 오픈(그리드별 토글 대상 구분)
+  const openDetail = (kind) => (venue, rect, instant) => setDetail({ venue, rect, instant, kind });
 
   // [V1] 선택 벤처 id·이름 요약(계측 payload)
   const venueSummary = (ids) =>
@@ -173,6 +179,7 @@ export default function GtsBuild() {
               selected={meals}
               max={cap}
               onToggle={guarded(toggleMeal)}
+              onDetail={openDetail('meal')}
               badgeKeys={MEAL_BADGES}
             />
           </section>
@@ -201,6 +208,7 @@ export default function GtsBuild() {
                   selected={picks}
                   max={2}
                   onToggle={guarded(togglePick)}
+                  onDetail={openDetail('pick')}
                 />
               </section>
               <section className="flex flex-col gap-12">
@@ -212,12 +220,25 @@ export default function GtsBuild() {
                   selected={picks}
                   max={2}
                   onToggle={guarded(togglePick)}
+                  onDetail={openDetail('pick')}
                 />
               </section>
             </div>
           </section>
         )}
       </StepStage>
+
+      {/* [V2] 장소 상세 확장 카드 · StepStage 형제(포털은 body — 늦은 마운트라 StepStage 위) */}
+      {detail && (
+        <VenueDetail
+          venue={detail.venue}
+          originRect={detail.rect}
+          instant={detail.instant}
+          isSelected={(detail.kind === 'meal' ? meals : picks).includes(detail.venue.id)}
+          onToggle={() => (detail.kind === 'meal' ? toggleMeal : togglePick)(detail.venue.id)}
+          onClose={() => setDetail(null)}
+        />
+      )}
     </>
   );
 }

@@ -1,0 +1,23 @@
+/* VenueDetail · [V2] 상세 패널 블록 스태거 + 시트 크로스페이드 키프레임.
+   명세: 블록 opacity 0→1 + translateY(20px→0) 360ms · 블록당 70ms 계단(60~90 구간).
+   transform·opacity 만 — width|height|left|top 애니메이션 금지(FLIP 성능 담보).
+   reduced-motion·키보드 개시는 컴포넌트가 애니메이션 스타일 자체를 미부여(즉시 상태). */
+@keyframes bh-venue-block {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bh-venue-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

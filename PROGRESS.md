@@ -27,6 +27,16 @@
 | [D4] | 존 C4 BUILDER: setup 매칭(4케이스 규칙 일치·CarFront/Bus 실존 확인), build 3스텝(VenueGrid §30 — 2/3/4열·로테이션 중 선택 보존·cap 초과 자동 해제 없음·순서 배지), route ItineraryMap §32(번호핀·draw-on·fitBounds·목업 coord null 시 리스트 폴백), checkout §33(1뷰·하차 필수·프로토타입 Dialog·LoginGate·스탬프), Ticket GTS 모드, data/gts/api.js 목 창구(api.js 원본 미수정), gts 3언어 74키 |
 | [DR] | 검수: 임의 시각 정규식 신규 코드 0 / DEPRECATED 라이브 참조 0(주석·CSS 재사용 3건은 판정 무해) / 3언어 527키 동형 / HEX·localStorage·select·이모지·blur 신규·font-normal 전부 0 / 매트릭스 320·1280·3840 가로 스크롤 0·캡 1800·그리드 2→4열 / E2E: 게이트 양방향 + setup→build→route→checkout→ticket 전 구간 브라우저 통과 / gateRoutes.js 소비자 0 → DEPRECATED 주석 |
 
+### 장소 상세 확장 카드 (2026-07-22 · [V2] 커밋 대기)
+
+- FLIP 이식(포트폴리오 검증 기법): 돋보기(primary 원형 36 · ZoomIn 실존 확인 · absolute라 카드 높이 136/172 불변) → 원본 카드 rect 측정 → fixed inset-0 오버레이(z-sheet · 스크림 0→1 520ms)에서 승격 카드가 transform(translate+scale)만으로 center(scale min(vw·0.62/w, vh·0.82/h) · 520ms cubic-bezier(0.16,1,0.3,1)) → 좌 도킹(min(vw·0.34/w, vh·0.8/h) · 560ms) 연속 재생. 실측: 도킹 scale 1.7067 = 수식값 정확, 트랜지션 속성 transform·opacity 뿐(grep 0건), 총 1080ms ≤ 1.1s.
+- 우 패널(50% · rounded-l-xl · shadow.lg · scroll-quiet): ①장소명+heroFacts ②Brand story ③Guest reviews(별점+인용+메타 · "Sample reviews" 캡션 목업 명시) ④Store info(라벨 좌 2열) ⑤하단 CTA Select/Selected(해제 가능) — 블록 스태거 360ms·70ms 계단. 패널 선택↔그리드 동기(선택·해제 모두 닫힘 동기 실측), 정원 초과 거절 시 열림 유지+capFull 고지.
+- 닫기 3경로(X·스크림·Escape) 역재생 실측 · 열림 중 Escape 인터럽트 = 현재값 역재생 무깨짐 · Escape는 window 캡처+stopPropagation로 StepStage '뒤로' 격리(스텝 2/3 유지 실측) · 카드 본체=선택만/돋보기=상세만(상호 오염 0 실측, 형제 버튼 구조라 중첩 button 0).
+- 모바일 390: 중앙 확대(520)까지만 → 풀스크린 시트 크로스페이드(fixed inset-0 · 상단 40dvh surface 면+장소명 · 세로 스크롤 884px 실측 · 닫기 상단 우측 스크롤 중 고정·히트 가능 · CTA 풀폭 358 · safe-area). reduced-motion·키보드 개시(detail 0) = 전 트랜지션 none 즉시(동일 still 경로 실측).
+- 콘텐츠: Venue details.md v5 → i18n venues 네임스페이스(EN 원문 · ko/th 번역 · 96키×3 동형, 전체 748×3 동형). [VERIFY]는 UI 미표기·venueDetails.js 주석 이관. 문서 id 매핑: gamja-batt→gamja-farm · mullegil→jungdo-mullegil. blur 신규 0(스크림+솔리드 패널).
+- 명세 밖 결정(보고): 문서 미커버 실장소 5곳(soul-roastery·hwadong-2571·soyang-dam·soyang-maiden·art-circle)은 목업 공통 상세(Coming soon 한 벌) 재사용 — 창작 금지 계약상 유일한 무창작 폴백 · 선택 배지는 돋보기와 겹쳐 right-48로 이동.
+- 사용자 준비물: [VERIFY] 항목 실측(요금·시간·주소 6곳 — venueDetails.js 주석 목록) 후 i18n 값 갱신, 장소 실사진 확보(현재 무이미지 분기: surface 면+장소명 타이포), 문서 미커버 실장소 5곳 상세 문안(Venue details.md 추가), th 네이티브 검수.
+
 ### 검증 스프린트 (2026-07-22 · [V1] 커밋 대기)
 
 - 인증: DEMO_AUTH·DEMO_MODE 기본 false(플래그 보존·env 토글), 헤더 Sign in → 글래스 로그인 모달(구글 G SVG·No sign-up·연구 동의 3언어·소셜 1종), /gts/* = RequireAuth(비로그인 모달·닫으면 홈), 리뷰 작성 가드, returnTo = OAuth state HMAC(쿼리 비노출·내부 경로 검증), 아바타 팝 메뉴 → 로그아웃 확인 모달.

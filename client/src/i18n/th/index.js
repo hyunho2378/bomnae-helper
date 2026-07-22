@@ -6,6 +6,7 @@ import legal from './legal';
 import gts from './gts';
 import loop from './loop';
 import reviews from './reviews';
+import venues from './venues';
 
-const th = { ...common, ...gate, ...loop, ...brand, ...legal, ...gts, ...reviews };
+const th = { ...common, ...gate, ...loop, ...brand, ...legal, ...gts, ...reviews, ...venues };
 export default th;
