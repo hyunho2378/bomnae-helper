@@ -8,8 +8,22 @@ const { setUserCookie, readUserId, clearUserCookie } = require('../lib/session')
 const router = express.Router();
 const DEMO_MODE = process.env.DEMO_MODE === 'true'; // [V1] 기본 false — 시연 복귀는 env DEMO_MODE=true
 
-const serverOrigin = (req) => process.env.SERVER_ORIGIN || `${req.protocol}://${req.get('host')}`;
+// [V1-fix2] redirect_uri 단일 고정 — 프록시 뒤 req.protocol='http' 조립로 구글 등록값(https)과 불일치하던 사고 방지.
+// SERVER_ORIGIN(권장: https://gts-server-pnzt.onrender.com)이 있으면 그 값만 사용 · 없으면 로컬호스트 외 https 강제.
+// 인가 요청·토큰 교환 모두 같은 redirectUri()를 쓰므로 양쪽 동일 보장.
+const envOrigin = (process.env.SERVER_ORIGIN || '').trim().replace(/\/$/, '');
+const serverOrigin = (req) => {
+  if (envOrigin) return envOrigin;
+  const host = req.get('host');
+  const proto = /^(localhost|127\.0\.0\.1)/.test(host) ? req.protocol : 'https';
+  return `${proto}://${host}`;
+};
 const redirectUri = (req) => `${serverOrigin(req)}/api/auth/google/callback`;
+// 기동 시 1회 출력 — 구글 콘솔 등록값과 문자 단위 대조용(시크릿 아님)
+console.log(
+  '[auth] OAuth redirect_uri =',
+  envOrigin ? `${envOrigin}/api/auth/google/callback` : '(SERVER_ORIGIN 미설정 — 요청 host 기반 · 로컬호스트 외 https 강제)',
+);
 
 // 데모 유저 upsert · 클라 AuthContext demoUser(demo@gts.ac.kr)와 동일 정체
 async function ensureDemoUser() {
@@ -86,7 +100,7 @@ router.get('/auth/google/callback', async (req, res) => {
       body: new URLSearchParams({
         code,
         client_id: process.env.GOOGLE_CLIENT_ID,
-        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        client_secret: (process.env.GOOGLE_CLIENT_SECRET || '').trim(), // 앞뒤 공백·줄바꿈 = invalid_client 원인
         redirect_uri: redirectUri(req),
         grant_type: 'authorization_code',
       }),
