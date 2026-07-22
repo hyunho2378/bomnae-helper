@@ -1,9 +1,9 @@
-// [V1] 관리자 판별 · env 없이도 동작하는 3인 폴백, env(ADMIN_EMAILS)가 있으면 env가 이긴다.
+// [V1] 관리자 판별 · env 없이도 동작하는 4인 폴백, env(ADMIN_EMAILS)가 있으면 env가 이긴다.
 // 이메일 비교는 항상 소문자(대문자 표기 계정도 판별 통과).
 const pool = require('../db/pool');
 const { readUserId } = require('./session');
 
-const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'smmilk2378@gmail.com,mijuhur@gmail.com,mv.tn04@gmail.com')
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'smmilk2378@gmail.com,mijuhur@gmail.com,mv.tn04@gmail.com,mardoto20220@gmail.com')
   .split(',')
   .map((s) => s.trim().toLowerCase());
 

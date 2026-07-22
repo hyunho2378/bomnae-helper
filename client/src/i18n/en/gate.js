@@ -8,7 +8,7 @@ export default {
   home: {
     hero: {
       title: "Chuncheon, on your terms.",
-      sub: "One trip, zero missing links. Plan the ride in, then build your day inside.",
+      sub: "Your trip, zero missing links. Choose your ride and create your own adventure.",
       ctaGate: "Plan my route",
       ctaBuild: "Build my day",
       slides: {

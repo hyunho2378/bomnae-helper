@@ -106,6 +106,20 @@ export default function Header() {
                   className={`pop-panel origin-top-right ${instantPop ? 'pop-instant' : ''} absolute right-0 top-full z-dialog mt-8 flex w-max flex-col rounded-md bg-white p-8 shadow-md ${menuClosing ? 'pop-panel-exit' : ''}`}
                 >
                   <p className="px-12 py-8 text-caption font-medium text-inkMeta">{user.email}</p>
+                  {/* 관리자 전용 · 서버 판정(/api/me isAdmin)만 신뢰 — 비관리자는 DOM에도 미렌더(존재 비노출).
+                      라벨은 관리자 내부 도구라 영어 하드카피(AdminPage와 동일 예외) */}
+                  {user.isAdmin && (
+                    <a
+                      href="/admin"
+                      target="_blank"
+                      rel="noopener"
+                      role="menuitem"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex min-h-44 w-full items-center rounded-sm px-12 text-left text-small font-semibold text-ink transition-colors duration-fast hover:bg-surface"
+                    >
+                      Dashboard
+                    </a>
+                  )}
                   <button
                     type="button"
                     role="menuitem"
