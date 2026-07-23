@@ -16,6 +16,10 @@ import NotFound from './NotFound';
 const VENUE_NAME = Object.fromEntries(venues.map((v) => [v.id, v.name.en]));
 const venueName = (id) => VENUE_NAME[id] ?? id;
 
+// [V6] 표시 순서 · 아래 계정은 목록 맨 아래로(내부·지인 테스터 · 데이터는 그대로 노출 · 요청 반영). 그 외는 서버 최신순.
+const DEMOTE_EMAILS = ['hlee10@schools.nyc.gov', 'fudai.t@sgs.tu.ac.th', 'mnx.ts04@gmail.com'];
+const isDemoted = (email) => DEMOTE_EMAILS.includes(String(email ?? '').toLowerCase());
+
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001';
 
 // civic 방식 폴링 훅 · poll ms 간격 자동 + 수동 reload — 실패 시 마지막 데이터 유지
@@ -81,9 +85,9 @@ const payloadSummary = (step, payload = {}) => {
   return '';
 };
 
-// [V6] 대시보드 재구성 · 컬럼: 이름 · Started · Ended · Duration · Completed(예약 유무 O/X).
+// [V6] 대시보드 재구성 · 컬럼: 이름 · Started · Ended · Duration (Completed 컬럼 제거 · 요청).
 //   중간 단계 컬럼은 화면에서 빼고(데이터는 보존) 행 클릭 시 전체 이벤트 타임라인 확장.
-const COLS = 'grid-cols-[1fr_104px_104px_96px_72px_24px]';
+const COLS = 'grid-cols-[1fr_112px_112px_112px_24px]';
 
 function ParticipantRow({ p }) {
   const [open, setOpen] = useState(false);
@@ -104,9 +108,6 @@ function ParticipantRow({ p }) {
         <span className="font-display text-caption text-inkSec">{fmtDateTime(p.started_at)}</span>
         <span className="font-display text-caption text-inkSec">{fmtDateTime(p.last_at)}</span>
         <span className="font-display font-semibold">{rowDuration(p)}</span>
-        <span className={`font-display font-bold ${p.completed ? 'text-green' : 'text-inkMeta'}`}>
-          {p.completed ? 'O' : 'X'}
-        </span>
         <ChevronDown
           size={16}
           aria-hidden="true"
@@ -148,7 +149,9 @@ function ParticipantRow({ p }) {
 
 function Overview() {
   const { data, error, loadedAt } = useApi('/api/admin/participants', { poll: 15000 });
-  const rows = data?.participants ?? [];
+  const raw = data?.participants ?? [];
+  // [V6] 지정 계정(DEMOTE_EMAILS)은 맨 아래로 · 나머지는 서버 최신순 유지(요청)
+  const rows = [...raw.filter((r) => !isDemoted(r.email)), ...raw.filter((r) => isDemoted(r.email))];
   const excludedCount = data?.excludedCount ?? 0;
   const completed = rows.filter((r) => r.completed).length;
   // [V6] 평균 체류 = 이벤트 2개 이상 유저의 (Ended − Started) 평균(1개 이하는 머문 시간 불명이라 제외).
@@ -177,15 +180,14 @@ function Overview() {
       {error && <p className="text-small font-medium text-spice">Load failed: {error}</p>}
       {/* [V6] 참가자별 여정 표(최신 활동순 · 행 클릭 = 전체 타임라인 확장) */}
       <div className="overflow-x-auto rounded-lg bg-white shadow-sm">
-        <div className={`grid min-w-[680px] ${COLS} gap-12 px-16 py-12 text-caption font-semibold uppercase tracking-eyebrow text-inkMeta`}>
+        <div className={`grid min-w-[760px] ${COLS} gap-12 px-16 py-12 text-caption font-semibold uppercase tracking-eyebrow text-inkMeta`}>
           <span>Participant</span>
           <span>Started</span>
           <span>Ended</span>
           <span>Duration</span>
-          <span>Completed</span>
           <span />
         </div>
-        <div className="flex min-w-[680px] flex-col divide-y divide-line">
+        <div className="flex min-w-[760px] flex-col divide-y divide-line">
           {rows.map((p) => (
             <ParticipantRow key={p.id} p={p} />
           ))}
