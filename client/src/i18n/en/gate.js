@@ -60,6 +60,7 @@ export default {
       title: "We already ran it.",
       body: "A real van, real riders, a real line. Filmed on the road, not mocked up.",
       cta: "See the proof",
+      alt: "GTS van on a real Chuncheon pilot run", // [V10] van-hero 이미지 대체 텍스트
     },
   },
   gate: {

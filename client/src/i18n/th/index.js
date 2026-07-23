@@ -8,6 +8,8 @@ import loop from './loop';
 import reviews from './reviews';
 import travelLog from './travelLog';
 import venues from './venues';
+import profile from './profile'; // [V10]
+import team from './team'; // [V10]
 
-const th = { ...common, ...gate, ...loop, ...brand, ...legal, ...gts, ...reviews, ...venues, ...travelLog };
+const th = { ...common, ...gate, ...loop, ...brand, ...legal, ...gts, ...reviews, ...venues, ...travelLog, ...profile, ...team };
 export default th;

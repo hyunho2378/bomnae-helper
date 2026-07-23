@@ -9,12 +9,12 @@ import { useAuth } from '../../context/AuthContext';
 import { useLang } from '../../i18n/LangContext';
 import LangSwap from '../../i18n/LangSwap';
 import { spacing } from '../../tokens';
+import Avatar from '../ui/Avatar';
 import LogoMark from '../../assets/logo-mark.svg?react';
 import { routeKeyFromPath } from '../layout/PageLayout';
 
-// [V3] 5항목: About | Trip Planner | Tour Builder | Travel Log | Reviews — 헤더와 동일 세트
+// [V10] 4항목: Trip Planner | Tour Builder | Travel Log | Reviews — 헤더와 동일 세트(About 비공개 제거)
 const MENU = [
-  { to: '/about', k: 'nav.about' },
   { to: '/gate', k: 'nav.gate' },
   { to: '/gts', k: 'nav.gts' },
   { to: '/travel-log', k: 'nav.travelLog' },
@@ -131,6 +131,19 @@ export default function GlassDock() {
                   <LangSwap k={k} />
                 </NavLink>
               ))}
+              {/* [V10] 로그인 시 Profile 진입(모바일) */}
+              {user && (
+                <NavLink
+                  to="/profile"
+                  className={({ isActive }) =>
+                    `flex min-h-44 items-center rounded-md px-16 text-small font-medium transition-colors duration-fast ${
+                      isActive ? 'text-primary' : 'text-inkSec hover:text-ink'
+                    }`
+                  }
+                >
+                  <LangSwap k="nav.profile" />
+                </NavLink>
+              )}
             </nav>
             <div className="flex items-center justify-between gap-16 p-8 px-16">
               {/* v3.1 언어 행 · 각 언어의 자기 표기(전 사전 동일 값, 시프트 0). LangToggle 대체 */}
@@ -155,9 +168,7 @@ export default function GlassDock() {
                   onClick={logout}
                   className="flex min-h-44 items-center gap-8 text-small font-medium text-inkSec"
                 >
-                  <span className="flex h-32 w-32 items-center justify-center rounded-pill bg-primary text-caption font-semibold text-white">
-                    {user.name[0]}
-                  </span>
+                  <Avatar user={user} size={32} />
                   <LangSwap k="nav.logout" />
                 </button>
               ) : (

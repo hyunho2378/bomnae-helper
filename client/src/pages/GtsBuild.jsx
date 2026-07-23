@@ -11,9 +11,12 @@ import { useNavigate } from 'react-router-dom';
 import StepStage from '../components/gts/StepStage';
 import VenueDetail from '../components/gts/VenueDetail';
 import VenueGrid from '../components/gts/VenueGrid';
+import CourseQueue from '../components/gts/CourseQueue';
 import Container from '../components/layout/Container';
 import { mealCap, useGts, useGtsGuard } from '../context/GtsContext';
 import { venues } from '../data/gts/venues';
+import { venueCoord } from '../data/gts/mockCoords';
+import { courseKm, courseMinutes } from '../data/gts/distance';
 import LangSwap from '../i18n/LangSwap';
 import { motion } from '../tokens';
 
@@ -70,6 +73,14 @@ export default function GtsBuild() {
   const cap = mealCap(mealPlan);
   const steps = mealPlan === 'none' ? ['plan', 'picks'] : ['plan', 'meals', 'picks'];
   const stepIndex = Math.max(0, steps.indexOf(step));
+
+  // [V9] picks 큐(food·activity 공용) 파생 — 큐 마지막 좌표 = 남은 후보 재정렬 기준(양 풀 공유),
+  //   좌표열 = 큐 합계 거리·시간 배지. 큐가 비면 sortCoord null(기본 정렬 복귀).
+  const picksVenues = picks.map((id) => venues.find((v) => v.id === id)).filter(Boolean);
+  const queueCoords = picksVenues.map(venueCoord);
+  const sortCoord = queueCoords.length ? queueCoords[queueCoords.length - 1] : null;
+  const courseKmVal = courseKm(queueCoords);
+  const courseMin = courseMinutes(courseKmVal);
 
   // 정원 초과 시 자동 해제 금지 · 안내만(§9.4) — 수용되면 안내 해제
   const guarded = (toggle) => (id) => setCapNotice(!toggle(id));
@@ -198,6 +209,7 @@ export default function GtsBuild() {
                 <LangSwap k="gts.build.capFull" as="p" className="text-small font-medium text-spice" />
               )}
             </div>
+            {/* [V9] food·activity 풀은 절대 섞지 않음 · 각 풀 안에서만 큐 마지막 좌표 기준 재정렬 */}
             <div className="grid gap-16 lg:grid-cols-2 lg:gap-24">
               <section className="flex flex-col gap-12">
                 <LangSwap k="gts.build.tabFoodspace" as="h3" className="text-body font-semibold" />
@@ -209,6 +221,8 @@ export default function GtsBuild() {
                   max={2}
                   onToggle={guarded(togglePick)}
                   onDetail={openDetail('pick')}
+                  queueMode
+                  sortCoord={sortCoord}
                 />
               </section>
               <section className="flex flex-col gap-12">
@@ -221,9 +235,13 @@ export default function GtsBuild() {
                   max={2}
                   onToggle={guarded(togglePick)}
                   onDetail={openDetail('pick')}
+                  queueMode
+                  sortCoord={sortCoord}
                 />
               </section>
             </div>
+            {/* [V9] 선택 큐 · food/activity 공용(유일한 공유) · 순서 유지 + X 제거 + 거리·시간 배지 */}
+            <CourseQueue items={picksVenues} onRemove={togglePick} km={courseKmVal} minutes={courseMin} />
           </section>
         )}
       </StepStage>

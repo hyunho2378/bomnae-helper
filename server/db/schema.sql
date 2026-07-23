@@ -98,3 +98,12 @@ DO $$ BEGIN
     ALTER TABLE users ADD CONSTRAINT users_username_key UNIQUE (username);
   END IF;
 END $$;
+
+-- [V10] 예약 소프트 취소 · status/cancelled_at(멱등). 기존 행은 'confirmed' 기본값으로 채워짐.
+--   취소는 행 삭제 아님(감사·환불 이력 보존) — status='cancelled' + cancelled_at 시각.
+--   avatar 사진(Vercel Blob)은 신규 컬럼 없이 기존 users.avatar 재사용(구글 picture와 동일 URL 저장소).
+ALTER TABLE gts_bookings ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'confirmed';
+ALTER TABLE gts_bookings ADD COLUMN IF NOT EXISTS cancelled_at TIMESTAMPTZ;
+ALTER TABLE gts_bookings DROP CONSTRAINT IF EXISTS gts_bookings_status_check;
+ALTER TABLE gts_bookings ADD CONSTRAINT gts_bookings_status_check
+  CHECK (status IN ('confirmed', 'cancelled'));

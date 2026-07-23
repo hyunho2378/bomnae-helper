@@ -101,6 +101,42 @@ export function AuthProvider({ children }) {
         }
         setUser(null);
       },
+      // [V10] 프로필 사진 업로드 · 서버 경유(토큰 비노출) · 성공 시 헤더 아바타 즉시 반영.
+      //   클라 선검증(이미지·5MB) 후 원본 바이트를 raw body로 전송(서버 express.raw 수신).
+      uploadAvatar: async (file) => {
+        if (!file || !file.type?.startsWith('image/')) return { ok: false, error: 'unsupported_type' };
+        if (file.size > 5 * 1024 * 1024) return { ok: false, error: 'too_large' };
+        try {
+          const res = await fetch(`${API_BASE}/api/profile/avatar`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': file.type },
+            body: file,
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) return { ok: false, error: data.error || 'upload_failed' };
+          setUser((u) => (u ? { ...u, avatar: data.avatar } : u));
+          return { ok: true, avatar: data.avatar };
+        } catch {
+          return { ok: false, error: 'network' };
+        }
+      },
+      // [V10] 비밀번호 변경 · 현재 비밀번호 확인 후 새 규칙 검증(서버 최종 판정). {ok, error?} 반환.
+      changePassword: async (currentPin, newPin) => {
+        try {
+          const res = await fetch(`${API_BASE}/api/auth/change-password`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ currentPin, newPin }),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) return { ok: false, error: data.error || 'change_failed' };
+          return { ok: true };
+        } catch {
+          return { ok: false, error: 'network' };
+        }
+      },
     }),
     [user, ready],
   );

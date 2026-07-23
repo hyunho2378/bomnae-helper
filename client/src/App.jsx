@@ -9,7 +9,9 @@ import { AuthProvider } from './context/AuthContext';
 import { BookingProvider } from './context/BookingContext';
 import { GtsProvider } from './context/GtsContext';
 import { LangProvider } from './i18n/LangContext';
-import About from './pages/About';
+// [V10] About는 비공개(HIDDEN) — 라우트가 404 위장을 렌더하므로 import하지 않음(pages/About.jsx는 보존).
+import Team from './pages/Team'; // [V10]
+import Profile from './pages/Profile'; // [V10]
 import Gate from './pages/Gate';
 import GtsBuild from './pages/GtsBuild';
 import GtsCheckout from './pages/GtsCheckout';
@@ -46,7 +48,11 @@ export default function App() {
                     <Route path="/travel-log" element={<TravelLog />} />
                     <Route path="/reviews" element={<Reviews />} />
                     <Route path="/admin" element={<AdminPage />} />
-                    <Route path="/about" element={<About />} />
+                    {/* [V10] 프로필(로그인 필수) · 팀 소개(공개) */}
+                    <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
+                    <Route path="/team" element={<Team />} />
+                    {/* [V10] About HIDDEN · 접근 시 404 위장(라우트·파일 보존 · 내비/푸터 링크 제거) */}
+                    <Route path="/about" element={<NotFound />} />
                     <Route path="/legal/privacy" element={<LegalPrivacy />} />
                     <Route path="/legal/terms" element={<LegalTerms />} />
                     {/* v4 리다이렉트 · 구 링크 생존(§9.1) */}

@@ -13,6 +13,7 @@ import StepIndicator from '../components/gts/StepIndicator';
 import Button from '../components/ui/Button';
 import Stepper from '../components/ui/Stepper';
 import { useGts } from '../context/GtsContext';
+import { OFFICIAL_EMAIL, PARTY_CONTACT_THRESHOLD } from '../config';
 import { useLang } from '../i18n/LangContext';
 import LangSwap from '../i18n/LangSwap';
 
@@ -40,6 +41,8 @@ export default function GtsSetup() {
   }, [travelDate, setTravelDate]);
 
   const Icon = vehicle ? VEHICLE_ICON[vehicle] : CarFront;
+  // [V9] 9명 이상 단체는 이메일 문의(Build 비활성 + 안내) · 8 이하로 내리면 즉시 복구
+  const overCap = (party ?? 1) >= PARTY_CONTACT_THRESHOLD;
 
   return (
     <Container>
@@ -118,9 +121,10 @@ export default function GtsSetup() {
           </div>
         </section>
 
-        {/* [H2-10] CTA · 우측 컬럼 바로 아래 우측 정렬(고아 좌측 버튼 금지) */}
-        <div className="flex justify-end lg:col-start-2">
+        {/* [H2-10] CTA · 우측 컬럼 바로 아래 우측 정렬(고아 좌측 버튼 금지) · [V9] 9명+ 비활성+안내 */}
+        <div className="flex flex-col items-end gap-8 lg:col-start-2">
           <Button
+            disabled={overCap}
             onClick={() => {
               // [V1] setup 완료 계측(비차단) · [V3] 날짜 포함
               trackStep('setup', { party: party ?? 1, luggage, vehicle, travelDate });
@@ -130,6 +134,18 @@ export default function GtsSetup() {
           >
             <LangSwap k="gts.setup.cta" />
           </Button>
+          {/* [V9] 9명 이상 단체 문의 안내 · 버튼 아래 · 실제 메일은 config OFFICIAL_EMAIL */}
+          {overCap && (
+            <p className="text-right text-small font-medium text-inkSec" aria-live="polite">
+              {t('gts.setup.partyCapHelp')}{' '}
+              <a
+                href={`mailto:${OFFICIAL_EMAIL}`}
+                className="font-semibold text-primary underline underline-offset-4"
+              >
+                {OFFICIAL_EMAIL}
+              </a>
+            </p>
+          )}
         </div>
         </div>
       </div>

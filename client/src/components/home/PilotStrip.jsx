@@ -1,34 +1,44 @@
-// Proof 스트립 · IA §2.1.6 v3.1: 실운행 썸네일 + "We already ran it." → /about#proof
-// (Pilot 페이지가 About §Proof로 흡수됨 · COMPONENTS v3.1 존 B 행).
-// navy는 강대비 면으로 허용(DESIGN §2). 갤러리 데이터는 data/pilot.js(정적 콘텐츠 ·
-// api.js 계약에 파일럿 게터가 없어 직접 import · AR 라운드 확정 사항).
+// Proof 스트립 · [V10] van-hero(/images/home/van-hero.jpg)를 히어로 이미지로 연결.
+//   데스크톱 풀블리드(고정 높이) / 모바일 16:9 크롭 · 하단 어두운 그라데이션(0→0.55)으로 텍스트 가독성 확보.
+//   alt = 3언어 사전 키(home.proof.alt) · 파일 부재/로드 실패 시 기존 갤러리 플레이스홀더로 폴백.
+//   About 비공개([V10] §3)로 링크 목적지는 /gts(Tour Builder)로 변경 — /about#proof는 이제 404 위장.
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useLang } from '../../i18n/LangContext';
 import LangSwap from '../../i18n/LangSwap';
 import { gallery } from '../../data/pilot';
 
+const HERO_SRC = '/images/home/van-hero.jpg';
+
 export default function PilotStrip() {
-  const { lang } = useLang();
-  const thumb = gallery[0];
+  const { t } = useLang();
+  // van-hero 부재 시 기존 플레이스홀더(갤러리 첫 컷)로 폴백 · 그것도 없으면 bg-surface 노출
+  const [src, setSrc] = useState(HERO_SRC);
 
   return (
     <Link
-      to="/about#proof"
-      // v3.2 §16.1: navy 면은 티켓 전용 · 크롬 단일색(primary)으로 교체([CR] 수정)
-      className="block overflow-hidden rounded-lg bg-primary text-white shadow-sm transition-all duration-fast hover:-translate-y-0.5 hover:shadow-md"
+      to="/gts"
+      className="group relative block overflow-hidden rounded-lg shadow-sm transition-all duration-fast hover:-translate-y-0.5 hover:shadow-md"
     >
-      <div className="grid md:grid-cols-2">
-        {/* PLACEHOLDER · 파일럿 실운행 촬영분으로 교체(3~4일차, PROGRESS 준비물) */}
+      <div className="relative aspect-[16/9] w-full sm:aspect-auto sm:h-[440px]">
         <img
-          src={thumb.photo}
-          alt={lang === 'ko' ? thumb.alt_ko : thumb.alt_en}
+          src={src}
+          alt={t('home.proof.alt')}
           loading="lazy"
-          className="aspect-video h-full w-full bg-surface object-cover"
+          onError={() => src !== gallery[0].photo && setSrc(gallery[0].photo)}
+          className="h-full w-full bg-surface object-cover"
         />
-        <div className="flex flex-col justify-center gap-16 p-24 lg:p-48">
-          <LangSwap k="home.proof.body" as="p" className="text-body font-medium" />
-          <span className="inline-flex min-h-44 items-center gap-8 font-semibold">
+        {/* 하단 어두운 그라데이션(투명 0 → scrim 0.55) — 오버레이 텍스트 가독성 */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 bottom-0 h-2/3"
+          style={{ background: 'linear-gradient(to top, rgba(20,23,46,0.55), rgba(20,23,46,0))' }}
+        />
+        {/* 좌하단 오버레이 텍스트 · body + CTA(흰색) */}
+        <div className="absolute inset-x-0 bottom-0 flex flex-col gap-12 p-24 lg:p-40">
+          <LangSwap k="home.proof.body" as="p" className="max-w-[560px] text-body font-medium text-white" />
+          <span className="inline-flex min-h-44 items-center gap-8 font-semibold text-white">
             <LangSwap k="home.proof.cta" />
             <ArrowRight size={20} aria-hidden="true" />
           </span>

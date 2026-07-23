@@ -50,6 +50,8 @@ export default {
       luggageToggle: "Luggage storage",
       matchTitle: "Your ride",
       cta: "Build my day",
+      // [V9] 9명 이상 단체 문의(뒤에 OFFICIAL_EMAIL 링크)
+      partyCapHelp: "Groups of 9 or more, please contact us by email:",
     },
     build: {
       title: "Build your day",
@@ -89,6 +91,11 @@ export default {
       tabActivity: "Activities",
       counterLabel: "selected",
       capFull: "Your picks are full. Unselect one first.",
+      // [V9] 선택 큐 + 거리 배지
+      queueTitle: "Your course",
+      queueRemove: "Remove from course",
+      approx: "About",
+      minUnit: "min",
       reason: {
         plan: "Choose a meal plan to continue",
         meals: "Finish your meal picks to continue",

@@ -59,6 +59,34 @@ export async function getTravelLogs() {
   }
 }
 
+// [V10] 내 예약 목록 · 로그인 세션 기준(서버가 user_id로 필터) · 최신순 · 취소 포함(status·cancellable 동반).
+//   서버 부재·비로그인(401) 시 빈 배열(프로필은 "예약 없음" 표시).
+export async function getMyBookings() {
+  try {
+    const res = await fetch(`${API_BASE}/api/gts/bookings`, { credentials: 'include' });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return Array.isArray(data.bookings) ? data.bookings : [];
+  } catch {
+    return [];
+  }
+}
+
+// [V10] 예약 취소(소프트) · {ok, error?} 반환. too_late = 48시간 규칙 위반, forbidden = 소유 아님.
+export async function cancelGtsBooking(code) {
+  try {
+    const res = await fetch(`${API_BASE}/api/gts/bookings/${String(code).toUpperCase()}/cancel`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) return { ok: false, error: data.error || 'cancel_failed' };
+    return { ok: true, status: data.status };
+  } catch {
+    return { ok: false, error: 'network' };
+  }
+}
+
 export async function getGtsBooking(id) {
   const key = String(id).toUpperCase();
   try {

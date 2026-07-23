@@ -5,17 +5,19 @@
 import { Link } from 'react-router-dom';
 import LangSwap from '../../i18n/LangSwap';
 import Container from '../layout/Container';
+import { useLang } from '../../i18n/LangContext';
 import LogoMark from '../../assets/logo-mark.svg?react';
 
-// v4(IA §9.1): 내비 3항목과 동일 세트 — 퇴역 라우트 링크 잔존 금지
+// [V10] Explore: About 제거([3]) · Travel Log를 Reviews 위에 추가([5]).
 const EXPLORE = [
-  { to: '/about', k: 'nav.about' },
   { to: '/gate', k: 'nav.gate' },
   { to: '/gts', k: 'nav.gts' },
+  { to: '/travel-log', k: 'nav.travelLog' },
   { to: '/reviews', k: 'nav.reviews' },
 ];
 
 export default function Footer() {
+  const { t } = useLang();
   return (
     <footer className="bg-primary text-white">
       <Container>
@@ -58,8 +60,13 @@ export default function Footer() {
           </div>
         </div>
         <div className="flex flex-col gap-8 pb-24 sm:flex-row sm:items-center sm:justify-between">
+          {/* [V10] "Team Bomnae Helper"를 /team 링크로 · 앞뒤 텍스트는 pre/post(t로 유령폭 회피) */}
           <p className="text-caption font-medium">
-            <LangSwap k="common.footer.copyright" />
+            {t('common.footer.copyrightPre')}
+            <Link to="/team" className="font-semibold underline underline-offset-2 hover:opacity-80">
+              {t('common.footer.teamName')}
+            </Link>
+            {t('common.footer.copyrightPost')}
           </p>
           <div className="flex items-center gap-24">
             {/* 내부 경로지만 새 탭 의도라 a 태그 허용(PATTERNS §17 유일 예외) */}

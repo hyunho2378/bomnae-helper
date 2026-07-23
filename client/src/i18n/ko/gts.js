@@ -50,6 +50,8 @@ export default {
       luggageToggle: "짐 보관",
       matchTitle: "매칭된 차량",
       cta: "하루 조립하러 가기",
+      // [V9] 9명 이상 단체 문의(뒤에 OFFICIAL_EMAIL 링크)
+      partyCapHelp: "9명 이상 단체는 이메일로 문의해 주세요:",
     },
     build: {
       title: "하루 조립",
@@ -89,6 +91,11 @@ export default {
       tabActivity: "액티비티",
       counterLabel: "선택됨",
       capFull: "정원이 찼습니다. 먼저 고른 곳을 해제해 주세요.",
+      // [V9] 선택 큐 + 거리 배지
+      queueTitle: "선택한 코스",
+      queueRemove: "코스에서 빼기",
+      approx: "약",
+      minUnit: "분",
       reason: {
         plan: "식사 플랜을 선택하면 넘어갈 수 있어요",
         meals: "식사 장소 선택을 마치면 넘어갈 수 있어요",

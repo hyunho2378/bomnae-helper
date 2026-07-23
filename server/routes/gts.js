@@ -3,8 +3,17 @@ const express = require('express');
 const pool = require('../db/pool');
 const { matchVehicle, computePassTotal } = require('../services/fares'); // [V7] 이용권 재계산(computeTotal DEPRECATED)
 const { resolveUserId } = require('./auth');
+const { readUserId } = require('../lib/session'); // [V10] 내 예약 조회·취소 소유권 판정
 
 const router = express.Router();
+
+// [V10] 여행일 기준 48시간 전이면 취소 가능 · travel_date(YYYY-MM-DD)를 KST 자정 시작 시각으로 해석.
+//   날짜 미지정 예약은 시점 제약을 증명할 수 없어 취소 허용(사용자 보수적).
+function cancellable(travelDateStr) {
+  if (!travelDateStr) return true;
+  const start = new Date(`${travelDateStr}T00:00:00+09:00`).getTime();
+  return start - Date.now() > 48 * 60 * 60 * 1000;
+}
 
 // [V5-frictionless] 회귀 방지 플래그(기본 false = 무마찰) · 운영 전환 시 env로 재필수화.
 //   REQUIRE_DROPOFF=true → 하차 지점 미입력 400 / REQUIRE_PAYMETHOD=true → 결제 수단 미선택 400.
@@ -88,6 +97,7 @@ router.get('/gts/bookings/:code', async (req, res) => {
       payMethod: b.pay_method,
       total: b.total,
       travelDate: b.travel_date_str, // [V3]
+      status: b.status, // [V10]
       // [V7] 분리 내역 · 구 예약은 pass_type NULL → 티켓 "Not specified"
       passType: b.pass_type,
       passAmount: b.pass_amount,
@@ -97,13 +107,65 @@ router.get('/gts/bookings/:code', async (req, res) => {
   );
 });
 
-// 클라 Ticket 계약(존 C4·C5)과 동일 모양: id=code, kind:'gts', status:'confirmed'
+// [V10] 내 예약 목록 · 로그인 필수 · 최신순. 취소 포함(status로 구분) · cancellable 플래그 동반.
+router.get('/gts/bookings', async (req, res) => {
+  const uid = readUserId(req);
+  if (!uid) return res.status(401).json({ error: 'unauthorized' });
+  const { rows } = await pool.query(
+    `SELECT *, to_char(travel_date, 'YYYY-MM-DD') AS travel_date_str
+       FROM gts_bookings WHERE user_id = $1 ORDER BY created_at DESC`,
+    [uid],
+  );
+  const bookings = rows.map((b) => ({
+    ...toBooking({
+      code: b.code.trim(),
+      party: b.party,
+      luggage: b.luggage,
+      vehicleType: b.vehicle_type,
+      mealPlan: b.meal_plan,
+      itinerary: b.picks,
+      dropoffText: b.dropoff_text,
+      payMethod: b.pay_method,
+      total: b.total,
+      travelDate: b.travel_date_str,
+      status: b.status,
+      passType: b.pass_type,
+      passAmount: b.pass_amount,
+      luggageAmount: b.luggage_amount,
+      totalAmount: b.total_amount,
+    }),
+    createdAt: b.created_at,
+    // 취소 버튼 활성 조건 = 확정 상태 + 여행일 48시간 전(서버가 최종 판정 · 클라는 표시용)
+    cancellable: b.status === 'confirmed' && cancellable(b.travel_date_str),
+  }));
+  res.json({ bookings });
+});
+
+// [V10] 예약 취소(소프트) · 로그인 + 소유권 필수 · 48시간 규칙 서버 강제 · status='cancelled'.
+router.post('/gts/bookings/:code/cancel', async (req, res) => {
+  const uid = readUserId(req);
+  if (!uid) return res.status(401).json({ error: 'unauthorized' });
+  const code = String(req.params.code).toUpperCase();
+  const { rows } = await pool.query(
+    "SELECT id, user_id, status, to_char(travel_date, 'YYYY-MM-DD') AS travel_date_str FROM gts_bookings WHERE code = $1",
+    [code],
+  );
+  const b = rows[0];
+  if (!b) return res.status(404).json({ error: 'not_found' });
+  if (b.user_id !== uid) return res.status(403).json({ error: 'forbidden' });
+  if (b.status === 'cancelled') return res.json({ status: 'cancelled' }); // 멱등
+  if (!cancellable(b.travel_date_str)) return res.status(409).json({ error: 'too_late' });
+  await pool.query("UPDATE gts_bookings SET status = 'cancelled', cancelled_at = now() WHERE id = $1", [b.id]);
+  return res.json({ status: 'cancelled' });
+});
+
+// 클라 Ticket 계약(존 C4·C5)과 동일 모양: id=code, kind:'gts' · [V10] status는 DB값 관통(기본 confirmed)
 function toBooking(src) {
   return {
     id: src.code,
     code: src.code,
     kind: 'gts',
-    status: 'confirmed',
+    status: src.status ?? 'confirmed',
     party: src.party,
     luggage: src.luggage,
     vehicleType: src.vehicleType,

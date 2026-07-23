@@ -21,7 +21,9 @@ export function routeKeyFromPath(pathname) {
   if (/^\/loop\/[^/]+\/?$/.test(pathname)) return 'lineDetail';
   if (pathname.startsWith('/ticket/')) return 'ticket';
   if (pathname === '/reviews') return 'reviews';
-  if (pathname === '/about' || pathname === '/pilot') return 'about';
+  if (pathname === '/team') return 'team'; // [V10]
+  if (pathname === '/profile') return 'profile'; // [V10]
+  // [V10] /about·/pilot은 비공개(HIDDEN) — meta 타이틀도 notFound로 폴백(404 위장 완성). 아래 default가 처리.
   if (pathname === '/legal/privacy') return 'legalPrivacy';
   if (pathname === '/legal/terms') return 'legalTerms';
   return 'notFound';

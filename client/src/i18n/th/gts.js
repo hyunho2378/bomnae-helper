@@ -49,6 +49,8 @@ export default {
       luggageToggle: "ฝากกระเป๋า",
       matchTitle: "รถของคุณ",
       cta: "ไปจัดวันของฉัน",
+      // [V9] 9명 이상 단체 문의(뒤에 OFFICIAL_EMAIL 링크) — 기계 번역 초안
+      partyCapHelp: "กลุ่ม 9 คนขึ้นไป กรุณาติดต่อเราทางอีเมล:",
     },
     build: {
       title: "จัดวันของคุณ",
@@ -88,6 +90,11 @@ export default {
       tabActivity: "กิจกรรม",
       counterLabel: "เลือกแล้ว",
       capFull: "เลือกครบแล้ว กรุณายกเลิกที่เลือกไว้ก่อน",
+      // [V9] 선택 큐 + 거리 배지 — 기계 번역 초안
+      queueTitle: "คอร์สของคุณ",
+      queueRemove: "นำออกจากคอร์ส",
+      approx: "ประมาณ",
+      minUnit: "นาที",
       reason: {
         plan: "เลือกแผนมื้ออาหารเพื่อไปต่อ",
         meals: "เลือกร้านอาหารให้ครบเพื่อไปต่อ",

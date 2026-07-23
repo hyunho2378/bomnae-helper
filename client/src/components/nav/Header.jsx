@@ -7,15 +7,15 @@ import { Link, NavLink } from 'react-router-dom';
 import LoginGate from '../ui/LoginGate';
 import LogoutConfirm from '../ui/LogoutConfirm';
 import usePopExit from '../ui/usePopExit';
+import Avatar from '../ui/Avatar';
 import { useAuth } from '../../context/AuthContext';
 import { useLang } from '../../i18n/LangContext';
 import LangSwap from '../../i18n/LangSwap';
 import LangMenu from './LangMenu';
 import LogoMark from '../../assets/logo-mark.svg?react';
 
-// [V3] 5항목: About | Trip Planner | Tour Builder | Travel Log | Reviews
+// [V10] 4항목: Trip Planner | Tour Builder | Travel Log | Reviews — About 비공개([3])로 내비에서 제거
 const MENU = [
-  { to: '/about', k: 'nav.about' },
   { to: '/gate', k: 'nav.gate' },
   { to: '/gts', k: 'nav.gts' },
   { to: '/travel-log', k: 'nav.travelLog' },
@@ -98,9 +98,8 @@ export default function Header() {
                 }}
                 className="flex h-44 w-44 items-center justify-center"
               >
-                <span className="flex h-32 w-32 items-center justify-center rounded-pill bg-primary text-small font-semibold text-white">
-                  {user.name[0]}
-                </span>
+                {/* [V10] 아바타 = Blob 사진 있으면 이미지, 없으면 이니셜(Avatar 공용) */}
+                <Avatar user={user} size={32} />
               </button>
               {menuMounted && (
                 <div
@@ -109,6 +108,15 @@ export default function Header() {
                   className={`pop-panel origin-top-right ${instantPop ? 'pop-instant' : ''} absolute right-0 top-full z-dialog mt-8 flex w-max flex-col rounded-md bg-white p-8 shadow-md ${menuClosing ? 'pop-panel-exit' : ''}`}
                 >
                   <p className="px-12 py-8 text-caption font-medium text-inkMeta">{user.email || `@${user.username}`}</p>
+                  {/* [V10] 프로필 진입 */}
+                  <Link
+                    to="/profile"
+                    role="menuitem"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex min-h-44 w-full items-center rounded-sm px-12 text-left text-small font-semibold text-ink transition-colors duration-fast hover:bg-surface"
+                  >
+                    <LangSwap k="nav.profile" />
+                  </Link>
                   {/* 관리자 전용 · 서버 판정(/api/me isAdmin)만 신뢰 — 비관리자는 DOM에도 미렌더(존재 비노출).
                       라벨은 관리자 내부 도구라 영어 하드카피(AdminPage와 동일 예외) */}
                   {user.isAdmin && (

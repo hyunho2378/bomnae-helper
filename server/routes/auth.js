@@ -138,60 +138,94 @@ router.get('/auth/google/callback', async (req, res) => {
 const bcrypt = require('bcryptjs');
 const { isAdminUser } = require('../lib/admin');
 
-// [V4] ID/PIN 등록 · username(영문 소문자+숫자 4자 이상) + PIN(6자 이상) · 이름 선택.
-//   PIN은 bcrypt 해시로만 저장(평문 금지) · username 중복 409 · 성공 시 즉시 세션 발급.
-const USERNAME_RE = /^[a-z0-9]{4,}$/;
+// [V10] 이메일 기반 회원가입 · ID = 이메일 형식 필수(email 컬럼 저장) + 비밀번호 규칙(6자+숫자+특수).
+//   비밀번호는 bcrypt 해시로만 저장(평문 금지) · email 중복 409 · 성공 시 즉시 세션 발급.
+//   [V4] 하위호환: 기존 minwoo 등 username 계정은 로그인 경로에서 계속 통과(등록만 이메일화).
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// 6자 이상 + 숫자 1개 이상 + 특수기호(비영숫자) 1개 이상 — 클라 실시간 검증과 동일 규칙.
+const PASSWORD_RE = /^(?=.*\d)(?=.*[^A-Za-z0-9]).{6,}$/;
+const DUMMY_HASH = '$2a$10$invalidinvalidinvalidinvalidinvalidinvalidinvalidinv'; // 타이밍/존재 비노출용
+const safeUser = (u) => {
+  const { pin_hash, ...rest } = u; // 해시 응답 제거
+  return { ...rest, isAdmin: isAdminUser(u), hasPassword: !!pin_hash };
+};
+
 router.post('/auth/register', async (req, res) => {
   try {
-    const { username, pin, name } = req.body ?? {};
-    if (typeof username !== 'string' || !USERNAME_RE.test(username)) return res.status(400).json({ error: 'bad_username' });
-    if (typeof pin !== 'string' || pin.length < 6) return res.status(400).json({ error: 'bad_pin' });
+    const { username, pin, name } = req.body ?? {}; // username 필드 = 이메일(클라 폼 필드명 유지)
+    const email = typeof username === 'string' ? username.trim().toLowerCase() : '';
+    if (!EMAIL_RE.test(email)) return res.status(400).json({ error: 'bad_email' });
+    if (typeof pin !== 'string' || !PASSWORD_RE.test(pin)) return res.status(400).json({ error: 'bad_pin' });
     const pinHash = await bcrypt.hash(pin, 10);
-    const displayName = typeof name === 'string' && name.trim() ? name.trim() : username;
+    const displayName = typeof name === 'string' && name.trim() ? name.trim() : email.split('@')[0];
     let rows;
     try {
       ({ rows } = await pool.query(
-        `INSERT INTO users (username, pin_hash, name) VALUES ($1, $2, $3) RETURNING id, email, name, avatar, username`,
-        [username, pinHash, displayName],
+        `INSERT INTO users (email, pin_hash, name) VALUES ($1, $2, $3) RETURNING id, email, name, avatar, username, pin_hash`,
+        [email, pinHash, displayName],
       ));
     } catch (e) {
-      if (e.code === '23505') return res.status(409).json({ error: 'username_taken' }); // unique 충돌
+      if (e.code === '23505') return res.status(409).json({ error: 'email_taken' }); // email UNIQUE 충돌
       throw e;
     }
     setUserCookie(res, rows[0].id);
-    return res.status(201).json({ user: { ...rows[0], isAdmin: isAdminUser(rows[0]) } });
+    return res.status(201).json({ user: safeUser(rows[0]) });
   } catch (e) {
-    console.error('[auth] register 실패:', e.message); // PIN·해시 비로깅
+    console.error('[auth] register 실패:', e.message); // 비밀번호·해시 비로깅
     return res.status(500).json({ error: 'register_failed' });
   }
 });
 
-// [V4] ID/PIN 로그인 · bcrypt 비교 · 실패 시 존재 여부 비노출(일반 오류 단일 문구).
+// [V10] 로그인 · 이메일 또는 레거시 username 어느 쪽이든 매칭(minwoo 하위호환) · 실패는 존재 비노출 단일 401.
 router.post('/auth/login', async (req, res) => {
   try {
     const { username, pin } = req.body ?? {};
     if (typeof username !== 'string' || typeof pin !== 'string') return res.status(400).json({ error: 'bad_request' });
-    const { rows } = await pool.query('SELECT id, email, name, avatar, username, pin_hash FROM users WHERE username = $1', [username]);
-    const u = rows[0];
+    const id = username.trim();
+    const { rows } = await pool.query(
+      'SELECT id, email, name, avatar, username, pin_hash FROM users WHERE lower(username) = lower($1) OR email = lower($1)',
+      [id],
+    );
+    const u = rows.find((r) => r.pin_hash) || rows[0]; // 비밀번호 보유 행 우선
     // 계정 부재도 bcrypt 비교를 수행(타이밍·존재 노출 완화) · 실패는 전부 동일 401
-    const ok = u && u.pin_hash ? await bcrypt.compare(pin, u.pin_hash) : await bcrypt.compare(pin, '$2a$10$invalidinvalidinvalidinvalidinvalidinvalidinvalidinv');
+    const ok = u && u.pin_hash ? await bcrypt.compare(pin, u.pin_hash) : await bcrypt.compare(pin, DUMMY_HASH);
     if (!u || !ok) return res.status(401).json({ error: 'invalid_credentials' });
     setUserCookie(res, u.id);
-    const { pin_hash, ...safe } = u; // 해시 응답 제거
-    return res.json({ user: { ...safe, isAdmin: isAdminUser(safe) } });
+    return res.json({ user: safeUser(u) });
   } catch (e) {
     console.error('[auth] login 실패:', e.message);
     return res.status(500).json({ error: 'login_failed' });
   }
 });
 
+// [V10] 비밀번호 변경 · 현재 비밀번호 확인 후 새 규칙 검증 · 구글 계정(pin_hash 없음)은 400(클라는 섹션 숨김).
+router.post('/auth/change-password', async (req, res) => {
+  try {
+    const uid = readUserId(req);
+    if (!uid) return res.status(401).json({ error: 'unauthorized' });
+    const { currentPin, newPin } = req.body ?? {};
+    const { rows } = await pool.query('SELECT pin_hash FROM users WHERE id = $1', [uid]);
+    const hash = rows[0]?.pin_hash;
+    if (!hash) return res.status(400).json({ error: 'no_password_account' });
+    if (typeof currentPin !== 'string' || !(await bcrypt.compare(currentPin, hash))) {
+      return res.status(400).json({ error: 'wrong_current' });
+    }
+    if (typeof newPin !== 'string' || !PASSWORD_RE.test(newPin)) return res.status(400).json({ error: 'bad_pin' });
+    const newHash = await bcrypt.hash(newPin, 10);
+    await pool.query('UPDATE users SET pin_hash = $1 WHERE id = $2', [newHash, uid]);
+    return res.json({ ok: true });
+  } catch (e) {
+    console.error('[auth] change-password 실패:', e.message);
+    return res.status(500).json({ error: 'change_failed' });
+  }
+});
+
 router.get('/me', async (req, res) => {
   const uid = readUserId(req);
   if (!uid) return res.json({ user: null, demoMode: DEMO_MODE });
-  const { rows } = await pool.query('SELECT id, email, name, avatar, username FROM users WHERE id = $1', [uid]);
-  const user = rows[0] ?? null;
-  // isAdmin은 불리언만(관리자 목록 비노출) — 이메일·유저네임 두 경로 반영([V4])
-  res.json({ user: user ? { ...user, isAdmin: isAdminUser(user) } : null, demoMode: DEMO_MODE });
+  const { rows } = await pool.query('SELECT id, email, name, avatar, username, pin_hash FROM users WHERE id = $1', [uid]);
+  // isAdmin은 불리언만(관리자 목록 비노출) · [V10] hasPassword = 비밀번호 계정 여부(프로필 비번변경 섹션 분기)
+  res.json({ user: rows[0] ? safeUser(rows[0]) : null, demoMode: DEMO_MODE });
 });
 
 router.post('/logout', (req, res) => {
