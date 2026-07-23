@@ -4,7 +4,7 @@
 // 비관리자·비로그인 = 404 위장(NotFound 렌더 · 관리자 존재 노출 금지). 서버측은 401/403 이중 차단.
 // 문자열: 관리자 내부 도구라 3언어 대상 아님 — 영어 단일 하드카피 허용(지시 [3] 명시 예외).
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { RefreshCw } from 'lucide-react';
+import { ChevronDown, RefreshCw } from 'lucide-react';
 import Container from '../components/layout/Container';
 import Button from '../components/ui/Button';
 import { useAuth } from '../context/AuthContext';
@@ -56,8 +56,54 @@ const payloadSummary = (step, payload = {}) => {
 };
 
 
-// [V4] Overview = 요약 스탯 4장만(Participants 테이블 제거). 서버 /api/admin/participants는
-//   스탯 집계 재사용을 위해 유지 · 클라 뷰(참가자 행 리스트)만 삭제.
+// [V6] Overview 참가자 표 복원 — [V4]에서 제거했던 ParticipantRow(클릭 확장 스텝 리스트)를 재도입.
+//   스탯 6장 + 참가자별 행 동거 · 데이터는 동일 /api/admin/participants 재사용(서버 변경 0).
+// 참가자 행 · 클릭 확장 → 스텝 세로 리스트(§28 타임라인 문법 준용: 수직 라인 + 노드 원)
+function ParticipantRow({ p }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="flex flex-col">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="grid min-h-44 grid-cols-[1fr_120px_100px_90px_90px_24px] items-center gap-12 px-16 py-8 text-left text-small transition-colors duration-fast hover:bg-surface"
+      >
+        <span className="min-w-0">
+          <span className="block truncate font-semibold text-ink">{p.email ?? p.name ?? '(guest)'}</span>
+          <span className="block truncate text-caption text-inkMeta">{p.name}</span>
+        </span>
+        <span className="font-display text-caption text-inkSec">{fmtTime(p.started_at)}</span>
+        <span className="font-semibold">{p.last_step}</span>
+        <span className={`font-display font-bold ${p.completed ? 'text-green' : 'text-inkMeta'}`}>
+          {p.completed ? (p.booking_code ?? 'done') : '-'}
+        </span>
+        <span className="font-display font-semibold">{fmtSec(p.total_ms)}</span>
+        <ChevronDown
+          size={16}
+          aria-hidden="true"
+          className={`text-inkMeta transition-transform duration-fast ${open ? 'rotate-180' : ''}`}
+        />
+      </button>
+      {open && (
+        <ol className="relative mx-16 mb-16 flex flex-col border-l-0 pl-24">
+          <span aria-hidden="true" className="absolute bottom-8 left-8 top-8 w-2 rounded-pill bg-line" />
+          {p.steps.map((s, i) => (
+            // 이벤트 배열 항목 · 순번 키 허용(불변 목록)
+            // eslint-disable-next-line react/no-array-index-key
+            <li key={i} className="relative flex items-baseline gap-12 py-8">
+              <span aria-hidden="true" className="absolute -left-20 top-1/2 h-12 w-12 -translate-y-1/2 rounded-pill bg-primary shadow-sm" />
+              <span className="w-96 shrink-0 font-display text-caption font-bold text-primary">{s.step}</span>
+              <span className="min-w-0 flex-1 text-small text-ink">{payloadSummary(s.step, s.payload)}</span>
+              <span className="shrink-0 font-display text-caption font-semibold text-inkSec">{fmtSec(s.durationMs)}</span>
+            </li>
+          ))}
+        </ol>
+      )}
+    </div>
+  );
+}
+
 // [V5] complete 이벤트 payload에서 두 건너뛰기 bool 추출 · 스킵 비율 = flag 보유 완주자 중 false 비율
 function skipRate(rows, field) {
   const flags = rows
@@ -96,6 +142,23 @@ function Overview() {
         ))}
       </div>
       {error && <p className="text-small font-medium text-spice">Load failed: {error}</p>}
+      {/* [V6] 복원 · 참가자별 여정 표(행 클릭 = 스텝 확장) */}
+      <div className="overflow-x-auto rounded-lg bg-white shadow-sm">
+        <div className="grid min-w-[720px] grid-cols-[1fr_120px_100px_90px_90px_24px] gap-12 px-16 py-12 text-caption font-semibold uppercase tracking-eyebrow text-inkMeta">
+          <span>Participant</span>
+          <span>Started</span>
+          <span>Last step</span>
+          <span>Booking</span>
+          <span>Total</span>
+          <span />
+        </div>
+        <div className="flex min-w-[720px] flex-col divide-y divide-line">
+          {rows.map((p) => (
+            <ParticipantRow key={p.id} p={p} />
+          ))}
+          {!rows.length && <p className="px-16 py-24 text-small text-inkSec">No journey events yet.</p>}
+        </div>
+      </div>
       {loadedAt && (
         <p className="text-caption text-inkMeta">Updated {loadedAt.toLocaleTimeString('en-GB')} · polls every 15s</p>
       )}
