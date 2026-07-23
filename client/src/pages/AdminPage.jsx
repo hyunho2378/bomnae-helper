@@ -85,9 +85,12 @@ const payloadSummary = (step, payload = {}) => {
   return '';
 };
 
-// [V6] 대시보드 재구성 · 컬럼: 이름 · Started · Ended · Duration (Completed 컬럼 제거 · 요청).
+// [V6] 대시보드 재구성 · 컬럼: Email · Name · Started · Status (Ended·Completed 제거 · 요청).
+//   Status = Reserved(Ended 존재 + Duration 표기) / Planning(Ended 미표기 + Duration unknown).
 //   중간 단계 컬럼은 화면에서 빼고(데이터는 보존) 행 클릭 시 전체 이벤트 타임라인 확장.
-const COLS = 'grid-cols-[1fr_112px_112px_112px_24px]';
+const COLS = 'grid-cols-[1.4fr_1fr_112px_88px_24px]';
+// Ended(last_at) 존재 + Duration 산출 가능 = Reserved · 그 외(로그인만 등) = Planning.
+const rowStatus = (p) => (rowDuration(p) !== 'unknown' ? 'Reserved' : 'Planning');
 
 function ParticipantRow({ p }) {
   const [open, setOpen] = useState(false);
@@ -99,15 +102,16 @@ function ParticipantRow({ p }) {
         aria-expanded={open}
         className={`grid min-h-44 ${COLS} items-center gap-12 px-16 py-8 text-left text-small transition-colors duration-fast hover:bg-surface`}
       >
-        <span className="min-w-0">
-          <span className="block truncate font-semibold text-ink">
-            {p.email ?? (p.username ? `@${p.username}` : null) ?? p.name ?? '(guest)'}
-          </span>
-          <span className="block truncate text-caption text-inkMeta">{p.name}</span>
+        {/* [V6] Email / Name 열 분리(요청) */}
+        <span className="min-w-0 truncate font-semibold text-ink">{p.email ?? '—'}</span>
+        <span className="min-w-0 truncate text-inkSec">
+          {p.name ?? (p.username ? `@${p.username}` : '—')}
         </span>
         <span className="font-display text-caption text-inkSec">{fmtDateTime(p.started_at)}</span>
-        <span className="font-display text-caption text-inkSec">{fmtDateTime(p.last_at)}</span>
-        <span className="font-display font-semibold">{rowDuration(p)}</span>
+        {/* [V6] Duration → Status(Reserved/Planning) */}
+        <span className={`font-display font-semibold ${rowStatus(p) === 'Reserved' ? 'text-green' : 'text-inkMeta'}`}>
+          {rowStatus(p)}
+        </span>
         <ChevronDown
           size={16}
           aria-hidden="true"
@@ -181,10 +185,10 @@ function Overview() {
       {/* [V6] 참가자별 여정 표(최신 활동순 · 행 클릭 = 전체 타임라인 확장) */}
       <div className="overflow-x-auto rounded-lg bg-white shadow-sm">
         <div className={`grid min-w-[760px] ${COLS} gap-12 px-16 py-12 text-caption font-semibold uppercase tracking-eyebrow text-inkMeta`}>
-          <span>Participant</span>
+          <span>Email</span>
+          <span>Name</span>
           <span>Started</span>
-          <span>Ended</span>
-          <span>Duration</span>
+          <span>Status</span>
           <span />
         </div>
         <div className="flex min-w-[760px] flex-col divide-y divide-line">

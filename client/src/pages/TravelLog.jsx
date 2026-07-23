@@ -19,12 +19,16 @@ import LangSwap from '../i18n/LangSwap';
 import { useLang } from '../i18n/LangContext';
 import { logShades } from '../tokens';
 
+// [V6] 익명화 · 여행자 표기는 Traveler A/B/C…(실명·국가 노출 안 함 · 요청).
+const anonLetter = (i) => (i < 26 ? String.fromCharCode(65 + i) : `#${i + 1}`);
+
 // 로그 → 지도 라인·카드 표시 데이터 파생(알 수 없는 venue id는 제외 · 좌표는 venueCoord 상시 유효)
 function hydrate(log, i) {
   const stops = log.itinerary.map((id) => venues.find((v) => v.id === id)).filter(Boolean);
   return {
     ...log,
     id: log.code,
+    anon: anonLetter(i), // [V6] Traveler A/B/C…
     stops,
     coords: stops.map(venueCoord),
     color: logShades[i % logShades.length],
@@ -38,6 +42,7 @@ function hydrate(log, i) {
 }
 
 function LogCard({ log, active, onHover, onLeave, onSelect, onStart, compact }) {
+  const { t } = useLang();
   return (
     <div
       className={`pointer-events-auto flex shrink-0 flex-col gap-8 rounded-lg bg-white p-16 text-left shadow-md transition-shadow duration-fast ${
@@ -48,16 +53,11 @@ function LogCard({ log, active, onHover, onLeave, onSelect, onStart, compact }) 
     >
       <button type="button" onClick={onSelect} className="flex flex-col items-start gap-8 text-left">
         <div className="flex w-full items-baseline justify-between gap-12">
-          <span className="flex items-baseline gap-8">
-            {/* 라인 컬러 도트(원색 원 + shadow · §16.1) = 지도 라인과 카드의 시각 동기 */}
-            {/* 도트 10px = §24 라인 컬러 원 명세값(spacing 토큰 외 수치) */}
+          <span className="flex items-baseline gap-6">
+            {/* 라인 컬러 도트(원색 원 + shadow · §16.1) = 지도 라인과 카드의 시각 동기 · 도트 10px(§24) */}
             <span aria-hidden="true" className="self-center rounded-pill shadow-sm" style={{ width: 10, height: 10, background: log.color }} />
-            <span className="font-display text-body font-bold">{log.author ?? ''}</span>
-            {log.country ? (
-              <TriText text={log.country} className="text-caption font-medium text-inkSec" />
-            ) : (
-              <LangSwap k="travelLog.traveler" className="text-caption font-medium text-inkSec" />
-            )}
+            {/* [V6] 익명화 · Traveler A/B/C…(실명·국가 미표기) · t()로 활성 언어만(유령 여백 방지) */}
+            <span className="font-display text-body font-bold">{`${t('travelLog.traveler')} ${log.anon}`}</span>
           </span>
           <span className="shrink-0 font-display text-caption font-semibold text-inkMeta">{log.travelDate}</span>
         </div>
