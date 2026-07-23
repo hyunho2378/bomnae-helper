@@ -88,7 +88,11 @@ function ParticipantRow({ p }) {
       {open && (
         <ol className="relative mx-16 mb-16 flex flex-col border-l-0 pl-24">
           <span aria-hidden="true" className="absolute bottom-8 left-8 top-8 w-2 rounded-pill bg-line" />
-          {p.steps.map((s, i) => (
+          {/* [V6] 이벤트 없이 로그인만 한 실계정 */}
+          {!(p.steps ?? []).length && (
+            <li className="py-8 text-caption text-inkMeta">Logged in — no journey steps recorded.</li>
+          )}
+          {(p.steps ?? []).map((s, i) => (
             // 이벤트 배열 항목 · 순번 키 허용(불변 목록)
             // eslint-disable-next-line react/no-array-index-key
             <li key={i} className="relative flex items-baseline gap-12 py-8">

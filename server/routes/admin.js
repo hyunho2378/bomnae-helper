@@ -7,23 +7,37 @@ const { requireAdmin } = require('../lib/admin');
 
 const router = express.Router();
 
+// [V6] 검증 대시보드 = 실제(구글/기관 이메일) 로그인 사용자만.
+//   LEFT JOIN이라 로그인만 하고 여정 이벤트가 없는 실계정도 표시("이 사람들이 로그인해 썼다" 검증).
+//   테스트/ID·PIN(email null)·example.com·demo 계정은 WHERE에서 제외(영구 삭제 아님 · 되돌리기 쉬움).
+const REAL_USER_FILTER = `u.email IS NOT NULL
+      AND lower(u.email) NOT LIKE '%@example.com'
+      AND lower(u.email) <> 'demo@gts.ac.kr'`;
+
 router.get('/admin/participants', requireAdmin, async (req, res) => {
   const { rows } = await pool.query(`
     SELECT
       u.id, u.email, u.name,
-      min(e.created_at)                          AS started_at,
+      coalesce(min(e.created_at), u.created_at)  AS started_at,
       max(e.created_at)                          AS last_at,
-      (array_agg(e.step ORDER BY e.created_at DESC))[1] AS last_step,
+      coalesce(
+        (array_agg(e.step ORDER BY e.created_at DESC) FILTER (WHERE e.step IS NOT NULL))[1],
+        'login'
+      )                                          AS last_step,
       bool_or(e.step = 'complete')               AS completed,
       max(CASE WHEN e.step = 'complete' THEN e.payload->>'code' END) AS booking_code,
       coalesce(sum(e.duration_ms), 0)::int       AS total_ms,
-      json_agg(json_build_object(
-        'step', e.step, 'payload', e.payload, 'durationMs', e.duration_ms, 'at', e.created_at
-      ) ORDER BY e.created_at)                   AS steps
-    FROM journey_events e
-    JOIN users u ON u.id = e.user_id
-    GROUP BY u.id, u.email, u.name
-    ORDER BY min(e.created_at) DESC
+      coalesce(
+        json_agg(json_build_object(
+          'step', e.step, 'payload', e.payload, 'durationMs', e.duration_ms, 'at', e.created_at
+        ) ORDER BY e.created_at) FILTER (WHERE e.id IS NOT NULL),
+        '[]'::json
+      )                                          AS steps
+    FROM users u
+    LEFT JOIN journey_events e ON e.user_id = u.id
+    WHERE ${REAL_USER_FILTER}
+    GROUP BY u.id, u.email, u.name, u.created_at
+    ORDER BY (count(e.id) > 0) DESC, coalesce(min(e.created_at), u.created_at) DESC
   `);
   res.json({ participants: rows });
 });
@@ -31,15 +45,14 @@ router.get('/admin/participants', requireAdmin, async (req, res) => {
 router.get('/admin/events', requireAdmin, async (req, res) => {
   const after = req.query.after ? new Date(String(req.query.after)) : null;
   const params = [];
-  let where = '';
+  // [V6] 타임라인도 실계정(구글/기관 이메일)만 · 테스트·ID/PIN 계정 제외
+  let where = `WHERE ${REAL_USER_FILTER}`;
   if (after && !Number.isNaN(after.getTime())) {
     params.push(after.toISOString());
-    where = 'WHERE e.created_at > $1';
+    where += ' AND e.created_at > $1';
   }
   const { rows } = await pool.query(
-    // [V4] ID/PIN 유저는 email null → username(@id) 폴백으로 타임라인 식별
-    `SELECT e.id, e.step, e.payload, e.duration_ms, e.created_at,
-            coalesce(u.email, '@' || u.username) AS email
+    `SELECT e.id, e.step, e.payload, e.duration_ms, e.created_at, u.email
      FROM journey_events e JOIN users u ON u.id = e.user_id
      ${where}
      ORDER BY e.created_at DESC
