@@ -16,6 +16,41 @@ const travelLogsRouter = require('./routes/travelLogs'); // [V3]
 const app = express();
 app.set('trust proxy', 1); // Render 등 프록시 뒤 secure 쿠키
 
+// [OPS1] GET /health — 외부 업타임 핑 전용(Render 슬립 방지).
+//   CORS/session/rate limit/인증 가드보다 먼저 등록: 이 라우트만 매칭돼 즉시 응답하므로 이후 미들웨어를 타지 않는다.
+//   쿠키·Set-Cookie 없음(setUserCookie/ensureAnonKey 미호출·cookieParser 이전) · journey_events 무기록(트래킹은 POST /api/track 로그인 전용).
+//   평시 DB 무접촉 · ?deep=1 일 때만 Neon SELECT 1(실패해도 500 아님 → 200 + db:"fail" 로 모니터 오탐 방지).
+const healthPool = require('./db/pool');
+const HEALTH_RL_WINDOW_MS = 60_000; // 분당 20회 상한(남용 방지) — 5분 핑은 여기 한참 못 미침
+const HEALTH_RL_MAX = 20;
+const healthHits = new Map(); // ip -> { start, count } · 고정 윈도, 커지면 만료분 정리
+function healthAllowed(ip) {
+  const now = Date.now();
+  const rec = healthHits.get(ip);
+  if (!rec || now - rec.start >= HEALTH_RL_WINDOW_MS) {
+    healthHits.set(ip, { start: now, count: 1 });
+    if (healthHits.size > 1000) for (const [k, v] of healthHits) if (now - v.start >= HEALTH_RL_WINDOW_MS) healthHits.delete(k);
+    return true;
+  }
+  rec.count += 1;
+  return rec.count <= HEALTH_RL_MAX;
+}
+app.get('/health', async (req, res) => {
+  res.set('X-Robots-Tag', 'noindex'); // 색인 제외
+  if (!healthAllowed(req.ip)) return res.status(429).json({ status: 'rate_limited' });
+  const body = { status: 'ok', uptime: process.uptime(), ts: new Date().toISOString() };
+  if (req.query.deep === '1') {
+    try {
+      await healthPool.query('SELECT 1');
+      body.db = 'ok';
+    } catch (e) {
+      body.db = 'fail';
+      console.warn('[health] deep DB fail:', e.message); // 로그는 db:"fail" 때만 1줄
+    }
+  }
+  res.json(body);
+});
+
 // [V1-fix3] env 원값 대신 정규화된 clientOrigin — env 오염('ttps://…') 시 CORS도 함께 깨지던 사고 방어
 const allowed = new Set(['http://localhost:5173', clientOrigin].filter(Boolean));
 app.use(
