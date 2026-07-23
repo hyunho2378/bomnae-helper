@@ -19,6 +19,26 @@ export default {
       perPerson: "Per person",
       total: "Total",
     },
+    // [V8] 여정 단계 인디케이터 · 라벨 = 지금 하는 단계 그대로(추상 표현 금지)
+    steps: {
+      label: "Booking steps",
+      s1: "Party & vehicle",
+      s2: "Course selection",
+      s3: "Route check",
+      s4: "Pay & confirm",
+    },
+    // [V7] 시간제 이용권 · 새 요금 체계(카드 4종 + 포함/초과 안내)
+    pass: {
+      title: "Time pass",
+      names: {
+        "1h": "1-hour pass",
+        "2h": "2-hour pass",
+        "4h": "4-hour pass",
+        day: "Full-day pass",
+      },
+      included: "Taxi rides, deposit and course fees are all included.",
+      overtime: "Beyond the included hours, 10,000 won is added per extra hour.",
+    },
     setup: {
       title: "Make your GTS day",
       sub: "Tell us who is coming and we will match your ride.",
@@ -101,6 +121,14 @@ export default {
       dropoffRequired: "Enter your drop off point to continue",
       priceTitle: "Price breakdown",
       payCta: "Pay",
+      // [V7] 이용권 선택·전액 포함 밴드·환불 동의
+      passTitle: "Choose your time pass",
+      passPick: "Pick a time pass above to see your total.",
+      allIncluded: "The total shown here is everything you pay. No extra costs.",
+      refundTitle: "Cancellation and refund",
+      refundBody:
+        "Cancel more than 48 hours before your start time and the deposit is fully refunded. From 48 hours before the start, the deposit is not refundable.",
+      consentLabel: "I agree to the cancellation and refund policy above.",
       // §42: 폼 하단 caption 1줄 프로토타입 고지(Terms §2 취지) — 확인 Dialog·성공 인터스티셜 폐지
       prototypeNotice: "Prototype: no real payment is processed.",
     },
@@ -121,6 +149,9 @@ export default {
       payMethodLabel: "Payment method",
       dropoffNone: "Not specified",
       payNone: "Not selected",
+      // [V7] 티켓 분리 내역 · 구 예약(pass_type null)은 "Not specified"
+      passLabel: "Time pass",
+      passNone: "Not specified",
       guideTitle: "Good to know",
       guide1: "Show your ticket code to the driver when you board.",
       guide2: "Each stop runs as a 2 hour slot and your driver keeps the schedule.",

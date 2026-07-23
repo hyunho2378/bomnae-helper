@@ -27,7 +27,8 @@ export function itineraryVenues(selection) {
     .filter(Boolean);
 }
 
-// 정오 기점 stayMin(120) 누적 시각 · §9.5 DRAFT 표기 규칙의 공유 구현(route + ticket §43).
+// [V7] DEPRECATED — 방문 순서 타임테이블 화면 제거로 소비자 0(롤백 대비 보존 · 삭제 금지).
+// 구: 정오 기점 stayMin(120) 누적 시각 · §9.5 DRAFT 표기 규칙의 공유 구현(route + ticket §43).
 // 시각표 생성이 아니라 표기 전용(코드 주석 한정 · 사용자 노출 초안 고지 없음 §10.4).
 const NOON_MIN = 12 * 60;
 

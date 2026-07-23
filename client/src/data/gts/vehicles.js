@@ -15,6 +15,7 @@ export function matchVehicle(party, luggage) {
 }
 
 // 요금표 · 합계 산식은 §33: base[vehicleType] + (luggage ? luggageFee : 0) + perPerson * party
+// [V7] DEPRECATED — 요금은 시간제 이용권(passes.js)이 단일 기준 · fares는 롤백 대비 보존(소비자: FareBreakdown[미사용]뿐).
 export const fares = {
   taxi: {
     base: 30000, // DRAFT — 초안 가격, BM 검토에서 확정

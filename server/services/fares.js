@@ -13,6 +13,7 @@ function matchVehicle(party, luggage) {
   return party <= 4 ? 'taxi' : 'van';
 }
 
+// [V7] DEPRECATED — 시간제 이용권(computePassTotal)으로 대체 · 소비자 0(롤백 대비 보존).
 function computeTotal(party, luggage) {
   const vehicleType = matchVehicle(party, luggage);
   const fare = FARES[vehicleType];
@@ -20,4 +21,17 @@ function computeTotal(party, luggage) {
   return { vehicleType, total };
 }
 
-module.exports = { FARES, matchVehicle, computeTotal };
+// [V7] 시간제 이용권 · 확정값 — 클라 data/gts/passes.js와 값·규칙 동일 유지 계약(동시 수정).
+const PASS_PRICES = { '1h': 10000, '2h': 20000, '4h': 40000, day: 60000 };
+const OVERTIME_PER_HOUR = 10000;
+const PASS_LUGGAGE_FEE = 5000;
+
+// 서버 재계산(클라 금액 신뢰 금지 유지) · passType 무효면 null 반환(400 근거)
+function computePassTotal(passType, luggage) {
+  if (!(passType in PASS_PRICES)) return null;
+  const passAmount = PASS_PRICES[passType];
+  const luggageAmount = luggage ? PASS_LUGGAGE_FEE : 0;
+  return { passAmount, luggageAmount, totalAmount: passAmount + luggageAmount };
+}
+
+module.exports = { FARES, matchVehicle, computeTotal, PASS_PRICES, OVERTIME_PER_HOUR, PASS_LUGGAGE_FEE, computePassTotal };

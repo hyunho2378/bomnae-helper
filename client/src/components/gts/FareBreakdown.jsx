@@ -1,4 +1,5 @@
-// 요금 구성 표시(IA §9.3 · PATTERNS §33) · data/gts/vehicles.js fares 조회 전용 + DRAFT 고지.
+// [V7] DEPRECATED — 시간제 이용권(passes.js + PassBreakdown)으로 요금 체계 대체 · 현재 소비자 0.
+//   롤백 대비 보존(삭제 금지). 구: 요금 구성 표시(IA §9.3 · PATTERNS §33) · fares 조회 전용.
 // 다크패턴 금지(§16.10): 전 항목 + 합계 항상 펼침. setup 매칭 카드와 checkout 금액 내역이 공유.
 import { computeGtsTotal } from '../../data/gts/api';
 import { fares } from '../../data/gts/vehicles';

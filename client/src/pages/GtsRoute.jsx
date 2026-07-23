@@ -10,7 +10,7 @@ import { useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ItineraryMap from '../components/gts/ItineraryMap';
 import VisitTimeline from '../components/gts/VisitTimeline';
-import { itinerarySchedule, itineraryVenues } from '../components/gts/itinerary';
+import { itineraryVenues } from '../components/gts/itinerary';
 import Container from '../components/layout/Container';
 import Button from '../components/ui/Button';
 import { useGts, useGtsGuard } from '../context/GtsContext';
@@ -34,7 +34,8 @@ export default function GtsRoute() {
   if (!ok) return null;
 
   const hasMock = entries.some((venue) => !venue.coord);
-  const schedule = itinerarySchedule(entries);
+  // [V7] 장소별 출발·도착 시각(2시간 슬롯 타임테이블) 화면 제거 — 순서·장소명·지도 라인만 유지.
+  //   itinerarySchedule 데이터 모델은 보존(롤백 대비 · itinerary.js DEPRECATED 주석).
 
   return (
     <Container>
@@ -57,11 +58,10 @@ export default function GtsRoute() {
               <LangSwap k="gts.route.mockNotice" as="p" className="text-small font-medium text-inkSec" />
             )}
             <VisitTimeline
-              items={schedule.map(({ venue, time }) => ({
+              items={entries.map((venue) => ({
                 id: venue.id,
                 name: venue.name,
                 oneLine: venue.oneLine,
-                time,
               }))}
             />
             <div className="flex flex-wrap items-center gap-12 pt-8">

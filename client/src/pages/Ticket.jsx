@@ -18,7 +18,6 @@ import SuccessStamp from '../components/booking/SuccessStamp';
 import ItineraryMap from '../components/gts/ItineraryMap';
 import TriText from '../components/gts/TriText';
 import VisitTimeline from '../components/gts/VisitTimeline';
-import { itinerarySchedule } from '../components/gts/itinerary';
 import { payMethodLabel } from '../components/pay/payMethods';
 // stories 데이터 · api.js에 접근자가 없어 직접 import(질문 목록 보고, 완료 보고 §5)
 import stories from '../data/stories';
@@ -128,9 +127,14 @@ function DetailRow({ labelKey, children }) {
 }
 
 // §43 GTS 티켓 · lg+ 2컬럼(좌 상세 / 우 sticky 320px 카드) — max-w-dialog 페이지 래퍼 해소(§10.4)
+// [V7] 구 예약 호환 · [V6] 막국수 중복 정리로 제거된 구 id → 유지 id 매핑(구 티켓 3곳 전부 표시)
+const LEGACY_VENUE_ID = { 'makguksu-museum': 'chuncheon-makguksu-museum' };
+
 function GtsTicket({ gts }) {
-  const entries = gts.itinerary.map((id) => venues.find((v) => v.id === id)).filter(Boolean);
-  const schedule = itinerarySchedule(entries);
+  const entries = gts.itinerary
+    .map((id) => venues.find((v) => v.id === (LEGACY_VENUE_ID[id] ?? id)))
+    .filter(Boolean);
+  // [V7] 장소별 시각 표기 렌더 중단(타임테이블 제거) — 순서·장소명만. 시간 필드 모델은 보존(롤백 대비).
   const payLabel = payMethodLabel(gts.payMethod);
 
   const save = async () => {
@@ -199,11 +203,10 @@ function GtsTicket({ gts }) {
             <section className="flex flex-col gap-12 rounded-xl bg-white p-24 shadow-sm">
               <LangSwap k="gts.ticket.orderTitle" as="h2" className="text-h3 font-semibold" />
               <VisitTimeline
-                items={schedule.map(({ venue, time }) => ({
+                items={entries.map((venue) => ({
                   id: venue.id,
                   name: venue.name,
                   oneLine: venue.oneLine,
-                  time,
                 }))}
               />
             </section>
@@ -271,12 +274,40 @@ function GtsTicket({ gts }) {
               <div className="flex flex-col gap-16">
                 {/* primary 면 위 디바이더 · 면 요소(white)로 표현(무보더 원칙) */}
                 <div aria-hidden="true" className="h-px w-full bg-white" />
-                <div className="flex items-baseline justify-between">
-                  <LangSwap k="gts.fare.total" className="text-small font-medium text-white" />
-                  <span className="font-display text-h3 font-bold text-white">
-                    {'₩'}
-                    {gts.total.toLocaleString('en-US')}
-                  </span>
+                {/* [V7] 분리 내역 · 이용권(이름·시간)/짐 보관(있을 때만)/최종 금액 — 구 예약(passType null)은 "Not specified" */}
+                <div className="flex flex-col gap-8">
+                  <div className="flex items-baseline justify-between gap-12">
+                    {gts.passType ? (
+                      <LangSwap k={`gts.pass.names.${gts.passType}`} className="text-small font-medium text-white" />
+                    ) : (
+                      <span className="flex items-baseline gap-8">
+                        <LangSwap k="gts.ticket.passLabel" className="text-small font-medium text-white" />
+                        <LangSwap k="gts.ticket.passNone" className="text-caption font-medium text-white" />
+                      </span>
+                    )}
+                    {gts.passType && gts.passAmount != null && (
+                      <span className="font-display text-small font-semibold text-white">
+                        {'₩'}
+                        {gts.passAmount.toLocaleString('en-US')}
+                      </span>
+                    )}
+                  </div>
+                  {gts.luggageAmount > 0 && (
+                    <div className="flex items-baseline justify-between gap-12">
+                      <LangSwap k="gts.fare.luggage" className="text-small font-medium text-white" />
+                      <span className="font-display text-small font-semibold text-white">
+                        {'₩'}
+                        {gts.luggageAmount.toLocaleString('en-US')}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex items-baseline justify-between">
+                    <LangSwap k="gts.fare.total" className="text-small font-medium text-white" />
+                    <span className="font-display text-h3 font-bold text-white">
+                      {'₩'}
+                      {(gts.totalAmount ?? gts.total).toLocaleString('en-US')}
+                    </span>
+                  </div>
                 </div>
               </div>
             </article>

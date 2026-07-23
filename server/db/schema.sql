@@ -85,6 +85,14 @@ ALTER TABLE users ALTER COLUMN email DROP NOT NULL;
 -- [V5-frictionless] 검증용 무마찰 결제: 하차 지점 미입력 허용 → dropoff_text NULL 저장 가능(멱등).
 --   pay_method는 이미 nullable. 재필수화는 서버 REQUIRE_DROPOFF/REQUIRE_PAYMETHOD env로 복원(스키마 불변).
 ALTER TABLE gts_bookings ALTER COLUMN dropoff_text DROP NOT NULL;
+
+-- [V7] 시간제 이용권 요금 체계 · 전부 멱등. 기존 행은 pass_type NULL 허용(티켓 "Not specified").
+--   consent_at = 환불 규정 동의 시각(동의 없으면 예약 불가라 신규 행은 항상 값 有).
+ALTER TABLE gts_bookings ADD COLUMN IF NOT EXISTS pass_type TEXT;
+ALTER TABLE gts_bookings ADD COLUMN IF NOT EXISTS pass_amount INTEGER;
+ALTER TABLE gts_bookings ADD COLUMN IF NOT EXISTS luggage_amount INTEGER;
+ALTER TABLE gts_bookings ADD COLUMN IF NOT EXISTS total_amount INTEGER;
+ALTER TABLE gts_bookings ADD COLUMN IF NOT EXISTS consent_at TIMESTAMPTZ;
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'users_username_key') THEN
     ALTER TABLE users ADD CONSTRAINT users_username_key UNIQUE (username);

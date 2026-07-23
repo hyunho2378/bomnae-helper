@@ -35,6 +35,7 @@ export function AuthProvider({ children }) {
           fetch(`${API_BASE}/api/track`, {
             method: 'POST',
             credentials: 'include',
+            keepalive: true, // [V6] 로그인 직후 전환에도 생존
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               sessionId: crypto.randomUUID(),
@@ -69,6 +70,7 @@ export function AuthProvider({ children }) {
       fetch(`${API_BASE}/api/track`, {
         method: 'POST',
         credentials: 'include',
+        keepalive: true, // [V6] 로그인 직후 전환에도 생존
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId: crypto.randomUUID(), step: 'login', payload: { username: data.user.username }, durationMs: null }),
       }).catch(() => console.warn('[track] login 전송 실패(무시)'));

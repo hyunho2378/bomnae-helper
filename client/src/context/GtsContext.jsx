@@ -62,6 +62,7 @@ export function GtsProvider({ children }) {
     fetch(`${API_BASE}/api/track`, {
       method: 'POST',
       credentials: 'include',
+      keepalive: true, // [V6] 단계 전환·페이지 이탈 중에도 요청 생존(fire-and-forget 드롭 방지)
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ sessionId, step, payload, durationMs }),
     }).catch(() => console.warn(`[track] ${step} 전송 실패(무시)`));

@@ -14,7 +14,7 @@ import CardForm from '../components/pay/CardForm';
 import ItineraryMap from '../components/gts/ItineraryMap';
 import PayMethodGrid from '../components/pay/PayMethodGrid';
 import { PAY_METHODS } from '../components/pay/payMethods';
-import FareBreakdown from '../components/gts/FareBreakdown';
+import PassBreakdown from '../components/gts/PassBreakdown';
 import TriText from '../components/gts/TriText';
 import { itineraryVenues } from '../components/gts/itinerary';
 import Container from '../components/layout/Container';
@@ -22,7 +22,8 @@ import Button from '../components/ui/Button';
 import LoginGate from '../components/ui/LoginGate';
 import { useAuth } from '../context/AuthContext';
 import { useGts, useGtsGuard } from '../context/GtsContext';
-import { computeGtsTotal, createGtsBooking } from '../data/gts/api';
+import { createGtsBooking } from '../data/gts/api';
+import { LUGGAGE_FEE, PASS_ORDER, PASS_PRICES, computePassTotal } from '../data/gts/passes';
 import { useLang } from '../i18n/LangContext';
 import LangSwap from '../i18n/LangSwap';
 
@@ -58,11 +59,14 @@ export default function GtsCheckout() {
   const [gateOpen, setGateOpen] = useState(false);
   const [payMethod, setPayMethod] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  // [V7] 시간제 이용권(금액의 단일 근거 · 미선택 시 Pay 비활성 — 무마찰 예외 아님) + 환불 규정 동의(필수)
+  const [passType, setPassType] = useState(null);
+  const [consent, setConsent] = useState(false);
 
   if (!ok) return null;
 
   const entries = itineraryVenues({ mealPlan, meals, picks });
-  const total = computeGtsTotal(vehicle, luggage, party);
+  const total = computePassTotal(passType, luggage); // [V7] 이용권 + 짐 보관(선택 시) · 미선택 null
   const dropoffOk = dropoffText.trim().length > 0;
   const Icon = VEHICLE_ICON[vehicle];
   const method = PAY_METHODS.find((m) => m.id === payMethod) ?? null;
@@ -72,7 +76,8 @@ export default function GtsCheckout() {
   const submit = async () => {
     setSubmitting(true);
     const dropoffValue = dropoffText.trim() || null;
-    trackStep('pay_method', { method: method?.id ?? null }); // [V1] 결제 수단(미선택 null)
+    // [V7] pay 단계 payload에 passType·consent 기록(명세 [4])
+    trackStep('pay_method', { method: method?.id ?? null, passType, consent });
     const booking = await createGtsBooking({
       party,
       luggage,
@@ -84,6 +89,12 @@ export default function GtsCheckout() {
       dropoffText: dropoffValue, // [V5] 미입력이면 null(빈 문자열 아님)
       payMethod: method?.id ?? null, // [V5] 미선택이면 null
       travelDate, // [V3] 빌더 날짜 관통(서버 travel_date)
+      // [V7] 시간제 이용권 · 서버가 금액 재계산(클라 값은 오프라인 폴백 티켓 표시용)
+      passType,
+      consent,
+      passAmount: PASS_PRICES[passType],
+      luggageAmount: luggage ? LUGGAGE_FEE : 0,
+      totalAmount: total,
       total,
     });
     // [V5] 검증 계측: 사람들이 이 두 단계를 건너뛰는가(대시보드 스킵 비율 소스)
@@ -110,6 +121,37 @@ export default function GtsCheckout() {
         {/* 좌 요약 / 우 금액+결제(lg) · 380px은 §15 패널 폭 준용(Booking 선례) */}
         <div className="flex flex-col gap-24 lg:grid lg:grid-cols-[1fr_380px] lg:items-start lg:gap-12">
           <div className="flex flex-col gap-24">
+            {/* [V7] 시간제 이용권 · 체크아웃 상단 — 새 요금의 단일 기준(카드 4종 단일 선택 · 미선택 시 Pay 비활성) */}
+            <section className="flex flex-col gap-16 rounded-xl bg-white p-24 shadow-sm">
+              <LangSwap k="gts.checkout.passTitle" as="h2" className="text-h3 font-semibold" />
+              <div className="grid grid-cols-2 gap-12 lg:grid-cols-4">
+                {PASS_ORDER.map((id) => {
+                  const selected = passType === id;
+                  return (
+                    <button
+                      key={id}
+                      type="button"
+                      aria-pressed={selected}
+                      onClick={() => setPassType(id)}
+                      className={`pressable flex flex-col gap-8 rounded-lg p-16 text-left ${
+                        selected ? 'bg-primary/10 ring-2 ring-inset ring-primary' : 'bg-surface'
+                      }`}
+                    >
+                      <LangSwap k={`gts.pass.names.${id}`} className="text-small font-semibold" />
+                      <span className="font-display text-h3 font-bold text-primary">
+                        {'₩'}
+                        {PASS_PRICES[id].toLocaleString('en-US')}
+                      </span>
+                      {/* 각 카드 포함 안내 1줄(명세 [1]) */}
+                      <LangSwap k="gts.pass.included" className="text-caption font-medium text-inkSec" />
+                    </button>
+                  );
+                })}
+              </div>
+              {/* 카드 아래 공통 초과 요금 안내 1줄(명세 [1]) */}
+              <LangSwap k="gts.pass.overtime" as="p" className="text-caption font-medium text-inkMeta" />
+            </section>
+
             {/* 선택 요약 · 전부 펼침(1뷰) */}
             <section className="flex flex-col rounded-xl bg-white px-24 py-8 shadow-sm">
               <LangSwap k="gts.checkout.summaryTitle" as="h2" className="pt-16 text-h3 font-semibold" />
@@ -205,12 +247,38 @@ export default function GtsCheckout() {
           {/* 금액 내역 + Pay · 전 항목 + 합계 항상 펼침(§33) · [H2-14] lg+ sticky 동행 */}
           <aside className="flex flex-col gap-24 rounded-xl bg-white p-24 shadow-md lg:sticky lg:top-24">
             <LangSwap k="gts.checkout.priceTitle" as="h2" className="text-h3 font-semibold" />
-            <FareBreakdown vehicle={vehicle} luggage={luggage} party={party} />
-            {/* [V5] Pay 게이팅: dropoff·pay_method·카드입력 어느 것도 막지 않음 · 로그인만 유지(실명 기록 목적).
-                재필수화 플래그 true일 때만 해당 필드가 다시 Pay를 막는다. */}
+            {/* [V7] 분리 내역: 이용권(이름·시간)·짐 보관(선택 시)·최종 금액 — FareBreakdown 대체 */}
+            <PassBreakdown passType={passType} luggage={luggage} />
+            {/* [V7] 전액 포함 안내 밴드(명세 [2]) · 결제 버튼 위 */}
+            <LangSwap
+              k="gts.checkout.allIncluded"
+              as="p"
+              className="rounded-md bg-surface px-16 py-12 text-caption font-semibold text-inkSec"
+            />
+            {/* [V7] 취소·환불 규정 요약 + 동의(필수 · 미동의 시 Pay 비활성 · 동의 시각 consent_at 저장) */}
+            <div className="flex flex-col gap-12 rounded-md bg-surface px-16 py-12">
+              <LangSwap k="gts.checkout.refundTitle" as="h3" className="text-small font-semibold" />
+              <LangSwap k="gts.checkout.refundBody" as="p" className="text-caption font-medium text-inkSec" />
+              <label className="flex min-h-44 cursor-pointer items-center gap-12">
+                <input
+                  type="checkbox"
+                  checked={consent}
+                  onChange={(e) => setConsent(e.target.checked)}
+                  className="h-20 w-20 shrink-0 accent-primary"
+                />
+                <LangSwap k="gts.checkout.consentLabel" className="text-small font-medium" />
+              </label>
+            </div>
+            {/* [V5] dropoff·pay_method는 무마찰 유지 · [V7] 이용권·동의는 금액·규정의 근거라 필수(예외 아님) */}
             <div className="grid">
               <Button
-                disabled={submitting || (REQUIRE_DROPOFF && !dropoffOk) || (REQUIRE_PAYMETHOD && !method)}
+                disabled={
+                  submitting ||
+                  !passType ||
+                  !consent ||
+                  (REQUIRE_DROPOFF && !dropoffOk) ||
+                  (REQUIRE_PAYMETHOD && !method)
+                }
                 onClick={onPay}
               >
                 <LangSwap k="gts.checkout.payCta" />

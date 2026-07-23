@@ -16,11 +16,17 @@ router.post('/track', async (req, res) => {
   if (!UUID_RE.test(String(sessionId ?? ''))) return res.status(400).json({ error: 'bad_session' });
   if (!STEPS.has(step)) return res.status(400).json({ error: 'bad_step' });
   const dur = Number.isFinite(durationMs) ? Math.max(0, Math.round(durationMs)) : null;
-  await pool.query(
-    'INSERT INTO journey_events (user_id, session_id, step, payload, duration_ms) VALUES ($1, $2, $3, $4, $5)',
-    [uid, sessionId, step, JSON.stringify(payload ?? {}), dur],
-  );
-  res.json({ ok: true });
+  try {
+    await pool.query(
+      'INSERT INTO journey_events (user_id, session_id, step, payload, duration_ms) VALUES ($1, $2, $3, $4, $5)',
+      [uid, sessionId, step, JSON.stringify(payload ?? {}), dur],
+    );
+    res.json({ ok: true });
+  } catch (e) {
+    // [V6] 실패를 삼키지 말고 1줄 경고(트래킹 유실 원인 추적용). 클라는 비차단이라 UX 무영향.
+    console.warn(`[track] insert 실패 user=${uid} step=${step}: ${e.message}`);
+    res.status(500).json({ error: 'track_failed' });
+  }
 });
 
 module.exports = router;

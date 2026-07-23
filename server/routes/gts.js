@@ -1,7 +1,7 @@
 // GTS 예약 API · IA §9.6 데이터 모델 · 총액은 서버 재계산(클라 total 신뢰 금지 — 지시 작업 3).
 const express = require('express');
 const pool = require('../db/pool');
-const { computeTotal } = require('../services/fares');
+const { matchVehicle, computePassTotal } = require('../services/fares'); // [V7] 이용권 재계산(computeTotal DEPRECATED)
 const { resolveUserId } = require('./auth');
 
 const router = express.Router();
@@ -18,7 +18,7 @@ const makeCode = () =>
 
 router.post('/gts/bookings', async (req, res) => {
   try {
-    const { party, luggage, mealPlan, itinerary, dropoffText, payMethod, travelDate } = req.body ?? {};
+    const { party, luggage, mealPlan, itinerary, dropoffText, payMethod, travelDate, passType, consent } = req.body ?? {};
     const p = Number(party);
     if (!Number.isInteger(p) || p < 1 || p > 12) return res.status(400).json({ error: 'party 1~12' });
     if (!['none', 'lunch', 'lunchDinner'].includes(mealPlan)) return res.status(400).json({ error: 'mealPlan' });
@@ -32,19 +32,30 @@ router.post('/gts/bookings', async (req, res) => {
     // [V3] 여행 날짜 · 선택값(YYYY-MM-DD) — 형식만 검증(당일 허용 · 과거 차단은 클라 캘린더 소유)
     const tDate = typeof travelDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(travelDate) ? travelDate : null;
     const lug = Boolean(luggage);
-    // 서버 재계산(§9.3 결정론 + 요금표) — 클라가 보낸 total·vehicleType은 무시
-    const { vehicleType, total } = computeTotal(p, lug);
+    // [V7] 시간제 이용권 = 금액의 단일 근거 · 서버 재계산(클라 금액 신뢰 금지 유지).
+    //   이용권·환불 동의는 무마찰 예외 아님(필수) — 미선택/미동의 400.
+    const pass = computePassTotal(passType, lug);
+    if (!pass) return res.status(400).json({ error: 'passType 필수(1h|2h|4h|day)' });
+    if (consent !== true) return res.status(400).json({ error: 'consent 필수' });
+    const { passAmount, luggageAmount, totalAmount } = pass;
+    const vehicleType = matchVehicle(p, lug); // §9.3 차량 매칭은 유지(표시용)
     const userId = await resolveUserId(req);
     // 코드 충돌 시 재시도 3회
     for (let i = 0; i < 3; i += 1) {
       const code = makeCode();
       try {
         const { rows } = await pool.query(
-          `INSERT INTO gts_bookings (code, user_id, party, luggage, vehicle_type, meal_plan, picks, dropoff_text, pay_method, total, travel_date)
-           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING code, created_at`,
-          [code, userId, p, lug, vehicleType, mealPlan, JSON.stringify(itinerary), dropoff, payMethodValue, total, tDate],
+          `INSERT INTO gts_bookings (code, user_id, party, luggage, vehicle_type, meal_plan, picks, dropoff_text, pay_method, total, travel_date,
+                                     pass_type, pass_amount, luggage_amount, total_amount, consent_at)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,now()) RETURNING code, created_at`,
+          [code, userId, p, lug, vehicleType, mealPlan, JSON.stringify(itinerary), dropoff, payMethodValue, totalAmount, tDate,
+           passType, passAmount, luggageAmount, totalAmount],
         );
-        return res.status(201).json(toBooking({ ...req.body, code: rows[0].code, vehicleType, total, party: p, luggage: lug, dropoffText: dropoff, payMethod: payMethodValue, travelDate: tDate }));
+        return res.status(201).json(toBooking({
+          ...req.body, code: rows[0].code, vehicleType, party: p, luggage: lug,
+          dropoffText: dropoff, payMethod: payMethodValue, travelDate: tDate,
+          passType, passAmount, luggageAmount, totalAmount, total: totalAmount,
+        }));
       } catch (e) {
         if (e.code !== '23505') throw e; // unique 충돌만 재시도
       }
@@ -77,6 +88,11 @@ router.get('/gts/bookings/:code', async (req, res) => {
       payMethod: b.pay_method,
       total: b.total,
       travelDate: b.travel_date_str, // [V3]
+      // [V7] 분리 내역 · 구 예약은 pass_type NULL → 티켓 "Not specified"
+      passType: b.pass_type,
+      passAmount: b.pass_amount,
+      luggageAmount: b.luggage_amount,
+      totalAmount: b.total_amount,
     }),
   );
 });
@@ -99,6 +115,11 @@ function toBooking(src) {
     payMethod: src.payMethod ?? null,
     total: src.total,
     travelDate: src.travelDate ?? null, // [V3] 빌더 날짜 관통(체크아웃·티켓 표기)
+    // [V7] 시간제 이용권 분리 내역(구 예약 null 허용)
+    passType: src.passType ?? null,
+    passAmount: src.passAmount ?? null,
+    luggageAmount: src.luggageAmount ?? null,
+    totalAmount: src.totalAmount ?? null,
   };
 }
 

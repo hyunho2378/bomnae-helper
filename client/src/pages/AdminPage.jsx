@@ -48,6 +48,20 @@ function useApi(path, { poll } = {}) {
 
 const fmtSec = (ms) => (ms == null ? '-' : `${(ms / 1000).toFixed(1)}s`);
 const fmtTime = (iso) => new Date(iso).toLocaleTimeString('en-GB');
+
+// [V6] Duration = Ended − Started(벽시계). 60초 미만은 초, 그 이상은 분·초.
+const fmtDur = (ms) => {
+  if (ms == null) return '-';
+  const s = Math.round(ms / 1000);
+  if (s < 60) return `${s}s`;
+  return `${Math.floor(s / 60)}m ${s % 60}s`;
+};
+// [V6] 이벤트가 2개 미만이면 머문 시간을 알 수 없음(0으로 오도하지 않음).
+const rowDuration = (p) => {
+  if ((p.event_count ?? 0) < 2 || !p.last_at || !p.started_at) return 'unknown';
+  return fmtDur(new Date(p.last_at) - new Date(p.started_at));
+};
+
 const payloadSummary = (step, payload = {}) => {
   if (step === 'setup') return `party ${payload.party} · ${payload.vehicle}${payload.luggage ? ' · luggage' : ''}`;
   if (step === 'meal_plan') return payload.plan ?? '';
@@ -60,10 +74,10 @@ const payloadSummary = (step, payload = {}) => {
   return '';
 };
 
+// [V6] 대시보드 재구성 · 컬럼: 이름 · Started · Ended · Duration · Completed(예약 유무 O/X).
+//   중간 단계 컬럼은 화면에서 빼고(데이터는 보존) 행 클릭 시 전체 이벤트 타임라인 확장.
+const COLS = 'grid-cols-[1fr_88px_88px_112px_80px_24px]';
 
-// [V6] Overview 참가자 표 복원 — [V4]에서 제거했던 ParticipantRow(클릭 확장 스텝 리스트)를 재도입.
-//   스탯 6장 + 참가자별 행 동거 · 데이터는 동일 /api/admin/participants 재사용(서버 변경 0).
-// 참가자 행 · 클릭 확장 → 스텝 세로 리스트(§28 타임라인 문법 준용: 수직 라인 + 노드 원)
 function ParticipantRow({ p }) {
   const [open, setOpen] = useState(false);
   return (
@@ -72,7 +86,7 @@ function ParticipantRow({ p }) {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="grid min-h-44 grid-cols-[1fr_120px_100px_90px_90px_24px] items-center gap-12 px-16 py-8 text-left text-small transition-colors duration-fast hover:bg-surface"
+        className={`grid min-h-44 ${COLS} items-center gap-12 px-16 py-8 text-left text-small transition-colors duration-fast hover:bg-surface`}
       >
         <span className="min-w-0">
           <span className="block truncate font-semibold text-ink">
@@ -81,11 +95,11 @@ function ParticipantRow({ p }) {
           <span className="block truncate text-caption text-inkMeta">{p.name}</span>
         </span>
         <span className="font-display text-caption text-inkSec">{fmtTime(p.started_at)}</span>
-        <span className="font-semibold">{p.last_step}</span>
+        <span className="font-display text-caption text-inkSec">{p.last_at ? fmtTime(p.last_at) : '-'}</span>
+        <span className="font-display font-semibold">{rowDuration(p)}</span>
         <span className={`font-display font-bold ${p.completed ? 'text-green' : 'text-inkMeta'}`}>
-          {p.completed ? (p.booking_code ?? 'done') : '-'}
+          {p.completed ? 'O' : 'X'}
         </span>
-        <span className="font-display font-semibold">{fmtSec(p.total_ms)}</span>
         <ChevronDown
           size={16}
           aria-hidden="true"
@@ -95,12 +109,14 @@ function ParticipantRow({ p }) {
       {open && (
         <ol className="relative mx-16 mb-16 flex flex-col border-l-0 pl-24">
           <span aria-hidden="true" className="absolute bottom-8 left-8 top-8 w-2 rounded-pill bg-line" />
-          {/* [V6] 이벤트 없이 완주(예약만 있음, 서버 다운 시 트래킹 누락) 또는 로그인만 */}
+          {/* [V6] 이벤트 없이 완주(예약만 있음, 트래킹 누락) 또는 로그인만 */}
           {!(p.steps ?? []).length &&
             (p.booking_picks?.length ? (
               <li className="relative flex items-baseline gap-12 py-8">
                 <span aria-hidden="true" className="absolute -left-20 top-1/2 h-12 w-12 -translate-y-1/2 rounded-pill bg-primary shadow-sm" />
-                <span className="w-96 shrink-0 font-display text-caption font-bold text-primary">booked</span>
+                <span className="w-96 shrink-0 font-display text-caption font-bold text-primary">
+                  booked {p.booking_code ?? ''}
+                </span>
                 <span className="min-w-0 flex-1 text-small text-ink">{p.booking_picks.map(venueName).join(' > ')}</span>
                 <span className="shrink-0 font-display text-caption font-semibold text-inkMeta">no tracking</span>
               </li>
@@ -123,36 +139,27 @@ function ParticipantRow({ p }) {
   );
 }
 
-// [V5] complete 이벤트 payload에서 두 건너뛰기 bool 추출 · 스킵 비율 = flag 보유 완주자 중 false 비율
-function skipRate(rows, field) {
-  const flags = rows
-    .filter((r) => r.completed)
-    .map((r) => (r.steps ?? []).find((s) => s.step === 'complete')?.payload)
-    .filter((p) => p && typeof p[field] === 'boolean');
-  if (!flags.length) return '-';
-  const skipped = flags.filter((p) => p[field] === false).length;
-  return `${Math.round((skipped / flags.length) * 100)}%`;
-}
-
 function Overview() {
   const { data, error, loadedAt } = useApi('/api/admin/participants', { poll: 15000 });
   const rows = data?.participants ?? [];
+  const excludedCount = data?.excludedCount ?? 0;
   const completed = rows.filter((r) => r.completed).length;
-  const avgMs = rows.length ? rows.reduce((a, r) => a + (r.total_ms ?? 0), 0) / rows.length : null;
+  // [V6] 평균 체류 = 이벤트 2개 이상 유저의 (Ended − Started) 평균(1개 이하는 머문 시간 불명이라 제외).
+  const dwellers = rows.filter((r) => (r.event_count ?? 0) >= 2 && r.last_at && r.started_at);
+  const avgDwellMs = dwellers.length
+    ? dwellers.reduce((a, r) => a + (new Date(r.last_at) - new Date(r.started_at)), 0) / dwellers.length
+    : null;
 
   const stats = [
     { label: 'Participants', value: rows.length },
     { label: 'Completed', value: completed },
     { label: 'Completion rate', value: rows.length ? `${Math.round((completed / rows.length) * 100)}%` : '-' },
-    { label: 'Avg total time', value: avgMs != null ? fmtSec(avgMs) : '-' },
-    // [V5] 무마찰 검증 스탯 · 완주자 중 각 단계를 건너뛴 비율
-    { label: 'Dropoff skipped', value: skipRate(rows, 'dropoffProvided') },
-    { label: 'Payment skipped', value: skipRate(rows, 'payMethodProvided') },
+    { label: 'Avg dwell (2+ events)', value: avgDwellMs != null ? fmtDur(avgDwellMs) : '-' },
   ];
 
   return (
     <div className="flex flex-col gap-24">
-      <div className="grid grid-cols-2 gap-16 lg:grid-cols-3">
+      <div className="grid grid-cols-2 gap-16 lg:grid-cols-4">
         {stats.map(({ label, value }) => (
           <div key={label} className="flex flex-col gap-4 rounded-lg bg-white p-24 shadow-sm">
             <span className="text-caption font-semibold uppercase tracking-eyebrow text-inkMeta">{label}</span>
@@ -161,26 +168,34 @@ function Overview() {
         ))}
       </div>
       {error && <p className="text-small font-medium text-spice">Load failed: {error}</p>}
-      {/* [V6] 복원 · 참가자별 여정 표(행 클릭 = 스텝 확장) */}
+      {/* [V6] 참가자별 여정 표(최신 활동순 · 행 클릭 = 전체 타임라인 확장) */}
       <div className="overflow-x-auto rounded-lg bg-white shadow-sm">
-        <div className="grid min-w-[720px] grid-cols-[1fr_120px_100px_90px_90px_24px] gap-12 px-16 py-12 text-caption font-semibold uppercase tracking-eyebrow text-inkMeta">
+        <div className={`grid min-w-[680px] ${COLS} gap-12 px-16 py-12 text-caption font-semibold uppercase tracking-eyebrow text-inkMeta`}>
           <span>Participant</span>
           <span>Started</span>
-          <span>Last step</span>
-          <span>Booking</span>
-          <span>Total</span>
+          <span>Ended</span>
+          <span>Duration</span>
+          <span>Completed</span>
           <span />
         </div>
-        <div className="flex min-w-[720px] flex-col divide-y divide-line">
+        <div className="flex min-w-[680px] flex-col divide-y divide-line">
           {rows.map((p) => (
             <ParticipantRow key={p.id} p={p} />
           ))}
-          {!rows.length && <p className="px-16 py-24 text-small text-inkSec">No journey events yet.</p>}
+          {!rows.length && <p className="px-16 py-24 text-small text-inkSec">No participants yet.</p>}
         </div>
       </div>
-      {loadedAt && (
-        <p className="text-caption text-inkMeta">Updated {loadedAt.toLocaleTimeString('en-GB')} · polls every 15s</p>
-      )}
+      <div className="flex flex-wrap items-center justify-between gap-8">
+        {loadedAt && (
+          <p className="text-caption text-inkMeta">Updated {loadedAt.toLocaleTimeString('en-GB')} · polls every 15s</p>
+        )}
+        {/* [V6] 팀 내부 계정은 통계에서 제외(행 삭제 아님) · 제외 수 고지 */}
+        {excludedCount > 0 && (
+          <p className="text-caption text-inkMeta">
+            {excludedCount} internal account{excludedCount === 1 ? '' : 's'} excluded from stats
+          </p>
+        )}
+      </div>
     </div>
   );
 }

@@ -17,8 +17,8 @@ const CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 const makeCode = () =>
   Array.from({ length: 6 }, () => CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)]).join('');
 
-// §33 합계 산식: base[vehicleType] + (luggage ? luggageFee : 0) + perPerson × party
-// 화면 실시간 표시용 — 확정 총액은 서버 재계산 값이 우선한다
+// [V7] DEPRECATED — 시간제 이용권(passes.js computePassTotal)으로 대체 · 소비자 0(롤백 대비 보존).
+// 구 §33 합계 산식: base[vehicleType] + (luggage ? luggageFee : 0) + perPerson × party
 export function computeGtsTotal(vehicleType, luggage, party) {
   const fare = fares[vehicleType];
   return fare.base + (luggage ? fares.luggageFee : 0) + fare.perPerson * party;

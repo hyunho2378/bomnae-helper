@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { Bus, CarFront } from 'lucide-react';
 import CalendarField from '../components/gate/CalendarField';
 import Container from '../components/layout/Container';
-import FareBreakdown from '../components/gts/FareBreakdown';
+import StepIndicator from '../components/gts/StepIndicator';
 import Button from '../components/ui/Button';
 import Stepper from '../components/ui/Stepper';
 import { useGts } from '../context/GtsContext';
@@ -45,9 +45,14 @@ export default function GtsSetup() {
     <Container>
       {/* v4.2 §10.4 데스크탑 확폭: max-w-dialog 페이지 래퍼 제거 — lg 2컬럼으로 v3.2 컨테이너 실사용 */}
       <div className="flex w-full flex-col gap-32 pb-64 pt-96">
-        <div className="flex flex-col gap-8">
-          <LangSwap k="gts.setup.title" as="h1" className="text-h1 font-bold tracking-display" />
-          <LangSwap k="gts.setup.sub" as="p" className="text-body text-inkSec" />
+        {/* [V8] 헤딩 + 단계 인디케이터 · lg = 헤딩 우측 상단(레이아웃 불침범) / <lg = 헤딩 아래 한 줄 컴팩트 */}
+        <div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between lg:gap-24">
+          <div className="flex flex-col gap-8">
+            <LangSwap k="gts.setup.title" as="h1" className="text-h1 font-bold tracking-display" />
+            <LangSwap k="gts.setup.sub" as="p" className="text-body text-inkSec" />
+          </div>
+          {/* 이 화면 = 1단계 active · 다른 화면 부착은 currentStep 한 줄 확장 */}
+          <StepIndicator currentStep={1} />
         </div>
 
         {/* [H2-10] 단일 카드: 좌 = Your ride / 우 = Travelers+짐 토글, CTA는 우측 컬럼 아래 우측 정렬 */}
@@ -66,8 +71,8 @@ export default function GtsSetup() {
               <LangSwap k={`gts.vehicle.${vehicle}`} className="font-display text-h2 font-bold" />
             )}
           </div>
-          {/* 요금 구성 · fares 조회 전용(§9.3) */}
-          {vehicle && <FareBreakdown vehicle={vehicle} luggage={luggage} party={party ?? 1} />}
+          {/* [V7] 구 요금 구성(FareBreakdown) 렌더 제거 — 요금은 체크아웃의 시간제 이용권이 단일 기준.
+              셋업 카드는 차량 매칭 결과만 표시(모순되는 이중 가격 노출 방지 · 명세 밖 결정 보고). */}
         </section>
 
         {/* 인원 + 짐 보관 · 우측 컬럼(lg) */}
