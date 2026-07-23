@@ -7,17 +7,21 @@ const { requireAdmin } = require('../lib/admin');
 
 const router = express.Router();
 
-// [V6] 검증 대시보드 = 실제(구글/기관 이메일) 로그인 사용자만.
+// [V6] 검증 대시보드 = 실제 로그인 사용자(구글 이메일 + ID/PIN 일반 로그인 모두 포함).
 //   LEFT JOIN이라 로그인만 하고 여정 이벤트가 없는 실계정도 표시("이 사람들이 로그인해 썼다" 검증).
-//   테스트/ID·PIN(email null)·example.com·demo 계정은 WHERE에서 제외(영구 삭제 아님 · 되돌리기 쉬움).
-const REAL_USER_FILTER = `u.email IS NOT NULL
-      AND lower(u.email) NOT LIKE '%@example.com'
-      AND lower(u.email) <> 'demo@gts.ac.kr'`;
+//   자동화/시드/데모 계정만 제외: demo · example.com · admin seed(minwoo) · tester01 · e2e*.
+//   NULL 필드는 coalesce로 안전 처리(미제외 조건이 NULL 되어 실계정이 누락되는 것 방지). 영구 삭제 아님.
+const REAL_USER_FILTER = `NOT (
+      coalesce(lower(u.email), '') = 'demo@gts.ac.kr'
+      OR coalesce(lower(u.email), '') LIKE '%@example.com'
+      OR coalesce(lower(u.username), '') IN ('minwoo', 'tester01')
+      OR coalesce(lower(u.username), '') LIKE 'e2e%'
+    )`;
 
 router.get('/admin/participants', requireAdmin, async (req, res) => {
   const { rows } = await pool.query(`
     SELECT
-      u.id, u.email, u.name,
+      u.id, u.email, u.name, u.username,
       coalesce(min(e.created_at), u.created_at)  AS started_at,
       max(e.created_at)                          AS last_at,
       coalesce(
@@ -36,7 +40,7 @@ router.get('/admin/participants', requireAdmin, async (req, res) => {
     FROM users u
     LEFT JOIN journey_events e ON e.user_id = u.id
     WHERE ${REAL_USER_FILTER}
-    GROUP BY u.id, u.email, u.name, u.created_at
+    GROUP BY u.id, u.email, u.name, u.username, u.created_at
     ORDER BY (count(e.id) > 0) DESC, coalesce(min(e.created_at), u.created_at) DESC
   `);
   res.json({ participants: rows });
@@ -52,7 +56,8 @@ router.get('/admin/events', requireAdmin, async (req, res) => {
     where += ' AND e.created_at > $1';
   }
   const { rows } = await pool.query(
-    `SELECT e.id, e.step, e.payload, e.duration_ms, e.created_at, u.email
+    `SELECT e.id, e.step, e.payload, e.duration_ms, e.created_at,
+            coalesce(u.email, '@' || u.username) AS email
      FROM journey_events e JOIN users u ON u.id = e.user_id
      ${where}
      ORDER BY e.created_at DESC

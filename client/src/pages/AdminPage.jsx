@@ -70,7 +70,9 @@ function ParticipantRow({ p }) {
         className="grid min-h-44 grid-cols-[1fr_120px_100px_90px_90px_24px] items-center gap-12 px-16 py-8 text-left text-small transition-colors duration-fast hover:bg-surface"
       >
         <span className="min-w-0">
-          <span className="block truncate font-semibold text-ink">{p.email ?? p.name ?? '(guest)'}</span>
+          <span className="block truncate font-semibold text-ink">
+            {p.email ?? (p.username ? `@${p.username}` : null) ?? p.name ?? '(guest)'}
+          </span>
           <span className="block truncate text-caption text-inkMeta">{p.name}</span>
         </span>
         <span className="font-display text-caption text-inkSec">{fmtTime(p.started_at)}</span>
