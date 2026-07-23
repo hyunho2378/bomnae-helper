@@ -7,6 +7,7 @@ import RequireAuth from './components/ui/RequireAuth'; // [V1]
 import { ArrivalProvider } from './context/ArrivalContext';
 import { AuthProvider } from './context/AuthContext';
 import { BookingProvider } from './context/BookingContext';
+import { CurrencyProvider } from './context/CurrencyContext'; // [V12]
 import { GtsProvider } from './context/GtsContext';
 import { LangProvider } from './i18n/LangContext';
 // [V10] About는 비공개(HIDDEN) — 라우트가 404 위장을 렌더하므로 import하지 않음(pages/About.jsx는 보존).
@@ -31,6 +32,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <LangProvider>
+        <CurrencyProvider>
         <AuthProvider>
           <BookingProvider>
             <ArrivalProvider>
@@ -69,6 +71,7 @@ export default function App() {
             </ArrivalProvider>
           </BookingProvider>
         </AuthProvider>
+        </CurrencyProvider>
       </LangProvider>
     </BrowserRouter>
   );

@@ -151,8 +151,9 @@ export default function BottomSheet({ open, onClose, title, children }) {
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-sheet lg:hidden">
-      <div aria-hidden="true" onClick={onClose} className="absolute inset-0" />
+    // [V13] z-dialog(70) — StepStage(z-sheet 60) 위 보장 · 어두운 스크림으로 배경과 분리
+    <div className="fixed inset-0 z-dialog lg:hidden">
+      <div aria-hidden="true" onClick={onClose} className="absolute inset-0 bg-scrim" />
       <div
         ref={panelRef}
         role="dialog"

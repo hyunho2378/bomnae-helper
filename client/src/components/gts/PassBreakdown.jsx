@@ -3,15 +3,7 @@
 // 이용권 미선택이면 금액 라인 대신 안내 1줄(금액의 근거가 없음).
 import { LUGGAGE_FEE, PASS_PRICES, computePassTotal } from '../../data/gts/passes';
 import LangSwap from '../../i18n/LangSwap';
-
-function PassRow({ labelKey, children }) {
-  return (
-    <div className="flex items-baseline justify-between gap-16">
-      <LangSwap k={labelKey} className="text-small font-medium text-inkSec" />
-      <span className="font-display text-body font-semibold">{children}</span>
-    </div>
-  );
-}
+import Money from '../ui/Money'; // [V12] 통화 환산 표시
 
 export default function PassBreakdown({ passType, luggage }) {
   const total = computePassTotal(passType, luggage);
@@ -23,26 +15,20 @@ export default function PassBreakdown({ passType, luggage }) {
       {/* 이용권 라인 · 이름에 시간 포함(1-hour pass 등) */}
       <div className="flex items-baseline justify-between gap-16">
         <LangSwap k={`gts.pass.names.${passType}`} className="text-small font-medium text-inkSec" />
-        <span className="font-display text-body font-semibold">
-          {'₩'}
-          {PASS_PRICES[passType].toLocaleString('en-US')}
-        </span>
+        <Money krw={PASS_PRICES[passType]} className="text-right font-display text-body font-semibold" />
       </div>
       {/* 짐 보관 · 선택 시에만 라인 노출(명세 [3]) */}
       {luggage && (
-        <PassRow labelKey="gts.fare.luggage">
-          {'₩'}
-          {LUGGAGE_FEE.toLocaleString('en-US')}
-        </PassRow>
+        <div className="flex items-baseline justify-between gap-16">
+          <LangSwap k="gts.fare.luggage" className="text-small font-medium text-inkSec" />
+          <Money krw={LUGGAGE_FEE} className="text-right font-display text-body font-semibold" />
+        </div>
       )}
       {/* 수평 디바이더 · colors.line 허용 예외(Booking 요약 카드 선례) */}
       <div aria-hidden="true" className="h-px w-full bg-line" />
       <div className="flex items-baseline justify-between gap-16">
         <LangSwap k="gts.fare.total" className="text-small font-semibold" />
-        <span className="font-display text-h3 font-bold text-primary">
-          {'₩'}
-          {total.toLocaleString('en-US')}
-        </span>
+        <Money krw={total} className="text-right font-display text-h3 font-bold text-primary" convClassName="text-caption font-medium text-inkMeta" />
       </div>
     </div>
   );

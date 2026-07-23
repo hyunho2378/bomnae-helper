@@ -1,9 +1,9 @@
-// 셸 · Header + Outlet + GlassDock(<lg) + Footer. /loop만 Footer 숨김(ROUTES §2 분기 1곳 허용).
+// 셸 · Header + Outlet + Footer. [V17] GlassDock(하단 바) 폐지 — 모바일 내비는 Header의 햄버거(MobileMenu).
+//   /travel-log만 Footer 숨김(풀블리드 지도 · ROUTES §2 분기 1곳 허용).
 import { useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useLang } from '../../i18n/LangContext';
 import Footer from '../nav/Footer';
-import GlassDock from '../nav/GlassDock';
 import Header from '../nav/Header';
 
 // pathname → meta.title 키 (v4 라우트 기준 · 구 loop 분기는 리다이렉트 경유라 잔존 무해).
@@ -50,11 +50,11 @@ export default function PageLayout() {
     <>
       <Header />
       {/* [H2-4] 짧은 페이지 푸터 밀어내기 · 헤더는 fixed(문서 공간 미점유)라 main이 top 0부터
-          시작 — min-height 100dvh로 푸터를 첫 화면 밖으로 민다 */}
-      <main className="relative z-content min-h-[100dvh] pb-96 lg:pb-0">
+          시작 — min-height 100dvh로 푸터를 첫 화면 밖으로 민다.
+          [V17] 하단 바(GlassDock) 폐지로 dock 여백(pb-96) 제거 — 하단 콘텐츠 잘림 없음(각 페이지 자체 하단 패딩 보유). */}
+      <main className="relative z-content min-h-[100dvh]">
         <Outlet />
       </main>
-      <GlassDock />
       {!hideFooter && <Footer />}
     </>
   );

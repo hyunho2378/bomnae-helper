@@ -12,9 +12,14 @@ async function seedMockReviews(client) {
   for (const r of mockReviews) {
     // eslint-disable-next-line no-await-in-loop
     await client.query(
+      // [V13] DO UPDATE — 재생성 시 날짜/문안 변경이 반영되게(시드 필드만 · 여전히 멱등, review_likes 무영향)
       `INSERT INTO reviews (id, user_id, author_label, country, course_label_key, rating, title, body, lang, mock, seed_likes, created_at)
        VALUES ($1, NULL, $2, $3::jsonb, $4, $5, $6, $7, $8, true, $9, $10)
-       ON CONFLICT (id) DO NOTHING`,
+       ON CONFLICT (id) DO UPDATE SET
+         author_label = EXCLUDED.author_label, country = EXCLUDED.country,
+         course_label_key = EXCLUDED.course_label_key, rating = EXCLUDED.rating,
+         title = EXCLUDED.title, body = EXCLUDED.body, lang = EXCLUDED.lang,
+         seed_likes = EXCLUDED.seed_likes, created_at = EXCLUDED.created_at`,
       [r.id, r.author_label, JSON.stringify(r.country), r.course_label_key, r.rating, r.title, r.body, r.lang, r.seed_likes, r.created_at],
     );
   }

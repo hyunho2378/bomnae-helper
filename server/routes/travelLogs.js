@@ -17,6 +17,8 @@ router.get('/travel-logs', async (req, res) => {
               u.name
        FROM gts_bookings b
        LEFT JOIN users u ON u.id = b.user_id
+       WHERE b.status IS DISTINCT FROM 'cancelled'
+         AND (b.travel_date IS NULL OR b.travel_date <= CURRENT_DATE)  -- [V13] 오늘 이후(미래 여행일) 제외
        ORDER BY b.created_at DESC
        LIMIT 6`,
     );

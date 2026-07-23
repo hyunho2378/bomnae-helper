@@ -43,7 +43,8 @@ export default function Dialog({ open, onClose, title, children }) {
 
   return createPortal(
     <div className="fixed inset-0 z-dialog hidden place-items-center lg:grid">
-      <div aria-hidden="true" onClick={onClose} className="absolute inset-0" />
+      {/* [V13] 어두운 스크림(§35) — 밝은 StepStage 글래스 패널 위에서도 모달이 묻히지 않게 */}
+      <div aria-hidden="true" onClick={onClose} className="absolute inset-0 bg-scrim" />
       <div
         ref={panelRef}
         role="dialog"

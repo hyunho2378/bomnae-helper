@@ -4,6 +4,7 @@
 const express = require('express');
 const pool = require('../db/pool');
 const { requireAdmin, ADMIN_EMAILS } = require('../lib/admin');
+const { setAdmin2faCookie, readAdmin2fa } = require('../lib/session'); // [V16] 2차 인증 서명 쿠키
 
 const router = express.Router();
 
@@ -86,50 +87,84 @@ router.get('/admin/events', requireAdmin, async (req, res) => {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // [V11] User Management 2차 게이트 · env ADMIN_2FA_PIN 검증(하드코딩 금지).
-//   성공 시 30분 유효 · 5회 실패 시 10분 잠금. 상태는 서버 프로세스 인메모리(userId 키) —
-//   재시작 시 재입력(허용) · 실패 카운트는 서버만 신뢰(클라 조작 방지).
+//   성공 시 30분 유효 · 5회 실패 시 10분 잠금.
+// [V16] 통과 상태 = 서명 쿠키 gts_admin2fa(HMAC, gts_session과 동일 패턴) — 인메모리 userId 검증 상태 폐지
+//   (다중 인스턴스·재시작에도 일관). 실패 잠금만 서버 메모리(IP 기준 Map · DB/테이블 의존 없음 · 재시작 초기화 무방).
+//   env 미설정 = 503, 비밀번호 불일치 = 401(일반 문구), 예외 = 500+스택 로깅. PIN 값은 어디에도 남기지 않는다.
 // ─────────────────────────────────────────────────────────────────────────────
-const ADMIN_2FA_PIN = (process.env.ADMIN_2FA_PIN || '').trim();
+// [V12] env 미설정 폴백: 개발(non-prod)에서만 '000000' · 프로덕션은 env 필수(미설정 시 not_configured 반환).
+//   Render env 붙여넣기 시 후행 공백/개행이 흔해 양쪽 trim(서버 env + 아래 요청 pin + 클라 입력).
+const IS_PROD = process.env.NODE_ENV === 'production';
+const ADMIN_2FA_PIN = (process.env.ADMIN_2FA_PIN || (IS_PROD ? '' : '000000')).trim();
+// [V12] 기동 시 1회 진단 로그 · 값 존재 여부 + 길이만(값 자체 절대 비로그 — Render 로그로 env 등록 확인).
+console.log(
+  '[admin] ADMIN_2FA_PIN configured:',
+  !!ADMIN_2FA_PIN,
+  '· length:',
+  ADMIN_2FA_PIN.length,
+  '· source:',
+  process.env.ADMIN_2FA_PIN ? 'env' : IS_PROD ? 'none' : 'dev-fallback(000000)',
+);
 const TWOFA_TTL_MS = 30 * 60 * 1000; // 30분 유효
 const LOCK_MS = 10 * 60 * 1000; // 10분 잠금
 const MAX_FAILS = 5;
-const twoFa = new Map(); // userId -> { verifiedUntil, failCount, lockedUntil }
-const twoFaState = (uid) => twoFa.get(uid) || { verifiedUntil: 0, failCount: 0, lockedUntil: 0 };
+
+// [V16] 통과 상태 = 서명 쿠키 gts_admin2fa(readAdmin2fa) · 실패 잠금 = 서버 메모리(IP 기준 Map, DB 미사용).
+//   프로세스 재시작 시 잠금 초기화 무방(스펙). userId 키 인메모리 검증 상태 폐지 → 다중 인스턴스/재시작에도 쿠키로 일관.
+const failByIp = new Map(); // ip -> { failCount, lockedUntil }
+const ipState = (ip) => failByIp.get(ip) || { failCount: 0, lockedUntil: 0 };
+const clientIp = (req) => req.ip || req.socket?.remoteAddress || 'unknown';
 
 router.post('/admin/2fa', requireAdmin, (req, res) => {
-  const uid = req.adminUserId;
-  const now = Date.now();
-  const st = twoFaState(uid);
-  if (st.lockedUntil > now) return res.status(423).json({ error: 'locked', lockedUntil: st.lockedUntil });
-  if (!ADMIN_2FA_PIN) return res.status(500).json({ error: 'not_configured' }); // env 미설정
-  const pin = String(req.body?.pin ?? '');
-  if (pin.length > 0 && pin === ADMIN_2FA_PIN) {
-    twoFa.set(uid, { verifiedUntil: now + TWOFA_TTL_MS, failCount: 0, lockedUntil: 0 });
-    return res.json({ ok: true, verifiedUntil: now + TWOFA_TTL_MS });
+  try {
+    const now = Date.now();
+    const ip = clientIp(req);
+    const st = ipState(ip);
+    if (st.lockedUntil > now) return res.status(423).json({ error: 'locked', lockedUntil: st.lockedUntil });
+    // [V16] env 미설정 = 503(500 아님) + 명확한 문구 · PIN 값은 로그·응답에 절대 담지 않는다
+    if (!ADMIN_2FA_PIN) {
+      return res.status(503).json({ error: 'not_configured', message: '관리자 인증이 구성되지 않았습니다' });
+    }
+    // [V16] 양쪽 trim 후 문자열 비교 · 클라 body 키('pin')와 서버 읽는 키('pin') 일치
+    const pin = String(req.body?.pin ?? '').trim();
+    if (pin.length > 0 && pin === ADMIN_2FA_PIN) {
+      failByIp.delete(ip); // 성공 시 실패 카운트 리셋
+      const expiresAt = now + TWOFA_TTL_MS;
+      setAdmin2faCookie(res, req.adminUserId, expiresAt); // [V16] 서명 쿠키(만료 포함)로 통과 상태 발급
+      return res.json({ ok: true, verifiedUntil: expiresAt });
+    }
+    const failCount = st.failCount + 1;
+    if (failCount >= MAX_FAILS) {
+      failByIp.set(ip, { failCount: 0, lockedUntil: now + LOCK_MS });
+      return res.status(423).json({ error: 'locked', lockedUntil: now + LOCK_MS });
+    }
+    failByIp.set(ip, { failCount, lockedUntil: 0 });
+    // [V16] 비밀번호 불일치 = 401 일반 오류(구체 사유 비노출) · 남은 시도 횟수만 동반
+    return res.status(401).json({ error: 'invalid_pin', remaining: MAX_FAILS - failCount });
+  } catch (e) {
+    // [V16] 스택 삼킴 금지 — 전문 로깅(단, PIN 값은 절대 로그하지 않음)
+    console.error('[admin:2fa] 예외:', e.stack || e.message);
+    return res.status(500).json({ error: 'internal' });
   }
-  const failCount = st.failCount + 1;
-  if (failCount >= MAX_FAILS) {
-    twoFa.set(uid, { verifiedUntil: 0, failCount: 0, lockedUntil: now + LOCK_MS });
-    return res.status(423).json({ error: 'locked', lockedUntil: now + LOCK_MS });
-  }
-  twoFa.set(uid, { verifiedUntil: 0, failCount, lockedUntil: 0 });
-  return res.status(401).json({ error: 'wrong_pin', remaining: MAX_FAILS - failCount });
 });
 
 router.get('/admin/2fa/status', requireAdmin, (req, res) => {
   const now = Date.now();
-  const st = twoFaState(req.adminUserId);
+  const v = readAdmin2fa(req); // 서명 쿠키 검증(서명·만료)
+  const verified = !!v && v.uid === req.adminUserId && v.expiresAt > now;
+  const st = ipState(clientIp(req));
   res.json({
-    verified: st.verifiedUntil > now,
-    verifiedUntil: st.verifiedUntil > now ? st.verifiedUntil : 0,
+    verified,
+    verifiedUntil: verified ? v.expiresAt : 0,
     lockedUntil: st.lockedUntil > now ? st.lockedUntil : 0,
     configured: !!ADMIN_2FA_PIN,
   });
 });
 
-// 2차 게이트 통과 필수(requireAdmin 다음 체이닝) · 미통과 시 403 2fa_required
+// [V16] 2차 게이트 통과 필수(requireAdmin 다음 체이닝) · 서명 쿠키로 판정 · 미통과 403
 function requireAdmin2fa(req, res, next) {
-  if (twoFaState(req.adminUserId).verifiedUntil > Date.now()) return next();
+  const v = readAdmin2fa(req);
+  if (v && v.uid === req.adminUserId && v.expiresAt > Date.now()) return next();
   return res.status(403).json({ error: '2fa_required' });
 }
 

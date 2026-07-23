@@ -10,8 +10,8 @@ import { motion } from '../../tokens';
 export default function CourseQueue({ items, onRemove, km, minutes }) {
   const { t } = useLang();
   if (!items.length) return null;
-  // 예: "약 12.4km · 25분" (지시 [1] 형식)
-  const badge = `${t('gts.build.approx')} ${km.toFixed(1)}km · ${minutes}${t('gts.build.minUnit')}`;
+  // [V13] 거리 배지 = 픽 2개 이상일 때만(0.0km 상태 숨김). 값은 SUIT(기본 폰트)·저두께·큰 크기.
+  const showEstimate = km > 0;
   return (
     <div className="flex flex-wrap items-center gap-8 rounded-lg bg-surface p-12">
       <LangSwap
@@ -24,7 +24,8 @@ export default function CourseQueue({ items, onRemove, km, minutes }) {
           className="flex items-center gap-6 rounded-pill bg-white py-4 pl-12 pr-4 shadow-sm"
           style={{ animation: `bh-queue-in 220ms ${motion.easeOut} both` }}
         >
-          <span className="font-display text-caption font-bold text-primary">{i + 1}</span>
+          {/* [V13] "1: 이름" 형식 */}
+          <span className="font-display text-caption font-bold text-primary">{i + 1}:</span>
           <TriText text={v.name} className="text-small font-semibold" />
           <button
             type="button"
@@ -37,10 +38,15 @@ export default function CourseQueue({ items, onRemove, km, minutes }) {
           </button>
         </span>
       ))}
-      {/* 우측 끝 합계 배지 · 큐 변경마다 즉시 갱신 */}
-      <span className="ml-auto shrink-0 rounded-pill bg-primary px-12 py-6 font-display text-caption font-bold text-white">
-        {badge}
-      </span>
+      {/* [V13] 우측 끝 추정 거리 · 라벨(3언어) + 값(SUIT·medium·body). 픽 1개 이하면 숨김 */}
+      {showEstimate && (
+        <span className="ml-auto flex shrink-0 flex-col items-end leading-tight">
+          <LangSwap k="gts.build.routeEstimate" className="text-caption font-medium text-inkMeta" />
+          <span className="text-body font-medium text-primary">
+            {`${t('gts.build.approx')} ${km.toFixed(1)}km · ${minutes}${t('gts.build.minUnit')}`}
+          </span>
+        </span>
+      )}
       <style>{`@keyframes bh-queue-in { from { opacity: 0; transform: scale(0.9) translateY(8px); } to { opacity: 1; transform: none; } }`}</style>
     </div>
   );

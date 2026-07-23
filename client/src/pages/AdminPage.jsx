@@ -104,8 +104,19 @@ function ParticipantRow({ p }) {
         aria-expanded={open}
         className={`grid min-h-44 ${COLS} items-center gap-12 px-16 py-8 text-left text-small transition-colors duration-fast hover:bg-surface`}
       >
-        {/* [V6] Email / Name 열 분리(요청) */}
-        <span className="min-w-0 truncate font-semibold text-ink">{p.email ?? '—'}</span>
+        {/* [V6] Email / Name 열 분리 · [V12] email null 계정은 @username + "ID" 회색 배지 */}
+        <span className="flex min-w-0 items-center gap-8">
+          {p.email ? (
+            <span className="min-w-0 truncate font-semibold text-ink">{p.email}</span>
+          ) : p.username ? (
+            <>
+              <span className="min-w-0 truncate font-semibold text-ink">{`@${p.username}`}</span>
+              <span className="shrink-0 rounded-pill bg-line px-8 py-2 text-caption font-semibold text-inkMeta">ID</span>
+            </>
+          ) : (
+            <span className="text-ink">—</span>
+          )}
+        </span>
         <span className="min-w-0 truncate text-inkSec">
           {p.name ?? (p.username ? `@${p.username}` : '—')}
         </span>
@@ -187,7 +198,7 @@ function Overview() {
       {/* [V6] 참가자별 여정 표(최신 활동순 · 행 클릭 = 전체 타임라인 확장) */}
       <div className="overflow-x-auto rounded-lg bg-white shadow-sm">
         <div className={`grid min-w-[760px] ${COLS} gap-12 px-16 py-12 text-caption font-semibold uppercase tracking-eyebrow text-inkMeta`}>
-          <span>Email</span>
+          <span>Email / ID</span>
           <span>Name</span>
           <span>Started</span>
           <span>Status</span>
@@ -294,7 +305,7 @@ function TwoFaModal({ open, onClose }) {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pin }),
+        body: JSON.stringify({ pin: pin.trim() }), // [V12] 전송 전 trim(서버와 동일 방어)
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.ok) {
@@ -306,10 +317,12 @@ function TwoFaModal({ open, onClose }) {
         setLockedUntil(data.lockedUntil || 0);
         setNow(Date.now());
         setMsg('Too many attempts.');
-      } else if (data.error === 'wrong_pin') {
+      } else if (data.error === 'invalid_pin') {
+        // [V16] 서버는 일반 오류(401 invalid_pin) · 남은 시도 횟수만 표시
         setMsg(`Incorrect PIN. ${data.remaining} attempt${data.remaining === 1 ? '' : 's'} left.`);
       } else if (data.error === 'not_configured') {
-        setMsg('2FA is not configured on the server.');
+        // [V16] env 미설정(503) — 서버 구성 문제
+        setMsg('Admin 2FA is not configured on the server.');
       } else {
         setMsg('Verification failed.');
       }

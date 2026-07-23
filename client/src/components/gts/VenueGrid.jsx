@@ -80,7 +80,7 @@ export default function VenueGrid({
             { transform: `translate(${prev.left - rect.left}px, ${prev.top - rect.top}px)` },
             { transform: 'translate(0px, 0px)' },
           ],
-          { duration: 280, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' },
+          { duration: 420, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' }, // [V13] 재정렬 420ms(오류처럼 안 보이게)
         );
       }
       prevPos.current.set(id, { left: rect.left, top: rect.top });
@@ -92,10 +92,11 @@ export default function VenueGrid({
     if (queueMode && selected.length < max && !prefersReduced()) {
       setLeavingId(id);
       clearTimeout(timerRef.current);
+      // [V13] 420ms — 카드가 축소되며 큐(아래)로 내려가는 경로가 눈에 보이게(사라짐이 아니라 이동)
       timerRef.current = setTimeout(() => {
         onToggle(id);
         setLeavingId(null);
-      }, 200);
+      }, 420);
     } else {
       onToggle(id);
     }
@@ -118,16 +119,18 @@ export default function VenueGrid({
                 type="button"
                 onClick={() => onCardClick(venue.id)}
                 aria-pressed={isSelected}
-                className={`pressable relative flex h-[172px] w-full flex-col items-start gap-8 overflow-hidden rounded-lg p-16 text-left shadow-sm lg:h-[136px] ${
+                className={`pressable relative flex h-[128px] w-full flex-col items-start gap-6 overflow-hidden rounded-lg p-12 text-left shadow-sm lg:h-[124px] ${
                   venue.mock ? 'bg-surface' : 'bg-white'
                 } ${isSelected ? 'ring-2 ring-primary' : 'hover:shadow-md'}`}
-                // [V9] 큐로 내려가는 마이크로인터랙션(축소+하강+페이드 · §17 이징)
+                // [V13] 큐로 내려가는 마이크로인터랙션 420ms · 축소하며 아래(큐)로 이동하는 경로가 보이게
+                //   (opacity는 약간 늦게 페이드 → 이동 중에도 카드가 보임 = "사라짐 아닌 이동" 인지)
                 style={
                   leaving
                     ? {
-                        transform: 'scale(0.85) translateY(24px)',
+                        transform: 'scale(0.6) translateY(72px)',
                         opacity: 0,
-                        transition: `transform 200ms ${motion.easeOut}, opacity 200ms ${motion.easeOut}`,
+                        transformOrigin: 'center bottom',
+                        transition: `transform 420ms ${motion.easeOut}, opacity 360ms ${motion.easeOut} 60ms`,
                       }
                     : undefined
                 }

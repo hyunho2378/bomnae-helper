@@ -16,6 +16,7 @@ export default {
       tip: 'Tip',
       select: 'Select this place',
       selected: 'Selected',
+      viewOnline: 'View online', // [V13] 신규 실장소 외부 링크 라벨
     },
     v: {
       'gamja-farm': {

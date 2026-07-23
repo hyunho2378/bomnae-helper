@@ -96,6 +96,7 @@ export default {
       queueRemove: "코스에서 빼기",
       approx: "약",
       minUnit: "분",
+      routeEstimate: "지금까지 예상 동선", // [V13] 거리 배지 라벨
       reason: {
         plan: "식사 플랜을 선택하면 넘어갈 수 있어요",
         meals: "식사 장소 선택을 마치면 넘어갈 수 있어요",

@@ -1,3 +1,6 @@
+// [V17] DEPRECATED · 미사용 — 모바일 하단 바(GlassDock)를 발견 가능성 문제로 폐지하고
+//   Header 우측 햄버거(MobileMenu)로 전면 교체함. PageLayout에서 더 이상 렌더하지 않음.
+//   파일·컴포넌트는 롤백 대비 보존(어디서도 import 금지).
 // 모바일 리퀴드 글래스 모핑 필(<lg) · DESIGN §6 + PATTERNS §3.
 // blur 예산 2/3, 그림자 예산 1/2. 접힘 56px pill / 확장 시 메뉴+언어+로그인.
 // 수축 트리거 4종: 바깥 탭 / 스와이프 다운(Δy>48) / Escape / 라우트 변경.

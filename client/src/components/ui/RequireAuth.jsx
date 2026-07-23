@@ -4,13 +4,15 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import LoginGate from './LoginGate';
+import { LoadingLogoCenter } from './LoadingLogo';
 
 export default function RequireAuth({ children }) {
   const { user, ready } = useAuth();
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
-  if (!ready) return null; // 세션 복원 중 — 콘텐츠·모달 플래시 방지
+  // [V13] 세션 복원 중(라우트 전환 로딩) — 공식 로고 펄스(콘텐츠·모달 플래시 방지)
+  if (!ready) return <LoadingLogoCenter className="min-h-screen" />;
   if (user) return children;
   return <LoginGate open onClose={() => navigate('/', { replace: true })} returnTo={pathname} />;
 }

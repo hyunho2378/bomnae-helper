@@ -157,7 +157,7 @@ function UsersView() {
           <div className="overflow-x-auto rounded-lg bg-white shadow-sm">
             <div className={`grid min-w-[620px] ${COLS} gap-12 px-16 py-12 text-caption font-semibold uppercase tracking-eyebrow text-inkMeta`}>
               <span>Name</span>
-              <span>Email</span>
+              <span>Email / ID</span>
               <span>Joined</span>
               <span>Books</span>
               <span>Last activity</span>
@@ -173,7 +173,17 @@ function UsersView() {
                   }`}
                 >
                   <span className="min-w-0 truncate font-semibold text-ink">{u.name}</span>
-                  <span className="min-w-0 truncate text-inkSec">{u.email || `@${u.username}`}</span>
+                  {/* [V12] email null 계정은 @username + "ID" 회색 배지 */}
+                  <span className="flex min-w-0 items-center gap-8 text-inkSec">
+                    {u.email ? (
+                      <span className="min-w-0 truncate">{u.email}</span>
+                    ) : (
+                      <>
+                        <span className="min-w-0 truncate">{`@${u.username}`}</span>
+                        <span className="shrink-0 rounded-pill bg-line px-8 py-2 text-caption font-semibold text-inkMeta">ID</span>
+                      </>
+                    )}
+                  </span>
                   <span className="font-display text-caption text-inkSec">{u.joined}</span>
                   <span className="font-display font-semibold">{u.booking_count}</span>
                   <span className="font-display text-caption text-inkSec">{fmtDateTime(u.last_at)}</span>

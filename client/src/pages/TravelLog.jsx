@@ -125,7 +125,7 @@ export default function TravelLog() {
     <div className="relative h-screen">
       {/* 풀블리드 맵 · 구 Loop 셸 재활용(헤더는 크롬 머티리얼로 위에 뜬다) */}
       <div className="absolute inset-0">
-        {logs && <TravelLogMap logs={logs} highlightId={activeHighlight} />}
+        {logs && <TravelLogMap logs={logs} highlightId={activeHighlight} focusId={selectedId} />}
       </div>
 
       <div className="pointer-events-none absolute inset-0 z-content">
@@ -145,9 +145,9 @@ export default function TravelLog() {
           </div>
         </div>
 
-        {/* 모바일 · 하단 가로 스냅 카드(§16.9 하단 소형 카드 문법 · Dock 위) */}
-        <div className="absolute inset-x-0 bottom-96 lg:hidden">
-          <div className="flex snap-x snap-mandatory gap-12 overflow-x-auto scroll-quiet px-16 pb-8">
+        {/* 모바일 · 하단 가로 스냅 카드(§16.9 · [V17] Dock 폐지로 bottom-0 + safe-area) */}
+        <div className="absolute inset-x-0 bottom-0 lg:hidden">
+          <div className="flex snap-x snap-mandatory gap-12 overflow-x-auto scroll-quiet px-16 pb-[max(8px,env(safe-area-inset-bottom))] pt-2">
             {cards(true)}
           </div>
         </div>

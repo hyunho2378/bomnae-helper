@@ -132,5 +132,11 @@ export default {
       h: "h",
       m: "m",
     },
+    // [V12] 통화 환산 표시 · label = 드롭다운 aria, about = 근사 접두어, disclaimer = 결제 내역 하단 고지
+    money: {
+      label: "Currency",
+      about: "about",
+      disclaimer: "Payments are processed in Korean won; converted amounts are for reference only.",
+    },
   },
 };

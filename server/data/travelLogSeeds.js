@@ -14,7 +14,7 @@ const MOCK_LOGS = [
     party: 2,
     mealPlan: 'lunch',
     itinerary: ['tongnamujip', 'skywalk', 'gamja-farm'],
-    travelDate: '2026-07-18',
+    travelDate: '2026-06-14',
   },
   {
     code: 'LOGSD2',
@@ -24,7 +24,7 @@ const MOCK_LOGS = [
     party: 2,
     mealPlan: 'none',
     itinerary: ['jungdo-mullegil', 'soul-roastery'],
-    travelDate: '2026-07-16',
+    travelDate: '2026-04-27',
   },
   {
     code: 'LOGSD3',
@@ -34,7 +34,7 @@ const MOCK_LOGS = [
     party: 4,
     mealPlan: 'lunch',
     itinerary: ['tongnamujip', 'chuncheon-makguksu-museum', 'gongjicheon'],
-    travelDate: '2026-07-15',
+    travelDate: '2026-02-09',
   },
   {
     code: 'LOGSD4',
@@ -44,7 +44,7 @@ const MOCK_LOGS = [
     party: 3,
     mealPlan: 'none',
     itinerary: ['gamja-farm', 'soyang-dam'],
-    travelDate: '2026-07-13',
+    travelDate: '2025-12-05',
   },
   {
     code: 'LOGSD5',
@@ -54,7 +54,7 @@ const MOCK_LOGS = [
     party: 2,
     mealPlan: 'lunch',
     itinerary: ['tongnamujip', 'soyang-maiden', 'hwadong-2571'],
-    travelDate: '2026-07-11',
+    travelDate: '2025-10-18',
   },
   {
     code: 'LOGSD6',
@@ -64,7 +64,7 @@ const MOCK_LOGS = [
     party: 5,
     mealPlan: 'none',
     itinerary: ['skywalk', 'gongjicheon'],
-    travelDate: '2026-07-09',
+    travelDate: '2025-08-23',
   },
 ];
 

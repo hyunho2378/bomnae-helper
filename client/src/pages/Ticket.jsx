@@ -24,8 +24,9 @@ import stories from '../data/stories';
 import { colors, fonts, lineColors } from '../tokens';
 import Container from '../components/layout/Container';
 import Button from '../components/ui/Button';
+import Money from '../components/ui/Money'; // [V12] 통화 환산 표시
 import EmptyState from '../components/ui/EmptyState';
-import Skeleton from '../components/ui/Skeleton';
+import { LoadingLogoCenter } from '../components/ui/LoadingLogo'; // [V13] 로딩 로고
 import { useLang } from '../i18n/LangContext';
 import LangSwap from '../i18n/LangSwap';
 
@@ -286,27 +287,30 @@ function GtsTicket({ gts }) {
                       </span>
                     )}
                     {gts.passType && gts.passAmount != null && (
-                      <span className="font-display text-small font-semibold text-white">
-                        {'₩'}
-                        {gts.passAmount.toLocaleString('en-US')}
-                      </span>
+                      <Money
+                        krw={gts.passAmount}
+                        className="text-right font-display text-small font-semibold text-white"
+                        convClassName="text-white/70"
+                      />
                     )}
                   </div>
                   {gts.luggageAmount > 0 && (
                     <div className="flex items-baseline justify-between gap-12">
                       <LangSwap k="gts.fare.luggage" className="text-small font-medium text-white" />
-                      <span className="font-display text-small font-semibold text-white">
-                        {'₩'}
-                        {gts.luggageAmount.toLocaleString('en-US')}
-                      </span>
+                      <Money
+                        krw={gts.luggageAmount}
+                        className="text-right font-display text-small font-semibold text-white"
+                        convClassName="text-white/70"
+                      />
                     </div>
                   )}
                   <div className="flex items-baseline justify-between">
                     <LangSwap k="gts.fare.total" className="text-small font-medium text-white" />
-                    <span className="font-display text-h3 font-bold text-white">
-                      {'₩'}
-                      {(gts.totalAmount ?? gts.total).toLocaleString('en-US')}
-                    </span>
+                    <Money
+                      krw={gts.totalAmount ?? gts.total}
+                      className="text-right font-display text-h3 font-bold text-white"
+                      convClassName="text-caption font-medium text-white/70"
+                    />
                   </div>
                 </div>
               </div>
@@ -322,8 +326,10 @@ function GtsTicket({ gts }) {
         </div>
       </div>
 
-      {/* §18.2 모바일 하단 고정 CTA 바 · LineDetail 선례(bottom-80 = Dock 위 · z-content) */}
-      <div className="fixed inset-x-0 bottom-80 z-content px-16 md:px-24 lg:hidden">
+      {/* §18.2 모바일 하단 고정 CTA 바 · [V17] Dock 폐지로 bottom-0 + safe-area(구 bottom-80 = Dock 위) */}
+      <div
+        className="fixed inset-x-0 bottom-0 z-content px-16 pb-[max(12px,env(safe-area-inset-bottom))] md:px-24 lg:hidden"
+      >
         <div className="mx-auto max-w-dialog rounded-lg bg-white p-12 shadow-md">
           <Button onClick={save} style={{ width: '100%' }}>
             <LangSwap k="gts.ticket.saveCta" />
@@ -388,9 +394,8 @@ export default function Ticket() {
   if (loading) {
     return (
       <Container>
-        <div className="mx-auto flex w-full max-w-dialog flex-col gap-16 pb-64 pt-96">
-          <Skeleton className="h-128 w-full" />
-          <Skeleton className="h-44 w-full" />
+        <div className="pb-64 pt-96">
+          <LoadingLogoCenter className="min-h-[50vh]" />
         </div>
       </Container>
     );

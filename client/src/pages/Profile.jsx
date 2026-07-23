@@ -13,6 +13,7 @@ import { venues } from '../data/gts/venues';
 import ItineraryMap from '../components/gts/ItineraryMap';
 import Avatar from '../components/ui/Avatar';
 import Button from '../components/ui/Button';
+import Money from '../components/ui/Money'; // [V12] 통화 환산 표시
 import Modal from '../components/ui/Modal';
 import PwChecklist from '../components/ui/PwChecklist';
 import Skeleton from '../components/ui/Skeleton';
@@ -151,7 +152,7 @@ function ReservationCard({ b, onCancelled }) {
       </div>
       <dl className="flex flex-col gap-4">
         <Row labelKey="profile.passLabel">{b.passType ? t(`gts.pass.names.${b.passType}`) : '—'}</Row>
-        <Row labelKey="profile.amountLabel">{`₩${amount.toLocaleString('en-US')}`}</Row>
+        <Row labelKey="profile.amountLabel"><Money krw={amount} /></Row>
       </dl>
       <div className="flex flex-wrap items-center gap-12">
         <Button as={Link} to={`/ticket/${b.code}`} variant="secondary">

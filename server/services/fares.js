@@ -22,7 +22,8 @@ function computeTotal(party, luggage) {
 }
 
 // [V7] 시간제 이용권 · 확정값 — 클라 data/gts/passes.js와 값·규칙 동일 유지 계약(동시 수정).
-const PASS_PRICES = { '1h': 10000, '2h': 20000, '4h': 40000, day: 60000 };
+// [V13] 1시간권 제거 · 2h/4h/day 3종. 구 예약(pass_type='1h')은 저장된 pass_amount로 티켓 표시(재계산 안 함).
+const PASS_PRICES = { '2h': 20000, '4h': 40000, day: 60000 };
 const OVERTIME_PER_HOUR = 10000;
 const PASS_LUGGAGE_FEE = 5000;
 

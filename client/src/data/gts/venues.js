@@ -108,6 +108,264 @@ export const venues = [
   },
   ...[7, 8, 9, 10, 11].map((n) => mockVenue(n, 'meal')),
 
+  // ---------- meal (실명 13 신규 · [V13] 사용자 제공 목록) ----------
+  //   할루시네이션 방지: 이름·소개·링크는 제공값 · 좌표는 실좌표 미조회라 mockCoords DEMO 결정 배치(coord:null)
+  //   · story는 제공 소개 기반 2문장(과장 금지) · th는 en 폴백(기존 실명 venue 패턴 동일).
+  {
+    id: 'sandak',
+    name: { en: 'Sandak', ko: '산닭', th: 'Sandak' },
+    category: 'meal',
+    oneLine: {
+      en: 'Mountain-side dakgalbi with potato pancake and buckwheat noodles',
+      ko: '감자전과 막국수를 곁들이는 춘천 산속 닭갈비',
+      th: 'Mountain-side dakgalbi with potato pancake and buckwheat noodles',
+    },
+    stayMin: 120,
+    coord: null, // DEMO — 실좌표 조회 시 교체(mockCoords 결정 배치)
+    mock: false,
+    link: 'https://instagram.com/sandak__official',
+    image: '/images/venues/sandak.jpg',
+    story: {
+      en: 'Sandak grills Chuncheon-style dakgalbi in a mountain setting, served with its own potato pancake and buckwheat noodles. Regulars come for that classic local combination in a calm, out-of-town spot.',
+      ko: '산속에서 춘천식 닭갈비를 굽고 감자전과 막국수를 함께 낸다. 한적한 분위기에서 이 조합을 즐기려는 단골이 많다.',
+      th: 'Sandak grills Chuncheon-style dakgalbi in a mountain setting, served with its own potato pancake and buckwheat noodles. Regulars come for that classic local combination in a calm, out-of-town spot.',
+    },
+  },
+  {
+    id: 'san-squid',
+    name: { en: 'San-Squid Sliced Fish', ko: 'San-Squid Sliced Fish', th: 'San-Squid Sliced Fish' },
+    category: 'meal',
+    oneLine: {
+      en: 'Live shellfish and clams grilled at the table',
+      ko: '테이블에서 굽는 활어조개구이',
+      th: 'Live shellfish and clams grilled at the table',
+    },
+    stayMin: 120,
+    coord: null, // DEMO
+    mock: false,
+    link: 'https://naver.me/FpwW3oYv',
+    image: '/images/venues/san-squid.jpg',
+    story: {
+      en: 'San-Squid serves live shellfish and clams grilled right at your table. It is a hands-on seafood meal that rewards a slower, shared pace.',
+      ko: '활어조개를 테이블에서 직접 구워 먹는 곳이다. 여럿이 천천히 나눠 먹기 좋은 해산물 상차림이다.',
+      th: 'San-Squid serves live shellfish and clams grilled right at your table. It is a hands-on seafood meal that rewards a slower, shared pace.',
+    },
+  },
+  {
+    id: 'modern-buckwheat',
+    name: { en: 'Modern Buckwheat', ko: '모던메밀', th: 'Modern Buckwheat' },
+    category: 'meal',
+    oneLine: {
+      en: 'A locally certified take on Chuncheon buckwheat',
+      ko: '로컬이 인정한 모던 메밀 맛집',
+      th: 'A locally certified take on Chuncheon buckwheat',
+    },
+    stayMin: 120,
+    coord: null, // DEMO
+    mock: false,
+    link: 'https://instagram.com/modern_maemeal',
+    image: '/images/venues/modern-buckwheat.jpg',
+    story: {
+      en: "Modern Buckwheat reworks Chuncheon's buckwheat tradition into a cleaner, contemporary plate. It has earned a local following as a certified neighborhood favorite.",
+      ko: '춘천 메밀을 현대적으로 재해석한 집이다. 로컬 사이에서 인증된 맛집으로 통한다.',
+      th: "Modern Buckwheat reworks Chuncheon's buckwheat tradition into a cleaner, contemporary plate. It has earned a local following as a certified neighborhood favorite.",
+    },
+  },
+  {
+    id: 'haneoul',
+    name: { en: 'Haneoul', ko: 'Haneoul', th: 'Haneoul' },
+    category: 'meal',
+    oneLine: {
+      en: 'Mori soba and an assorted cutlet platter',
+      ko: '모리소바와 모둠카츠',
+      th: 'Mori soba and an assorted cutlet platter',
+    },
+    stayMin: 120,
+    coord: null, // DEMO
+    mock: false,
+    link: 'https://naver.me/5MV7UDaf',
+    image: '/images/venues/haneoul.jpg',
+    story: {
+      en: 'Haneoul pairs chilled mori soba with an assorted cutlet platter for a light, varied lunch. The set makes it easy for a group to share a bit of everything.',
+      ko: '시원한 모리소바와 모둠카츠를 함께 낸다. 여럿이 조금씩 나눠 먹기 좋은 구성이다.',
+      th: 'Haneoul pairs chilled mori soba with an assorted cutlet platter for a light, varied lunch. The set makes it easy for a group to share a bit of everything.',
+    },
+  },
+  {
+    id: 'hwadon-garden',
+    name: { en: 'Hwadon Garden', ko: 'Hwadon Garden', th: 'Hwadon Garden' },
+    category: 'meal',
+    oneLine: {
+      en: 'Private-room dinners in a garden setting',
+      ko: '정원 분위기의 프라이빗룸 디너',
+      th: 'Private-room dinners in a garden setting',
+    },
+    stayMin: 120,
+    coord: null, // DEMO
+    mock: false,
+    link: 'https://naver.me/Grma4r8Q',
+    image: '/images/venues/hwadon-garden.jpg',
+    story: {
+      en: 'Hwadon Garden serves dinner in private rooms with a quiet garden feel. It suits groups who want a calmer, more private table.',
+      ko: '정원 분위기 속 프라이빗룸에서 저녁을 낸다. 조용하고 프라이빗한 자리를 원하는 일행에게 어울린다.',
+      th: 'Hwadon Garden serves dinner in private rooms with a quiet garden feel. It suits groups who want a calmer, more private table.',
+    },
+  },
+  {
+    id: 'himalayan-indian',
+    name: { en: 'Himalayan Indian Cuisine', ko: 'Himalayan Indian Cuisine', th: 'Himalayan Indian Cuisine' },
+    category: 'meal',
+    oneLine: {
+      en: 'Traditional Indian curries in Chuncheon',
+      ko: '춘천의 전통 인도 커리',
+      th: 'Traditional Indian curries in Chuncheon',
+    },
+    stayMin: 120,
+    coord: null, // DEMO
+    mock: false,
+    link: 'https://naver.me/GbDRmj5m',
+    image: '/images/venues/himalayan-indian.jpg',
+    story: {
+      en: 'Himalayan Indian Cuisine cooks traditional curries for a change of pace from the local grills. It is a reliable stop for travelers who want something different midway through the day.',
+      ko: '로컬 구이와는 다른 전통 인도 커리를 낸다. 하루 중간에 색다른 한 끼를 원할 때 좋은 선택이다.',
+      th: 'Himalayan Indian Cuisine cooks traditional curries for a change of pace from the local grills. It is a reliable stop for travelers who want something different midway through the day.',
+    },
+  },
+  {
+    id: 'umi-dakgalbi',
+    name: { en: 'Umi Dakgalbi', ko: '우미 닭갈비', th: 'Umi Dakgalbi' },
+    category: 'meal',
+    oneLine: {
+      en: 'Blue Ribbon certified Chuncheon dakgalbi',
+      ko: '블루리본 인증 춘천 닭갈비',
+      th: 'Blue Ribbon certified Chuncheon dakgalbi',
+    },
+    stayMin: 120,
+    coord: null, // DEMO
+    mock: false,
+    link: 'https://naver.me/Gf0jYQgG',
+    image: '/images/venues/umi-dakgalbi.jpg',
+    story: {
+      en: "Umi Dakgalbi is a Blue Ribbon certified take on the city's signature dish. The recognition draws a steady line, so an off-peak slot helps.",
+      ko: '춘천 대표 음식을 블루리본 인증으로 인정받은 집이다. 줄이 꾸준한 편이라 붐비는 시간대는 피하는 게 좋다.',
+      th: "Umi Dakgalbi is a Blue Ribbon certified take on the city's signature dish. The recognition draws a steady line, so an off-peak slot helps.",
+    },
+  },
+  {
+    id: 'hakgok-makguksu',
+    name: { en: 'Hakgok Makguksu & Dakgalbi', ko: '학곡막국수닭갈비', th: 'Hakgok Makguksu & Dakgalbi' },
+    category: 'meal',
+    oneLine: {
+      en: 'Makguksu and dakgalbi under one roof',
+      ko: '막국수와 닭갈비를 한자리에서',
+      th: 'Makguksu and dakgalbi under one roof',
+    },
+    stayMin: 120,
+    coord: null, // DEMO
+    mock: false,
+    link: 'https://smartstore.naver.com/hakgokri',
+    image: '/images/venues/hakgok.jpg',
+    story: {
+      en: "Hakgok serves both makguksu and dakgalbi, so a group can cover Chuncheon's two staples in one sitting. It is a practical single stop for first-time visitors.",
+      ko: '막국수와 닭갈비를 한곳에서 낸다. 춘천의 두 대표 메뉴를 한 번에 맛보기 좋은 실용적인 한 곳이다.',
+      th: "Hakgok serves both makguksu and dakgalbi, so a group can cover Chuncheon's two staples in one sitting. It is a practical single stop for first-time visitors.",
+    },
+  },
+  {
+    id: 'saembat-makguksu',
+    name: { en: 'Saembat Makguksu', ko: '샘밭막국수', th: 'Saembat Makguksu' },
+    category: 'meal',
+    oneLine: {
+      en: 'Pure buckwheat makguksu with pressed pork',
+      ko: '순메밀 막국수와 편육',
+      th: 'Pure buckwheat makguksu with pressed pork',
+    },
+    stayMin: 120,
+    coord: null, // DEMO
+    mock: false,
+    image: '/images/venues/saembat.jpg',
+    story: {
+      en: 'Saembat Makguksu plates pure buckwheat noodles alongside pressed pork. The pairing is a Chuncheon classic done simply and well.',
+      ko: '순메밀 막국수에 편육을 곁들여 낸다. 단정하게 잘 차려낸 춘천의 정석 조합이다.',
+      th: 'Saembat Makguksu plates pure buckwheat noodles alongside pressed pork. The pairing is a Chuncheon classic done simply and well.',
+    },
+  },
+  {
+    id: 'keunjip-hanwoo',
+    name: { en: 'Keunjip Hanwoo', ko: '큰집한우', th: 'Keunjip Hanwoo' },
+    category: 'meal',
+    oneLine: {
+      en: 'Dry-aged Korean beef',
+      ko: '드라이에이징 한우',
+      th: 'Dry-aged Korean beef',
+    },
+    stayMin: 120,
+    coord: null, // DEMO
+    mock: false,
+    image: '/images/venues/keunjip-hanwoo.jpg',
+    story: {
+      en: 'Keunjip Hanwoo focuses on dry-aged Korean beef for a richer, more concentrated flavor. It is the splurge option among the day’s meals.',
+      ko: '드라이에이징 한우로 진한 풍미를 낸다. 하루 식사 중 특별한 한 끼를 원할 때의 선택이다.',
+      th: 'Keunjip Hanwoo focuses on dry-aged Korean beef for a richer, more concentrated flavor. It is the splurge option among the day’s meals.',
+    },
+  },
+  {
+    id: 'silbi-makguksu',
+    name: { en: 'Chuncheon Silbi Makguksu', ko: '춘천실비막국수', th: 'Chuncheon Silbi Makguksu' },
+    category: 'meal',
+    oneLine: {
+      en: 'Makguksu with pressed pork and mustard sauce',
+      ko: '편육과 겨자소스 막국수',
+      th: 'Makguksu with pressed pork and mustard sauce',
+    },
+    stayMin: 120,
+    coord: null, // DEMO
+    mock: false,
+    image: '/images/venues/silbi.jpg',
+    story: {
+      en: 'Chuncheon Silbi Makguksu serves its buckwheat noodles with pressed pork and a sharp mustard sauce. The mustard kick is what regulars come back for.',
+      ko: '막국수에 편육과 알싸한 겨자소스를 곁들인다. 이 겨자 맛에 다시 찾는 단골이 많다.',
+      th: 'Chuncheon Silbi Makguksu serves its buckwheat noodles with pressed pork and a sharp mustard sauce. The mustard kick is what regulars come back for.',
+    },
+  },
+  {
+    id: 'nambu-makguksu',
+    name: { en: 'Nambu Makguksu', ko: '남부막국수', th: 'Nambu Makguksu' },
+    category: 'meal',
+    oneLine: {
+      en: 'Traditional makguksu with potato pancake',
+      ko: '전통 막국수와 감자전',
+      th: 'Traditional makguksu with potato pancake',
+    },
+    stayMin: 120,
+    coord: null, // DEMO
+    mock: false,
+    image: '/images/venues/nambu.jpg',
+    story: {
+      en: 'Nambu Makguksu keeps to a traditional buckwheat plate with a side of potato pancake. It is a straightforward, dependable local lunch.',
+      ko: '전통 막국수에 감자전을 곁들이는 집이다. 군더더기 없이 믿음직한 로컬 점심이다.',
+      th: 'Nambu Makguksu keeps to a traditional buckwheat plate with a side of potato pancake. It is a straightforward, dependable local lunch.',
+    },
+  },
+  {
+    id: 'pyeongyang-naengmyeon',
+    name: { en: 'Pyeongyang Naengmyeon', ko: '평양냉면', th: 'Pyeongyang Naengmyeon' },
+    category: 'meal',
+    oneLine: {
+      en: 'Pyongyang-style cold noodles with boiled pork',
+      ko: '평양냉면과 수육',
+      th: 'Pyongyang-style cold noodles with boiled pork',
+    },
+    stayMin: 120,
+    coord: null, // DEMO
+    mock: false,
+    image: '/images/venues/pyeongyang.jpg',
+    story: {
+      en: 'This spot serves Pyongyang-style cold buckwheat noodles with a plate of boiled pork. The clean, cool broth suits a warm afternoon in the itinerary.',
+      ko: '평양식 냉면에 수육을 함께 낸다. 맑고 시원한 육수가 따뜻한 오후 일정에 잘 맞는다.',
+      th: 'This spot serves Pyongyang-style cold buckwheat noodles with a plate of boiled pork. The clean, cool broth suits a warm afternoon in the itinerary.',
+    },
+  },
   // ---------- foodspace (실명 12 = 3 + [V5] 9 · 목업 0) ----------
   {
     id: 'gamja-farm',

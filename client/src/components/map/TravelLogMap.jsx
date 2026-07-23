@@ -16,7 +16,7 @@ const DIM = 0.4; // 지시 [1] 명세값 · 비강조 라인 40%
 const FIT_PADDING = 80; // §32 준용
 const w = (a, b) => ['interpolate', ['linear'], ['zoom'], 11.5, a, 15, b]; // §13 폭 보간
 
-export default function TravelLogMap({ logs, highlightId }) {
+export default function TravelLogMap({ logs, highlightId, focusId = null }) {
   const node = useRef(null);
   const [mapObj, setMapObj] = useState(null);
 
@@ -93,6 +93,18 @@ export default function TravelLogMap({ logs, highlightId }) {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [logs]);
+
+  // [V13] 로그 클릭(focusId) 시 해당 여정으로 부드럽게 클로즈업(fitBounds) · null이면 유지(초기 전체 fit은 load 담당)
+  useEffect(() => {
+    if (!mapObj || focusId == null) return;
+    const target = logs.find((l) => l.id === focusId);
+    if (!target?.coords.length) return;
+    const bounds = target.coords.reduce(
+      (b, c) => b.extend(c),
+      new maplibregl.LngLatBounds(target.coords[0], target.coords[0]),
+    );
+    mapObj.fitBounds(bounds, { padding: 120, duration: 700, maxZoom: 15 });
+  }, [mapObj, focusId, logs]);
 
   // 강조 동기 · 강조 외 40% 감쇠(opacity만 · 색·폭 불변)
   useEffect(() => {

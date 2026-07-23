@@ -37,7 +37,7 @@ export default function PilotStrip() {
         />
         {/* 좌하단 오버레이 텍스트 · body + CTA(흰색) */}
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-12 p-24 lg:p-40">
-          <LangSwap k="home.proof.body" as="p" className="max-w-[560px] text-body font-medium text-white" />
+          <LangSwap k="home.proof.body" as="p" className="max-w-[560px] whitespace-pre-line text-body font-medium text-white" />
           <span className="inline-flex min-h-44 items-center gap-8 font-semibold text-white">
             <LangSwap k="home.proof.cta" />
             <ArrowRight size={20} aria-hidden="true" />

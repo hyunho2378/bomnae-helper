@@ -15,6 +15,7 @@ export default {
       tip: '팁',
       select: '이 장소 선택하기',
       selected: '선택됨',
+      viewOnline: '웹에서 보기', // [V13] 신규 실장소 외부 링크 라벨
     },
     v: {
       'gamja-farm': {

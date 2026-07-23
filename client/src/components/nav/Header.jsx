@@ -1,7 +1,7 @@
 // 헤더 v3.2(DESIGN §16.4 · visitkorea 스케일) · 전 라우트 불투명.
 // 높이 80 고정 — 스크롤 축소·글래스 전환 폐지(사용자 결정). 메뉴 17px 600 간격 32+.
-// 순서 v4(IA §9.1): About | Getting Here | Make GTS — Bag Delivery·City Lines 항목 삭제.
-// 모바일에도 상단 헤더 존재: 로고+LangMenu+로그인만 · 메뉴는 GlassDock 단일 소유(햄버거 금지).
+// [V17] 모바일 내비 = 우측 햄버거(MobileMenu) · 데스크탑(lg+)은 상단 인라인 내비+언어·통화·계정 유지.
+//   GlassDock(하단 바) 폐지(발견 가능성 이슈) — 브레이크포인트 경계에서 두 방식이 겹치거나 둘 다 사라지지 않게 lg로 분기.
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import LoginGate from '../ui/LoginGate';
@@ -12,6 +12,8 @@ import { useAuth } from '../../context/AuthContext';
 import { useLang } from '../../i18n/LangContext';
 import LangSwap from '../../i18n/LangSwap';
 import LangMenu from './LangMenu';
+import CurrencyMenu from './CurrencyMenu'; // [V12]
+import MobileMenu from './MobileMenu'; // [V17] 모바일 햄버거
 import LogoMark from '../../assets/logo-mark.svg?react';
 
 // [V10] 4항목: Trip Planner | Tour Builder | Travel Log | Reviews — About 비공개([3])로 내비에서 제거
@@ -64,7 +66,7 @@ export default function Header() {
             Global Tourism System
           </span>
         </Link>
-        {/* 데스크탑 전용 메뉴 · 모바일 내비는 GlassDock 단일 소유(§16.4) */}
+        {/* [V17] 데스크탑 전용 인라인 메뉴(lg+) · 모바일 내비는 우측 햄버거(MobileMenu)가 소유 */}
         <nav className="hidden items-center gap-32 lg:flex">
           {MENU.map(({ to, k }) => (
             <NavLink
@@ -82,7 +84,11 @@ export default function Header() {
           ))}
         </nav>
         <div className="flex items-center gap-8">
+          {/* [V17] 데스크탑(lg+): 언어·통화·계정 인라인 · 모바일은 아래 햄버거가 소유 */}
+          <div className="hidden items-center gap-8 lg:flex">
           <LangMenu />
+          {/* [V12] 통화 선택 · 언어 옆 */}
+          <CurrencyMenu />
           {user ? (
             <div ref={menuRootRef} className="relative">
               <button
@@ -154,6 +160,9 @@ export default function Header() {
               <LangSwap k="nav.login" />
             </button>
           )}
+          </div>
+          {/* [V17] 모바일 햄버거 · 언어·통화·계정·내비 전부 패널 안(GlassDock 대체) */}
+          <MobileMenu />
         </div>
       </div>
       {/* §35 스크롤 엣지 페이드 · 콘텐츠와 겹칠 때만(스크롤 0 비표시), 1px 경계선 금지 유지 */}

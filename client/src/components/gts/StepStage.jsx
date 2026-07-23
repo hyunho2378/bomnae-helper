@@ -122,7 +122,7 @@ export default function StepStage({
           WebkitBackdropFilter: 'blur(24px) saturate(180%)',
           borderTop: '1px solid rgba(255,255,255,0.4)',
         }}
-        className="relative flex h-[88dvh] w-full flex-col overflow-hidden rounded-xl shadow-lg lg:h-[84dvh]"
+        className="relative flex h-[92dvh] w-full flex-col overflow-hidden rounded-xl shadow-lg lg:h-[90dvh]"
       >
         {/* 상단 · 스텝 라벨 + 진행 도트(§41) */}
         <div className="flex flex-col items-center gap-8 px-24 pb-16 pt-24 lg:px-32 lg:pb-24 lg:pt-32">
@@ -162,10 +162,11 @@ export default function StepStage({
 
         {/* 하단 중앙 고정 버튼 페어(§41) · 항상 동일 위치 · 사유는 aria-live · §18.3 safe-area */}
         <div
-          className="flex flex-col items-center gap-8 px-24 pt-16 lg:px-32 lg:pt-24"
+          className="flex flex-col items-center gap-16 px-24 pt-16 lg:px-32 lg:pt-24"
           style={{ paddingBottom: 'max(20px, env(safe-area-inset-bottom))' }}
         >
-          <div aria-live="polite">
+          {/* [V13] 안내(사유)와 버튼 사이 16px 여백 확보(gap-16) */}
+          <div aria-live="polite" className="min-h-[18px]">
             {nextDisabled && reasonKey && (
               <LangSwap k={reasonKey} className="text-caption font-medium text-spice" />
             )}

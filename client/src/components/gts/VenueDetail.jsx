@@ -162,13 +162,34 @@ export default function VenueDetail({ venue, originRect, instant = false, isSele
   };
 
   // 블록 ①~④(문서 커버 장소) / ①~②(mock 공통) — 순서 고정(명세)
+  // [V13] 신규 실장소는 인라인 venue.story(2문장) + venue.link 렌더(주소/시간 미제공이라 info 섹션 없음).
+  const hasStory = !!venue.story;
   const blocks = (pad) => (
     <div className={`flex flex-col gap-32 ${pad}`}>
       <Block order={0} still={still} className="flex flex-col gap-8">
         <TriText text={venue.name} className="font-display text-h2 font-bold tracking-display" />
-        <LangSwap k={`${keyBase}.hero`} className="text-small font-medium text-inkSec" />
+        {hasStory ? (
+          <TriText text={venue.oneLine} className="text-small font-medium text-inkSec" />
+        ) : (
+          <LangSwap k={`${keyBase}.hero`} className="text-small font-medium text-inkSec" />
+        )}
       </Block>
-      {d ? (
+      {hasStory ? (
+        <Block order={1} still={still} className="flex flex-col gap-12">
+          <LangSwap k="venues.detail.story" as="h3" className="text-h3 font-semibold" />
+          <TriText text={venue.story} className="text-body" />
+          {venue.link && (
+            <a
+              href={venue.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-fit text-small font-semibold text-primary underline underline-offset-2"
+            >
+              {t('venues.detail.viewOnline')}
+            </a>
+          )}
+        </Block>
+      ) : d ? (
         <>
           <Block order={1} still={still} className="flex flex-col gap-12">
             <LangSwap k="venues.detail.story" as="h3" className="text-h3 font-semibold" />

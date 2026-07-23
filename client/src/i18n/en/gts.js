@@ -96,6 +96,7 @@ export default {
       queueRemove: "Remove from course",
       approx: "About",
       minUnit: "min",
+      routeEstimate: "Estimated route so far", // [V13] 거리 배지 라벨
       reason: {
         plan: "Choose a meal plan to continue",
         meals: "Finish your meal picks to continue",

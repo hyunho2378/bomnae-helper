@@ -13,6 +13,7 @@ const trackRouter = require('./routes/track'); // [V1]
 const adminRouter = require('./routes/admin'); // [V1]
 const travelLogsRouter = require('./routes/travelLogs'); // [V3]
 const profileRouter = require('./routes/profile'); // [V10] 프로필 사진 업로드(Vercel Blob)
+const ratesRouter = require('./routes/rates'); // [V12] 환율 캐시(GET /api/rates)
 
 const app = express();
 app.set('trust proxy', 1); // Render 등 프록시 뒤 secure 쿠키
@@ -75,10 +76,13 @@ app.use('/api', trackRouter); // [V1] 여정 트래킹
 app.use('/api', adminRouter); // [V1] 관리자(requireAdmin 내장)
 app.use('/api', travelLogsRouter); // [V3] Travel Log 발자취
 app.use('/api', profileRouter); // [V10] 프로필 사진 업로드
+app.use('/api', ratesRouter); // [V12] 환율
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, async () => {
   console.log(`Bomnae Helper server listening on port ${PORT}`);
+  // [V12] 환율 캐시 워밍(기동 시 1회 + 6시간 간격) · 실패해도 서버는 산다(환산만 숨김)
+  require('./services/rates').startRatesCache();
   // TAGO ID 캐시 워밍(지시 2: 기동 시 1회 · 실패해도 서버는 산다 — 해당 기능만 fallback)
   try {
     const { ensureIds } = require('./services/busService');

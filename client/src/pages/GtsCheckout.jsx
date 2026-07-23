@@ -19,8 +19,10 @@ import TriText from '../components/gts/TriText';
 import { itineraryVenues } from '../components/gts/itinerary';
 import Container from '../components/layout/Container';
 import Button from '../components/ui/Button';
+import Money from '../components/ui/Money'; // [V12] 통화 환산 표시
 import LoginGate from '../components/ui/LoginGate';
 import { useAuth } from '../context/AuthContext';
+import { useCurrency } from '../context/CurrencyContext'; // [V12] 환산 고지 조건
 import { useGts, useGtsGuard } from '../context/GtsContext';
 import { createGtsBooking } from '../data/gts/api';
 import { LUGGAGE_FEE, PASS_ORDER, PASS_PRICES, computePassTotal } from '../data/gts/passes';
@@ -54,6 +56,7 @@ export default function GtsCheckout() {
   const ok = useGtsGuard('checkout');
   const { user } = useAuth();
   const { t } = useLang();
+  const { convert } = useCurrency(); // [V12] 외화 환산 활성 여부(고지 문구 노출 조건)
   const { party, luggage, vehicle, mealPlan, meals, picks, dropoffText, travelDate, setDropoffText, trackStep } = useGts();
   const navigate = useNavigate();
   const [gateOpen, setGateOpen] = useState(false);
@@ -124,7 +127,8 @@ export default function GtsCheckout() {
             {/* [V7] 시간제 이용권 · 체크아웃 상단 — 새 요금의 단일 기준(카드 4종 단일 선택 · 미선택 시 Pay 비활성) */}
             <section className="flex flex-col gap-16 rounded-xl bg-white p-24 shadow-sm">
               <LangSwap k="gts.checkout.passTitle" as="h2" className="text-h3 font-semibold" />
-              <div className="grid grid-cols-2 gap-12 lg:grid-cols-4">
+              {/* [V13] 이용권 3종(2h/4h/day) — 3열 그리드 */}
+              <div className="grid grid-cols-1 gap-12 sm:grid-cols-3">
                 {PASS_ORDER.map((id) => {
                   const selected = passType === id;
                   return (
@@ -138,10 +142,12 @@ export default function GtsCheckout() {
                       }`}
                     >
                       <LangSwap k={`gts.pass.names.${id}`} className="text-small font-semibold" />
-                      <span className="font-display text-h3 font-bold text-primary">
-                        {'₩'}
-                        {PASS_PRICES[id].toLocaleString('en-US')}
-                      </span>
+                      {/* [V12] ₩ 주 금액 + 환산 보조(카드에선 아래 줄) */}
+                      <Money
+                        krw={PASS_PRICES[id]}
+                        className="font-display text-h3 font-bold text-primary"
+                        convClassName="block text-caption font-medium text-inkMeta"
+                      />
                       {/* 각 카드 포함 안내 1줄(명세 [1]) */}
                       <LangSwap k="gts.pass.included" className="text-caption font-medium text-inkSec" />
                     </button>
@@ -255,6 +261,10 @@ export default function GtsCheckout() {
               as="p"
               className="rounded-md bg-surface px-16 py-12 text-caption font-semibold text-inkSec"
             />
+            {/* [V12] 환산 고지 · 외화 표시 중일 때만(결제 내역 하단 1줄) — 원화 결제·참고용 환산 */}
+            {convert(1000) && (
+              <LangSwap k="common.money.disclaimer" as="p" className="text-caption font-medium text-inkMeta" />
+            )}
             {/* [V7] 취소·환불 규정 요약 + 동의(필수 · 미동의 시 Pay 비활성 · 동의 시각 consent_at 저장) */}
             <div className="flex flex-col gap-12 rounded-md bg-surface px-16 py-12">
               <LangSwap k="gts.checkout.refundTitle" as="h3" className="text-small font-semibold" />
