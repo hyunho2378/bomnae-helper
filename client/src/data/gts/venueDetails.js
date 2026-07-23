@@ -10,7 +10,6 @@
 //   gamja-farm.price      감자빵 3,500원선 [VERIFY]
 //   tongnamujip.address   정확한 지점 주소 [VERIFY exact branch address] · price 1인 14,000원선 [VERIFY]
 //   skywalk.hours         현재 시즌 운영 시간 [VERIFY current season] · price 상품권 환급 조건 [VERIFY]
-//   makguksu-museum       address 정확 주소 [VERIFY] · hours [VERIFY] · 체험비 [VERIFY fee]
 //   jungdo-mullegil       address 선착장 주소 [VERIFY dock address] · hours [VERIFY] · 대여료 [VERIFY fee]
 //   gongjicheon.price     자전거 대여료 [VERIFY fee]
 // ============================================================
@@ -19,9 +18,33 @@ export const VENUE_DETAILS = {
   'gamja-farm': { paragraphs: 3, ratings: [5, 5, 4], mockReviews: true },
   tongnamujip: { paragraphs: 3, ratings: [5, 5, 4], mockReviews: true },
   skywalk: { paragraphs: 3, ratings: [5, 4, 5], mockReviews: true },
-  'makguksu-museum': { paragraphs: 3, ratings: [5, 4, 4], mockReviews: true },
   'jungdo-mullegil': { paragraphs: 2, ratings: [5, 5, 4], mockReviews: true },
   gongjicheon: { paragraphs: 2, ratings: [5, 4, 5], mockReviews: true },
+  'baekil-kalguksu': { paragraphs: 2, ratings: [5, 5, 4], mockReviews: true },
+  'hoeyeongru': { paragraphs: 2, ratings: [4, 5, 4], mockReviews: true },
+  'saemto-dakgalbi': { paragraphs: 2, ratings: [5, 4, 5], mockReviews: true },
+  'wonjo-charcoal-dak': { paragraphs: 2, ratings: [5, 4, 4], mockReviews: true },
+  'onefive-dakgalbi': { paragraphs: 2, ratings: [5, 5, 4], mockReviews: true },
+  'todam-galbi': { paragraphs: 2, ratings: [5, 4, 5], mockReviews: true },
+  'soul-roastery': { paragraphs: 2, ratings: [5, 5, 4], mockReviews: true },
+  'hwadong-2571': { paragraphs: 3, ratings: [4, 5, 4], mockReviews: true },
+  'earth17-cafe': { paragraphs: 2, ratings: [5, 5, 4], mockReviews: true },
+  'mom-in-garden': { paragraphs: 2, ratings: [5, 4, 5], mockReviews: true },
+  'saempildeu-cafe': { paragraphs: 2, ratings: [5, 5, 5], mockReviews: true },
+  'choilang': { paragraphs: 2, ratings: [5, 5, 4], mockReviews: true },
+  'character-indeo': { paragraphs: 2, ratings: [4, 5, 4], mockReviews: true },
+  'cafe-nas': { paragraphs: 2, ratings: [5, 4, 5], mockReviews: true },
+  'tomntoms-soyang': { paragraphs: 2, ratings: [4, 4, 5], mockReviews: true },
+  'arcape-coffee': { paragraphs: 2, ratings: [5, 5, 5], mockReviews: true },
+  'cafe-bomnal': { paragraphs: 2, ratings: [5, 4, 5], mockReviews: true },
+  'soyang-dam': { paragraphs: 3, ratings: [5, 4, 5], mockReviews: true },
+  'soyang-maiden': { paragraphs: 2, ratings: [5, 5, 4], mockReviews: true },
+  'art-circle': { paragraphs: 2, ratings: [5, 4, 5], mockReviews: true },
+  'gangchon-railpark': { paragraphs: 3, ratings: [5, 5, 4], mockReviews: true },
+  'chuncheon-national-museum': { paragraphs: 3, ratings: [5, 4, 5], mockReviews: true },
+  'chuncheon-makguksu-museum': { paragraphs: 3, ratings: [5, 4, 4], mockReviews: true },
+  'legoland': { paragraphs: 3, ratings: [4, 5, 4], mockReviews: true },
+  'animation-museum': { paragraphs: 2, ratings: [5, 4, 5], mockReviews: true },
 };
 
 export default VENUE_DETAILS;

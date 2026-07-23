@@ -29,7 +29,7 @@ export const TRAVEL_LOG_SEEDS = [
     country: { en: 'Japan', ko: '일본', th: 'ญี่ปุ่น' },
     party: 4,
     mealPlan: 'lunch',
-    itinerary: ['tongnamujip', 'makguksu-museum', 'gongjicheon'],
+    itinerary: ['tongnamujip', 'chuncheon-makguksu-museum', 'gongjicheon'],
     travelDate: '2026-07-15',
   },
   {

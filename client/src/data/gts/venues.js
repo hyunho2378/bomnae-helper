@@ -38,7 +38,7 @@ export const venues = [
       th: 'crispy fried dumplings and rich mushroom hot pot kalguksu',
     },
     stayMin: 120,
-    coord: [127.7362176, 37.8928954], // 구글 검색 중심 · verify
+    coord: [127.7313722, 37.9022634], // 네이버 실측 · 춘천백일칼국수 우두점(id 1127380163)
     mock: false,
   },
   {
@@ -64,7 +64,7 @@ export const venues = [
       th: 'Grilled iron plates and charcoal near Soyanggang Dam',
     },
     stayMin: 120,
-    coord: [127.790303, 37.9313189], // 구글맵 실측
+    coord: [127.7393575, 37.9086236], // 네이버 실측 · 2025년 우두동 이전(충열로 175, id 13414103)
     mock: false,
   },
   {
@@ -132,7 +132,7 @@ export const venues = [
       th: 'โรงคั่วกาแฟสเปเชียลตี',
     },
     stayMin: 120,
-    coord: [127.718, 37.877], // PLACEHOLDER — verify
+    coord: [127.7676653, 37.9244011], // 네이버 실측 · 소울로스터리(소양강로 538, id 1164959443)
     mock: false,
   },
   {
@@ -140,12 +140,12 @@ export const venues = [
     name: { en: 'Hwadong 2571', ko: '화동2571', th: 'ฮวาดง 2571' },
     category: 'foodspace',
     oneLine: {
-      en: 'Neighborhood cafe in the old town',
-      ko: '구도심의 동네 카페',
-      th: 'คาเฟ่ย่านเมืองเก่า',
+      en: 'A K-food culture complex of cafes and kitchens',
+      ko: '카페와 청년 주방이 모인 먹거리 복합문화공간',
+      th: 'ศูนย์วัฒนธรรมอาหารรวมคาเฟ่และครัว',
     },
     stayMin: 120,
-    coord: [127.733, 37.882], // PLACEHOLDER — verify
+    coord: [127.716055, 37.8872075], // 네이버 실측 · 화동2571 복합문화공간(영서로 2571, id 1018763789)
     mock: false,
   },
   // [V5] mockup1.md Food Spaces 12~20 실명 반영 · 좌표 = 네이버 place redirect / 구글맵 !3d!4d 실측.
@@ -267,20 +267,8 @@ export const venues = [
     mock: false,
   },
 
-  // ---------- activity (실명 12 = 7 + [V5] 5 · 목업 0 · 23=makguksu 중복 주의) ----------
-  {
-    id: 'makguksu-museum',
-    name: { en: 'Makguksu Experience Museum', ko: '막국수체험박물관', th: 'พิพิธภัณฑ์ประสบการณ์มักกุกซู' },
-    category: 'activity',
-    oneLine: {
-      en: 'Make your own makguksu noodles',
-      ko: '막국수를 직접 만들어 보는 체험',
-      th: 'ลองทำเส้นมักกุกซูด้วยตัวเอง',
-    },
-    stayMin: 120,
-    coord: [127.73, 37.944], // PLACEHOLDER — verify
-    mock: false,
-  },
+  // ---------- activity (실명 11 = 6 + [V5] 5 · 목업 0) ----------
+  // 구 'makguksu-museum'은 chuncheon-makguksu-museum(신북로 264 실주소)과 동일 장소라 제거([V5] 중복 정리).
   {
     id: 'skywalk',
     name: { en: 'Soyanggang Skywalk', ko: '소양강 스카이워크', th: 'โซยังกัง สกายวอล์ก' },
@@ -304,7 +292,7 @@ export const venues = [
       th: 'สันเขื่อนวิวทะเลสาบกว้าง',
     },
     stayMin: 120,
-    coord: [127.779, 37.945], // PLACEHOLDER — verify
+    coord: [127.813266, 37.947555], // 네이버 실측 · 소양강댐 정상(준공기념탑 일대, id 15637604)
     mock: false,
   },
   {
@@ -351,12 +339,12 @@ export const venues = [
     name: { en: 'Art Circle', ko: '아트서클', th: 'อาร์ตเซอร์เคิล' },
     category: 'activity',
     oneLine: {
-      en: 'Local art space and workshops',
-      ko: '로컬 아트 스페이스와 워크숍',
-      th: 'อาร์ตสเปซท้องถิ่นและเวิร์กช็อป',
+      en: 'A circular public-art sky-deck over the old town',
+      ko: '구도심 위를 도는 공공예술 공중 데크',
+      th: 'เดคลอยฟ้าวงกลมศิลปะสาธารณะเหนือเมืองเก่า',
     },
     stayMin: 120,
-    coord: [127.729, 37.88], // PLACEHOLDER — verify
+    coord: [127.7269438, 37.8936299], // 네이버 실측 · 소양아트서클(소양2교 앞, id 4090051998)
     mock: false,
   },
   // [V5] mockup1.md Activities 21~25 실명 반영 · 좌표 = 네이버 place redirect 실측.
@@ -386,8 +374,7 @@ export const venues = [
     coord: [127.7538801, 37.8639007], // 네이버 실측
     mock: false,
   },
-  // [V5-주의] 아래는 기존 실명 venue 'makguksu-museum'(막국수체험박물관)과 동일 장소 — mockup1.md 23번 중복.
-  //   사용자 확인 대기: 둘 중 하나만 남기는 게 맞음(현재는 지시 "전부 반영"대로 둘 다 유지 · 좌표는 실측값).
+  // 막국수 중복 정리 완료: 구 'makguksu-museum'을 제거하고 이 항목(실주소 신북읍 신북로 264)만 유지.
   {
     id: 'chuncheon-makguksu-museum',
     name: { en: 'Chuncheon Makguksu Museum', ko: '춘천막국수체험박물관', th: 'Chuncheon Makguksu Museum' },
