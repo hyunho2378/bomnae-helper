@@ -48,6 +48,13 @@ function useApi(path, { poll } = {}) {
 
 const fmtSec = (ms) => (ms == null ? '-' : `${(ms / 1000).toFixed(1)}s`);
 const fmtTime = (iso) => new Date(iso).toLocaleTimeString('en-GB');
+// [V6] 참가자 Started/Ended = 날짜 + 시각(여러 날에 걸친 데이터라 시각만으론 순서가 안 읽힘 · 요청 반영).
+const fmtDateTime = (iso) => {
+  if (!iso) return '-';
+  const d = new Date(iso);
+  const p = (n) => String(n).padStart(2, '0');
+  return `${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+};
 
 // [V6] Duration = Ended − Started(벽시계). 60초 미만은 초, 그 이상은 분·초.
 const fmtDur = (ms) => {
@@ -76,7 +83,7 @@ const payloadSummary = (step, payload = {}) => {
 
 // [V6] 대시보드 재구성 · 컬럼: 이름 · Started · Ended · Duration · Completed(예약 유무 O/X).
 //   중간 단계 컬럼은 화면에서 빼고(데이터는 보존) 행 클릭 시 전체 이벤트 타임라인 확장.
-const COLS = 'grid-cols-[1fr_88px_88px_112px_80px_24px]';
+const COLS = 'grid-cols-[1fr_104px_104px_96px_72px_24px]';
 
 function ParticipantRow({ p }) {
   const [open, setOpen] = useState(false);
@@ -94,8 +101,8 @@ function ParticipantRow({ p }) {
           </span>
           <span className="block truncate text-caption text-inkMeta">{p.name}</span>
         </span>
-        <span className="font-display text-caption text-inkSec">{fmtTime(p.started_at)}</span>
-        <span className="font-display text-caption text-inkSec">{p.last_at ? fmtTime(p.last_at) : '-'}</span>
+        <span className="font-display text-caption text-inkSec">{fmtDateTime(p.started_at)}</span>
+        <span className="font-display text-caption text-inkSec">{fmtDateTime(p.last_at)}</span>
         <span className="font-display font-semibold">{rowDuration(p)}</span>
         <span className={`font-display font-bold ${p.completed ? 'text-green' : 'text-inkMeta'}`}>
           {p.completed ? 'O' : 'X'}
