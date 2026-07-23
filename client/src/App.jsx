@@ -22,6 +22,7 @@ import LegalPrivacy from './pages/LegalPrivacy';
 import LegalTerms from './pages/LegalTerms';
 import NotFound from './pages/NotFound';
 import AdminPage from './pages/AdminPage'; // [V1] 헤더 링크 없음 · 직접 URL 진입만
+import AdminUsers from './pages/AdminUsers'; // [V11] User Management(2차 게이트 경유)
 import Reviews from './pages/Reviews';
 import TravelLog from './pages/TravelLog'; // [V3] 발자취(공개 열람 · 템플릿 시작은 /gts 가드 경유)
 import Ticket from './pages/Ticket';
@@ -48,6 +49,7 @@ export default function App() {
                     <Route path="/travel-log" element={<TravelLog />} />
                     <Route path="/reviews" element={<Reviews />} />
                     <Route path="/admin" element={<AdminPage />} />
+                    <Route path="/admin/users" element={<AdminUsers />} />
                     {/* [V10] 프로필(로그인 필수) · 팀 소개(공개) */}
                     <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
                     <Route path="/team" element={<Team />} />

@@ -1,7 +1,7 @@
 // TravelLogMap · [V3] — 퇴역한 구 Loop 지도 코드(§13 3레이어 문법)의 재활용·개명(DEPRECATED 해제).
 // 구 LoopMap의 라인 칩·정류장·POI·셔틀 시뮬 종속을 걷어내고 "발자취 다중 라인" 전용으로 경량화:
 //   로그별 소스 1개(LineString) + §13 3레이어(glow→casing→main · line-cap round) ·
-//   라인별 색 = tokens.logShades(primary 계열 명도 차등 단색 · 그라데이션 금지 §16.1) ·
+//   라인별 색 = tokens.logShades([V11] 채도 높은 8색 순환 단색 · 그라데이션 금지 §16.1) ·
 //   강조 = highlightId 외 라인 40% 감쇠(지시 [1] · line-opacity만 조정 — 레이어 재생성 없음) ·
 //   fitBounds(패딩 80) 1회 · §23 아티팩트 수술 준수(antialias·중복 가드·ResizeObserver·contextlost).
 // props: { logs: [{ id, coords: [[lng,lat]...], color }], highlightId }

@@ -4,9 +4,11 @@
 // 비관리자·비로그인 = 404 위장(NotFound 렌더 · 관리자 존재 노출 금지). 서버측은 401/403 이중 차단.
 // 문자열: 관리자 내부 도구라 3언어 대상 아님 — 영어 단일 하드카피 허용(지시 [3] 명시 예외).
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronDown, RefreshCw } from 'lucide-react';
 import Container from '../components/layout/Container';
 import Button from '../components/ui/Button';
+import Modal from '../components/ui/Modal';
 import { useAuth } from '../context/AuthContext';
 import { motion } from '../tokens';
 import { venues } from '../data/gts/venues';
@@ -267,6 +269,91 @@ function LiveTimeline() {
   );
 }
 
+// [V11] User Management 2차 게이트 모달 · env ADMIN_2FA_PIN 검증(서버) · 통과 시 /admin/users 이동.
+//   실패 5회 시 서버가 10분 잠금(423 locked) — 카운트다운 표기. 관리자 도구라 영어 하드카피.
+function TwoFaModal({ open, onClose }) {
+  const navigate = useNavigate();
+  const [pin, setPin] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState(null);
+  const [lockedUntil, setLockedUntil] = useState(0);
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    if (lockedUntil <= Date.now()) return undefined;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [lockedUntil]);
+  const locked = lockedUntil > now;
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setBusy(true);
+    setMsg(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/2fa`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.ok) {
+        onClose();
+        navigate('/admin/users');
+        return;
+      }
+      if (data.error === 'locked') {
+        setLockedUntil(data.lockedUntil || 0);
+        setNow(Date.now());
+        setMsg('Too many attempts.');
+      } else if (data.error === 'wrong_pin') {
+        setMsg(`Incorrect PIN. ${data.remaining} attempt${data.remaining === 1 ? '' : 's'} left.`);
+      } else if (data.error === 'not_configured') {
+        setMsg('2FA is not configured on the server.');
+      } else {
+        setMsg('Verification failed.');
+      }
+    } catch {
+      setMsg('Network error.');
+    } finally {
+      setBusy(false);
+      setPin('');
+    }
+  };
+
+  return (
+    <Modal open={open} onClose={onClose}>
+      <div className="flex flex-col gap-16">
+        <h2 className="text-h3 font-semibold">User Management access</h2>
+        <p className="text-small text-inkSec">Enter the admin 2FA PIN to continue.</p>
+        <form onSubmit={submit} className="flex flex-col gap-12">
+          <input
+            type="password"
+            inputMode="numeric"
+            autoComplete="off"
+            value={pin}
+            onChange={(e) => setPin(e.target.value)}
+            placeholder="2FA PIN"
+            disabled={locked}
+            className="h-48 rounded-md bg-surface px-16 text-body focus:ring-2 focus:ring-primary"
+          />
+          {msg && (
+            <p className="text-small font-medium text-spice">
+              {msg}
+              {locked && ` Locked, try again in ${Math.max(0, Math.ceil((lockedUntil - now) / 1000))}s.`}
+            </p>
+          )}
+          <div className="grid">
+            <Button as="button" type="submit" disabled={busy || locked || !pin}>
+              Verify
+            </Button>
+          </div>
+        </form>
+      </div>
+    </Modal>
+  );
+}
+
 // DAH RequireAdmin 문법: 비로그인·비관리자 = NotFound 렌더(404 위장 · UI 미렌더)
 function RequireAdmin({ children }) {
   const { user, ready } = useAuth();
@@ -278,6 +365,7 @@ function RequireAdmin({ children }) {
 export default function AdminPage() {
   const [tab, setTab] = useState('overview');
   const [reloadKey, setReloadKey] = useState(0);
+  const [twoFaOpen, setTwoFaOpen] = useState(false); // [V11] User Management 2차 게이트
 
   return (
     <RequireAdmin>
@@ -285,11 +373,18 @@ export default function AdminPage() {
         <div className="flex flex-col gap-24 pb-64 pt-96">
           <div className="flex flex-wrap items-center justify-between gap-16">
             <h1 className="font-display text-h1 font-bold tracking-display">Validation dashboard</h1>
-            <Button variant="secondary" onClick={() => setReloadKey((k) => k + 1)}>
-              <RefreshCw size={16} aria-hidden="true" />
-              Refresh
-            </Button>
+            <div className="flex items-center gap-8">
+              {/* [V11] 2차 게이트 → 통과 시 /admin/users */}
+              <Button variant="secondary" onClick={() => setTwoFaOpen(true)}>
+                User Management
+              </Button>
+              <Button variant="secondary" onClick={() => setReloadKey((k) => k + 1)}>
+                <RefreshCw size={16} aria-hidden="true" />
+                Refresh
+              </Button>
+            </div>
           </div>
+          <TwoFaModal open={twoFaOpen} onClose={() => setTwoFaOpen(false)} />
           {/* DAH AdminLayout 구도 · 좌 사이드바 + 우 콘텐츠 */}
           <div className="flex flex-col gap-24 lg:grid lg:grid-cols-[200px_1fr] lg:items-start">
             <nav className="flex gap-8 lg:flex-col">

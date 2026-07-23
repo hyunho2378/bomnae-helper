@@ -6,13 +6,54 @@
 // [G1] 데이터 배선만 서버 연동(사용자 승인: UI 구조·레이아웃·카피 불변) —
 //   로드 = fetchReviews(실패 시 seedReviews 세션 메모리 폴백 · 명세 5-②),
 //   게시 = postReview / 좋아요 = toggleLikeRemote(실패 시 기존 세션 로직 유지).
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import ReviewCard from '../components/reviews/ReviewCard';
 import ReviewForm from '../components/reviews/ReviewForm';
 import Container from '../components/layout/Container';
 import Chip from '../components/ui/Chip';
 import { seedReviews, fetchReviews, postReview, toggleLikeRemote } from '../data/reviews';
 import LangSwap from '../i18n/LangSwap';
+import { useLang } from '../i18n/LangContext';
+
+// [V11] 리뷰 100+건 페이지네이션 · 페이지당 24개. 숫자 페이지 + 이전/다음 화살표(접근성 aria).
+const PAGE_SIZE = 24;
+
+function Pagination({ page, totalPages, onGoto, t }) {
+  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+  const arrow = (dir, disabled, to, Icon, labelKey) => (
+    <button
+      type="button"
+      aria-label={t(labelKey)}
+      disabled={disabled}
+      onClick={() => onGoto(to)}
+      className={`flex h-40 w-40 items-center justify-center rounded-pill ${
+        disabled ? 'text-inkMeta opacity-40' : 'text-ink hover:bg-surface'
+      }`}
+    >
+      <Icon size={18} aria-hidden="true" />
+    </button>
+  );
+  return (
+    <nav aria-label={t('nav.pagination')} className="flex flex-wrap items-center justify-center gap-8 pt-8">
+      {arrow('prev', page === 1, page - 1, ChevronLeft, 'reviews.prevPage')}
+      {pages.map((p) => (
+        <button
+          key={p}
+          type="button"
+          aria-current={p === page ? 'page' : undefined}
+          onClick={() => onGoto(p)}
+          className={`flex h-40 min-w-40 items-center justify-center rounded-pill px-12 font-display text-small font-semibold transition-colors duration-fast ${
+            p === page ? 'bg-primary text-white' : 'bg-white text-ink shadow-sm hover:bg-surface'
+          }`}
+        >
+          {p}
+        </button>
+      ))}
+      {arrow('next', page === totalPages, page + 1, ChevronRight, 'reviews.nextPage')}
+    </nav>
+  );
+}
 
 export default function Reviews() {
   const [reviews, setReviews] = useState(seedReviews);
@@ -44,6 +85,21 @@ export default function Reviews() {
     else list.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
     return list;
   }, [reviews, sort]);
+
+  // [V11] 페이지네이션 · 정렬 변경 시 1페이지로 · 페이지 이동 시 그리드 상단으로 스크롤
+  const { t } = useLang();
+  const [page, setPage] = useState(1);
+  useEffect(() => {
+    setPage(1);
+  }, [sort]);
+  const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+  const pageClamped = Math.min(page, totalPages);
+  const paged = sorted.slice((pageClamped - 1) * PAGE_SIZE, pageClamped * PAGE_SIZE);
+  const gridRef = useRef(null);
+  const goto = (p) => {
+    setPage(p);
+    gridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   // 좋아요 · 서버 토글(카운트는 서버 값 반영) · 실패·폴백 시 기존 세션 로직(§10.8)
   const toggleLike = (id) => {
@@ -114,8 +170,8 @@ export default function Reviews() {
           </Chip>
         </div>
 
-        <div className="grid grid-cols-2 gap-16 md:grid-cols-3 md:gap-24 lg:grid-cols-4">
-          {sorted.map((review) => (
+        <div ref={gridRef} className="grid grid-cols-2 gap-16 md:grid-cols-3 md:gap-24 lg:grid-cols-4">
+          {paged.map((review) => (
             <ReviewCard
               key={review.id}
               review={review}
@@ -124,6 +180,9 @@ export default function Reviews() {
             />
           ))}
         </div>
+        {totalPages > 1 && (
+          <Pagination page={pageClamped} totalPages={totalPages} onGoto={goto} t={t} />
+        )}
       </div>
     </Container>
   );

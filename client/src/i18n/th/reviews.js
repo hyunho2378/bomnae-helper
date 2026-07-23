@@ -7,6 +7,8 @@ export default {
     sortLatest: "ล่าสุด",
     sortLikes: "ถูกใจมากที่สุด",
     like: "ถูกใจรีวิวนี้",
+    prevPage: "หน้าก่อนหน้า",
+    nextPage: "หน้าถัดไป",
     course: {
       lunch2act: "มื้อกลางวัน · 2 กิจกรรม",
       lunchDinner2act: "กลางวันและเย็น · 2 กิจกรรม",

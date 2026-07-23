@@ -84,4 +84,97 @@ router.get('/admin/events', requireAdmin, async (req, res) => {
   res.json({ events: rows });
 });
 
+// ─────────────────────────────────────────────────────────────────────────────
+// [V11] User Management 2차 게이트 · env ADMIN_2FA_PIN 검증(하드코딩 금지).
+//   성공 시 30분 유효 · 5회 실패 시 10분 잠금. 상태는 서버 프로세스 인메모리(userId 키) —
+//   재시작 시 재입력(허용) · 실패 카운트는 서버만 신뢰(클라 조작 방지).
+// ─────────────────────────────────────────────────────────────────────────────
+const ADMIN_2FA_PIN = (process.env.ADMIN_2FA_PIN || '').trim();
+const TWOFA_TTL_MS = 30 * 60 * 1000; // 30분 유효
+const LOCK_MS = 10 * 60 * 1000; // 10분 잠금
+const MAX_FAILS = 5;
+const twoFa = new Map(); // userId -> { verifiedUntil, failCount, lockedUntil }
+const twoFaState = (uid) => twoFa.get(uid) || { verifiedUntil: 0, failCount: 0, lockedUntil: 0 };
+
+router.post('/admin/2fa', requireAdmin, (req, res) => {
+  const uid = req.adminUserId;
+  const now = Date.now();
+  const st = twoFaState(uid);
+  if (st.lockedUntil > now) return res.status(423).json({ error: 'locked', lockedUntil: st.lockedUntil });
+  if (!ADMIN_2FA_PIN) return res.status(500).json({ error: 'not_configured' }); // env 미설정
+  const pin = String(req.body?.pin ?? '');
+  if (pin.length > 0 && pin === ADMIN_2FA_PIN) {
+    twoFa.set(uid, { verifiedUntil: now + TWOFA_TTL_MS, failCount: 0, lockedUntil: 0 });
+    return res.json({ ok: true, verifiedUntil: now + TWOFA_TTL_MS });
+  }
+  const failCount = st.failCount + 1;
+  if (failCount >= MAX_FAILS) {
+    twoFa.set(uid, { verifiedUntil: 0, failCount: 0, lockedUntil: now + LOCK_MS });
+    return res.status(423).json({ error: 'locked', lockedUntil: now + LOCK_MS });
+  }
+  twoFa.set(uid, { verifiedUntil: 0, failCount, lockedUntil: 0 });
+  return res.status(401).json({ error: 'wrong_pin', remaining: MAX_FAILS - failCount });
+});
+
+router.get('/admin/2fa/status', requireAdmin, (req, res) => {
+  const now = Date.now();
+  const st = twoFaState(req.adminUserId);
+  res.json({
+    verified: st.verifiedUntil > now,
+    verifiedUntil: st.verifiedUntil > now ? st.verifiedUntil : 0,
+    lockedUntil: st.lockedUntil > now ? st.lockedUntil : 0,
+    configured: !!ADMIN_2FA_PIN,
+  });
+});
+
+// 2차 게이트 통과 필수(requireAdmin 다음 체이닝) · 미통과 시 403 2fa_required
+function requireAdmin2fa(req, res, next) {
+  if (twoFaState(req.adminUserId).verifiedUntil > Date.now()) return next();
+  return res.status(403).json({ error: '2fa_required' });
+}
+
+// [V11] 전체 사용자 테이블 · 이름/이메일/가입일/예약 수/마지막 활동.
+//   User Management는 검증 대시보드와 달리 REAL_USER_FILTER 없음(전체 사용자 관리 목적).
+//   이 조회는 SELECT만 — journey_events에 아무 것도 쓰지 않는다(관리자 행위로 데이터 오염 금지 · 지시 [1]).
+router.get('/admin/users', requireAdmin, requireAdmin2fa, async (req, res) => {
+  const { rows } = await pool.query(
+    `SELECT u.id, u.name, u.email, u.username,
+            to_char(u.created_at AT TIME ZONE 'Asia/Seoul', 'YYYY-MM-DD') AS joined,
+            (SELECT count(*) FROM gts_bookings b WHERE b.user_id = u.id)::int AS booking_count,
+            GREATEST(
+              (SELECT max(created_at) FROM gts_bookings b WHERE b.user_id = u.id),
+              (SELECT max(created_at) FROM journey_events e WHERE e.user_id = u.id)
+            ) AS last_at
+       FROM users u
+      ORDER BY last_at DESC NULLS LAST, u.created_at DESC`,
+  );
+  res.json({ users: rows });
+});
+
+// [V11] 사용자 상세 · 예약 목록(picks=선택 동선) + journey_events 타임라인. SELECT만(기록 안 함).
+router.get('/admin/users/:id', requireAdmin, requireAdmin2fa, async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id)) return res.status(400).json({ error: 'bad_id' });
+  const { rows: urows } = await pool.query(
+    `SELECT id, name, email, username,
+            to_char(created_at AT TIME ZONE 'Asia/Seoul', 'YYYY-MM-DD') AS joined
+       FROM users WHERE id = $1`,
+    [id],
+  );
+  if (!urows.length) return res.status(404).json({ error: 'not_found' });
+  const { rows: bookings } = await pool.query(
+    `SELECT code, status, party, meal_plan, pass_type, total_amount, total, picks,
+            to_char(travel_date, 'YYYY-MM-DD') AS travel_date,
+            to_char(created_at AT TIME ZONE 'Asia/Seoul', 'YYYY-MM-DD HH24:MI') AS created_at
+       FROM gts_bookings WHERE user_id = $1 ORDER BY created_at DESC`,
+    [id],
+  );
+  const { rows: events } = await pool.query(
+    `SELECT id, step, payload, duration_ms, created_at
+       FROM journey_events WHERE user_id = $1 ORDER BY created_at DESC LIMIT 200`,
+    [id],
+  );
+  res.json({ user: urows[0], bookings, events });
+});
+
 module.exports = router;

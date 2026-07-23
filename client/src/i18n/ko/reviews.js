@@ -7,6 +7,8 @@ export default {
     sortLatest: "최신순",
     sortLikes: "좋아요순",
     like: "이 후기에 좋아요",
+    prevPage: "이전 페이지",
+    nextPage: "다음 페이지",
     course: {
       lunch2act: "점심 · 액티비티 2",
       lunchDinner2act: "점심과 저녁 · 액티비티 2",

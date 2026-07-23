@@ -30,9 +30,19 @@ export const lineColors = {
   lake: colors.primary,     // Lake/Culture Line: 소양강스카이워크 → 화동2571 → 공지천
 };
 
-// [V3] Travel Log 발자취 라인 · primary(#0073EC) 계열 명도 차등 단색 시리즈.
-// 라인별 1색(그라데이션 금지 · DESIGN §16.1 원색 원칙) — 로그 수 > 6이면 modulo 순환.
-export const logShades = ['#0073EC', '#0A4A99', '#4D9FF3', '#063B76', '#2166C4', '#77B7F5'];
+// [V11] Travel Log 발자취 라인 · 채도 높은 8색 순환(파랑 1 + 주황·초록·보라·로즈·청록·앰버·인디고).
+//   기존 primary 명도 차등(구분 저하)을 교체 — 라인별 1색(그라데이션 금지 · §16.1), 로그 > 8이면 modulo 순환.
+//   카드 좌측 도트와 지도 라인이 같은 색으로 짝지어진다(TravelLog·TravelLogMap 공유).
+export const logShades = [
+  '#0073EC', // blue (파랑 계열 1개 유지)
+  '#FB6A00', // orange (주황)
+  '#00B865', // green (초록)
+  '#8B3FE8', // purple (보라)
+  '#F0347C', // rose (로즈)
+  '#00B5AD', // teal (청록)
+  '#F5A623', // amber (앰버)
+  '#3F51D6', // indigo (인디고)
+];
 
 export const fonts = {
   // v3.2: 본문 Pretendard → SUIT Variable 교체(라틴 회색조·얇음 문제). Kanit은 디스플레이·숫자·태국어.
