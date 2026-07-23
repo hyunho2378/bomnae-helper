@@ -9,6 +9,8 @@ const VARIANTS = {
   primary: 'bg-primary text-white hover:shadow-md',
   secondary: 'bg-transparent text-primary ring-1.5 ring-inset ring-primary hover:bg-primary/10',
   ghost: 'bg-transparent text-primary hover:opacity-80',
+  // onPhoto: 히어로 사진 위 흰 pill(primary 블루와 페어). primary와 padding·height·radius·font 동일(면 색만 차이).
+  onPhoto: 'bg-white text-primary hover:shadow-md',
 };
 
 const SIZES = {

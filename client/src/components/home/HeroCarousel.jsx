@@ -59,16 +59,17 @@ export default function HeroCarousel() {
             className="font-display text-display font-bold tracking-display text-white"
           />
           <LangSwap k="home.hero.sub" as="p" className="mt-16 text-h2 font-medium text-white" />
-          {/* [V4] CTA 페어 최종 재구축 · Button 프리미티브 2개를 공통 flex 래퍼 하나로 렌더.
-              래퍼가 배치를 소유(gap-12 · items-stretch) · 개별 버튼에 margin·width·height·transform·개별 클래스 0.
-              차이는 라벨·variant·목적지뿐 — variant는 padding·height·radius·font 공유, secondary 보더는
-              ring(box-shadow inset)이라 치수 불변(Button.jsx). flex-wrap: 좁은 폭에서 가로 스크롤 대신 세로 접힘. */}
-          <div className="mt-32 flex w-fit flex-wrap items-stretch gap-12">
+          {/* CTA 페어 재구축 · 라벨은 t()로 활성 언어만 렌더 → 버튼 폭이 텍스트에 딱 맞음.
+              (구: LangSwap이 3언어를 grid 셀에 겹쳐 최장 언어=태국어 폭으로 고정 → 짧은 언어에서 우측 유령 여백.
+               트레이드오프: 언어 전환 시 버튼 폭이 라벨 길이에 따라 변함 — 여백 제거를 우선.)
+              래퍼가 배치 소유(gap-12) · 개별 버튼 margin·width 0. flex-wrap: 좁은 폭에서 세로 접힘.
+              primary=블루 면+white / onPhoto=흰 면+블루(사진 위 가독 · 치수는 primary와 동일). */}
+          <div className="mt-32 flex flex-wrap items-center gap-12">
             <Button as={Link} to="/gate" variant="primary" size="lg">
-              <LangSwap k="home.hero.ctaGate" />
+              {t('home.hero.ctaGate')}
             </Button>
-            <Button as={Link} to="/gts" variant="secondary" size="lg">
-              <LangSwap k="home.hero.ctaBuild" />
+            <Button as={Link} to="/gts" variant="onPhoto" size="lg">
+              {t('home.hero.ctaBuild')}
             </Button>
           </div>
         </div>
