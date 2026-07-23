@@ -9,7 +9,12 @@ import Container from '../components/layout/Container';
 import Button from '../components/ui/Button';
 import { useAuth } from '../context/AuthContext';
 import { motion } from '../tokens';
+import { venues } from '../data/gts/venues';
 import NotFound from './NotFound';
+
+// [V6] 예약 picks(venue id) → 이름. 관리자 도구는 영어 단일이라 name.en 사용, 없으면 id 폴백.
+const VENUE_NAME = Object.fromEntries(venues.map((v) => [v.id, v.name.en]));
+const venueName = (id) => VENUE_NAME[id] ?? id;
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001';
 
@@ -90,10 +95,18 @@ function ParticipantRow({ p }) {
       {open && (
         <ol className="relative mx-16 mb-16 flex flex-col border-l-0 pl-24">
           <span aria-hidden="true" className="absolute bottom-8 left-8 top-8 w-2 rounded-pill bg-line" />
-          {/* [V6] 이벤트 없이 로그인만 한 실계정 */}
-          {!(p.steps ?? []).length && (
-            <li className="py-8 text-caption text-inkMeta">Logged in — no journey steps recorded.</li>
-          )}
+          {/* [V6] 이벤트 없이 완주(예약만 있음, 서버 다운 시 트래킹 누락) 또는 로그인만 */}
+          {!(p.steps ?? []).length &&
+            (p.booking_picks?.length ? (
+              <li className="relative flex items-baseline gap-12 py-8">
+                <span aria-hidden="true" className="absolute -left-20 top-1/2 h-12 w-12 -translate-y-1/2 rounded-pill bg-primary shadow-sm" />
+                <span className="w-96 shrink-0 font-display text-caption font-bold text-primary">booked</span>
+                <span className="min-w-0 flex-1 text-small text-ink">{p.booking_picks.map(venueName).join(' > ')}</span>
+                <span className="shrink-0 font-display text-caption font-semibold text-inkMeta">no tracking</span>
+              </li>
+            ) : (
+              <li className="py-8 text-caption text-inkMeta">Logged in — no journey steps recorded.</li>
+            ))}
           {(p.steps ?? []).map((s, i) => (
             // 이벤트 배열 항목 · 순번 키 허용(불변 목록)
             // eslint-disable-next-line react/no-array-index-key
