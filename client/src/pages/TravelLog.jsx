@@ -53,7 +53,7 @@ function LogCard({ log, active, onHover, onLeave, onSelect, onStart, compact }) 
     >
       <button type="button" onClick={onSelect} className="flex flex-col items-start gap-8 text-left">
         <div className="flex w-full items-baseline justify-between gap-12">
-          <span className="flex items-baseline gap-6">
+          <span className="flex items-baseline gap-8">
             {/* 라인 컬러 도트(원색 원 + shadow · §16.1) = 지도 라인과 카드의 시각 동기 · 도트 10px(§24) */}
             <span aria-hidden="true" className="self-center rounded-pill shadow-sm" style={{ width: 10, height: 10, background: log.color }} />
             {/* [V6] 익명화 · Traveler A/B/C…(실명·국가 미표기) · t()로 활성 언어만(유령 여백 방지) */}

@@ -127,6 +127,15 @@ export default {
       dropoffPlaceholder: "예: 춘천역, 숙소 주소",
       dropoffOptional: "선택 입력입니다. 정하지 않았다면 비워 두세요.",
       dropoffRequired: "하차 지점을 입력하면 결제할 수 있어요",
+      // [V23] 필수 복원 · 배지 · 필수 안내 · 인라인 오류 · 부족 항목 라벨
+      requiredBadge: "필수",
+      dropoffRequiredNote: "필수 입력입니다. 일정 마지막에 내려드릴 장소를 알려주세요.",
+      payMethodRequired: "결제 수단을 선택해 주세요.",
+      needLabel: "남은 항목",
+      needPass: "이용권",
+      needDropoff: "도착지",
+      needPay: "결제 수단",
+      needConsent: "환불 동의",
       priceTitle: "금액 내역",
       payCta: "결제하기",
       // [V7] 이용권 선택·전액 포함 밴드·환불 동의

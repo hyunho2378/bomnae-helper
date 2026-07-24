@@ -7,7 +7,7 @@
 //   스탬프는 Ticket 페이지 진입 시 1회 재생으로 이동(§43).
 // 로그인: 기본 데모 유저(§10.6)로 게이트 통과 — user 없을 때만 LoginGate 폴백(Guest-first 보존).
 // 가드(§31): route 경유 — 미충족 시 route로 replace.
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bus, CarFront, Loader2 } from 'lucide-react';
 import CardForm from '../components/pay/CardForm';
@@ -31,10 +31,10 @@ import LangSwap from '../i18n/LangSwap';
 
 const VEHICLE_ICON = { taxi: CarFront, van: Bus };
 
-// [V5-frictionless] 검증용 무마찰: 하차 지점·결제 수단 미선택이어도 Pay 활성(완주율 저하 방지).
-//   회귀 방지 플래그(기본 false) — true로 되돌리면 필수 검증·비활성 사유 복원(서버 REQUIRE_* env와 짝).
-const REQUIRE_DROPOFF = false;
-const REQUIRE_PAYMETHOD = false;
+// [V23] 필수값 복원: 하차 지점·결제 수단을 다시 필수화(플래그 구조 유지 · 기본값만 true로 전환).
+//   서버 REQUIRE_* env와 짝 — 서버도 REQUIRE_DROPOFF=true·REQUIRE_PAYMETHOD=true로 함께 강제(OPS/배포 env).
+const REQUIRE_DROPOFF = true;
+const REQUIRE_PAYMETHOD = true;
 
 // 요약 행 · Booking 단일 확인 페이지 Row 선례(라벨 caption + 값 우측)
 function Row({ labelKey, children }) {
@@ -52,6 +52,17 @@ function Row({ labelKey, children }) {
   );
 }
 
+// [V23] 필수 표시 배지 · 라벨 옆(하차 지점·결제 수단) — 사전 인지용(별표 대체 텍스트 배지)
+function RequiredBadge() {
+  return (
+    <LangSwap
+      k="gts.checkout.requiredBadge"
+      as="span"
+      className="shrink-0 rounded-pill bg-spice/10 px-8 py-2 text-caption font-semibold uppercase tracking-eyebrow text-spice"
+    />
+  );
+}
+
 export default function GtsCheckout() {
   const ok = useGtsGuard('checkout');
   const { user } = useAuth();
@@ -62,6 +73,8 @@ export default function GtsCheckout() {
   const [gateOpen, setGateOpen] = useState(false);
   const [payMethod, setPayMethod] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [attempted, setAttempted] = useState(false); // [V23] 제출 시도 후에만 인라인 오류 노출
+  const dropoffRef = useRef(null); // [V23] 미입력 제출 시 포커스 이동 대상
   // [V7] 시간제 이용권(금액의 단일 근거 · 미선택 시 Pay 비활성 — 무마찰 예외 아님) + 환불 규정 동의(필수)
   const [passType, setPassType] = useState(null);
   const [consent, setConsent] = useState(false);
@@ -73,6 +86,22 @@ export default function GtsCheckout() {
   const dropoffOk = dropoffText.trim().length > 0;
   const Icon = VEHICLE_ICON[vehicle];
   const method = PAY_METHODS.find((m) => m.id === payMethod) ?? null;
+
+  // [V23] Pay 활성 조건 4가지: 이용권 · 환불 동의 · (필수 시) 하차 지점 · (필수 시) 결제 수단
+  const blocked =
+    !passType || !consent || (REQUIRE_DROPOFF && !dropoffOk) || (REQUIRE_PAYMETHOD && !method);
+  // 버튼 하단 부족 항목 안내(읽기 순서: 이용권 → 하차 지점 → 결제 수단 → 환불 동의)
+  const missing = [
+    !passType && 'gts.checkout.needPass',
+    REQUIRE_DROPOFF && !dropoffOk && 'gts.checkout.needDropoff',
+    REQUIRE_PAYMETHOD && !method && 'gts.checkout.needPay',
+    !consent && 'gts.checkout.needConsent',
+  ].filter(Boolean);
+  // 비활성 Pay 버튼 위 클릭은 통과(Button disabled = pointer-events-none) → 제출 시도 계측 + 첫 미입력 포커스
+  const onBlockedAttempt = () => {
+    setAttempted(true);
+    if (REQUIRE_DROPOFF && !dropoffOk) dropoffRef.current?.focus();
+  };
 
   // §42: 카드 입력값은 저장하지 않는다(검증 없음 · 빈 제출 허용) — 수단 문자열만 예약에 저장
   // [V5-frictionless] 하차·결제 수단 모두 선택적 · 미선택이면 null 저장
@@ -213,23 +242,33 @@ export default function GtsCheckout() {
               </ol>
             </section>
 
-            {/* 최종 하차 지점 · [V5] 선택 입력(무마찰) — 미입력이면 null 저장·티켓 "Not specified" */}
+            {/* 최종 하차 지점 · [V23] 필수 복원(미입력 시 Pay 비활성 · 제출 시도 시 포커스+인라인 오류) */}
             <section className="flex flex-col gap-12 rounded-xl bg-white p-24 shadow-sm">
               <label className="flex flex-col gap-8">
-                <LangSwap k="gts.checkout.dropoffLabel" as="span" className="text-h3 font-semibold" />
-                <LangSwap k="gts.checkout.dropoffOptional" className="text-caption font-medium text-inkMeta" />
+                <span className="flex items-center gap-8">
+                  <LangSwap k="gts.checkout.dropoffLabel" as="span" className="text-h3 font-semibold" />
+                  {REQUIRE_DROPOFF && <RequiredBadge />}
+                </span>
+                <LangSwap
+                  k={REQUIRE_DROPOFF ? 'gts.checkout.dropoffRequiredNote' : 'gts.checkout.dropoffOptional'}
+                  className="text-caption font-medium text-inkMeta"
+                />
                 <input
+                  ref={dropoffRef}
                   type="text"
                   value={dropoffText}
                   onChange={(e) => setDropoffText(e.target.value)}
                   placeholder={t('gts.checkout.dropoffPlaceholder')}
-                  className="h-48 rounded-md bg-surface px-16 text-body focus:ring-2 focus:ring-primary"
+                  aria-invalid={REQUIRE_DROPOFF && attempted && !dropoffOk}
+                  className={`h-48 rounded-md bg-surface px-16 text-body focus:ring-2 focus:ring-primary ${
+                    REQUIRE_DROPOFF && attempted && !dropoffOk ? 'ring-2 ring-spice' : ''
+                  }`}
                 />
               </label>
-              {/* [V5] 사유 문구는 재필수화(REQUIRE_DROPOFF) 시에만 — 기본 무마찰이라 미표시 */}
+              {/* [V23] 인라인 오류 = 제출 시도(attempted) 후 미입력일 때만 */}
               {REQUIRE_DROPOFF && (
                 <div aria-live="polite">
-                  {!dropoffOk && (
+                  {attempted && !dropoffOk && (
                     <LangSwap
                       k="gts.checkout.dropoffRequired"
                       as="p"
@@ -240,10 +279,25 @@ export default function GtsCheckout() {
               )}
             </section>
 
-            {/* §42 결제 수단 그리드 8종 + 카드 폼/월렛 카피 */}
+            {/* §42 결제 수단 그리드 8종 + 카드 폼/월렛 카피 · [V23] 필수 복원(미선택 시 Pay 비활성) */}
             <section className="flex flex-col gap-16 rounded-xl bg-white p-24 shadow-sm">
-              <LangSwap k="gts.pay.title" as="h2" className="text-h3 font-semibold" />
+              <div className="flex items-center gap-8">
+                <LangSwap k="gts.pay.title" as="h2" className="text-h3 font-semibold" />
+                {REQUIRE_PAYMETHOD && <RequiredBadge />}
+              </div>
               <PayMethodGrid value={payMethod} onChange={setPayMethod} />
+              {/* [V23] 선택 그리드 아래 인라인 오류 = 제출 시도(attempted) 후 미선택일 때만 */}
+              {REQUIRE_PAYMETHOD && (
+                <div aria-live="polite">
+                  {attempted && !method && (
+                    <LangSwap
+                      k="gts.checkout.payMethodRequired"
+                      as="p"
+                      className="text-small font-medium text-spice"
+                    />
+                  )}
+                </div>
+              )}
               {/* [H2-16] 월렛 시뮬레이션 카피 삭제 · 월렛 = 폼 생략 + 바로 Pay(§42 유지) */}
               {/* 카드 계열 = 하단 카드 폼 확장(마운트 시 220ms easeOut · CardForm 내장) */}
               {method && !method.wallet && <CardForm />}
@@ -279,23 +333,23 @@ export default function GtsCheckout() {
                 <LangSwap k="gts.checkout.consentLabel" className="text-small font-medium" />
               </label>
             </div>
-            {/* [V5] dropoff·pay_method는 무마찰 유지 · [V7] 이용권·동의는 금액·규정의 근거라 필수(예외 아님) */}
-            <div className="grid">
-              <Button
-                disabled={
-                  submitting ||
-                  !passType ||
-                  !consent ||
-                  (REQUIRE_DROPOFF && !dropoffOk) ||
-                  (REQUIRE_PAYMETHOD && !method)
-                }
-                onClick={onPay}
-              >
-                <LangSwap k="gts.checkout.payCta" />
-                {submitting && (
-                  <Loader2 size={16} aria-hidden="true" className="animate-spin motion-reduce:animate-none" />
-                )}
-              </Button>
+            {/* [V23] Pay 활성 조건 4가지(이용권·동의·하차 지점·결제 수단) · 미충족 시 비활성 + 부족 항목 안내 */}
+            <div className="grid gap-8">
+              {/* 비활성 시 Button은 pointer-events-none — 래퍼가 클릭을 받아 제출 시도 계측+포커스 처리 */}
+              <div className="grid" onClick={blocked && !submitting ? onBlockedAttempt : undefined}>
+                <Button disabled={submitting || blocked} onClick={onPay}>
+                  <LangSwap k="gts.checkout.payCta" />
+                  {submitting && (
+                    <Loader2 size={16} aria-hidden="true" className="animate-spin motion-reduce:animate-none" />
+                  )}
+                </Button>
+              </div>
+              {/* 무엇이 남았는지 한 줄 안내(비활성일 때만) */}
+              {blocked && !submitting && (
+                <p aria-live="polite" className="text-caption font-medium text-inkSec">
+                  {t('gts.checkout.needLabel')}: {missing.map((k) => t(k)).join(', ')}
+                </p>
+              )}
             </div>
             {/* [V3] 수정하기 · 현재 선택(템플릿 포함)이 프리필된 채 build 스텝으로 복귀 —
                 StepStage 정상 동작(카운터·정원 규칙 유지 · Context 상태 그대로) */}

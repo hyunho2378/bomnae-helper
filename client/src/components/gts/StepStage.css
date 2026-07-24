@@ -23,3 +23,14 @@
     transform: translateX(-24px);
   }
 }
+/* [V22] 초과 안내 토스트 진입 · 상단중앙에서 아래로 살짝 내려오며 페이드 */
+@keyframes bh-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

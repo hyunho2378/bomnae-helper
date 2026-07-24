@@ -474,19 +474,6 @@ const RAW_VENUES = [
     mock: false,
   },
   {
-    id: 'tomntoms-soyang',
-    name: { en: 'Tom N Toms Coffee', ko: '탐앤탐스', th: 'Tom N Toms Coffee' },
-    category: 'foodspace',
-    oneLine: {
-      en: '24-hour cafe located below Soyang Dam',
-      ko: '소양강댐 아래 위치한 24시간 카페',
-      th: '24-hour cafe located below Soyang Dam',
-    },
-    stayMin: 120,
-    coord: [127.7877602, 37.9260948], // 구글맵 실측
-    mock: false,
-  },
-  {
     id: 'arcape-coffee',
     name: { en: 'Arcape Coffee', ko: 'ARCAPE COFFEE', th: 'Arcape Coffee' },
     category: 'foodspace',
@@ -497,19 +484,6 @@ const RAW_VENUES = [
     },
     stayMin: 120,
     coord: [127.6924301, 37.8957058], // 네이버 실측
-    mock: false,
-  },
-  {
-    id: 'cafe-bomnal',
-    name: { en: 'Cafe Bomnal', ko: '카페봄날', th: 'Cafe Bomnal' },
-    category: 'foodspace',
-    oneLine: {
-      en: 'A great cafe for view of Chuncheon',
-      ko: '춘천 전망 좋은 카페',
-      th: 'A great cafe for view of Chuncheon',
-    },
-    stayMin: 120,
-    coord: [127.7785008, 37.8880807], // 구글맵 실측
     mock: false,
   },
   // ---------- foodspace (실명 10 신규 · [V20] 사용자 제공 목록) ----------
@@ -840,20 +814,6 @@ const RAW_VENUES = [
     },
     stayMin: 120,
     coord: [127.6918678, 37.8930335], // 네이버 실측
-    mock: false,
-  },
-  // [V20] Jina House · 사용자 목록 포함 요청 · 설명·좌표·링크 미제공 → 임시 카피(확정 정보 대기 · PLACEHOLDER)
-  {
-    id: 'jina-house',
-    name: { en: 'Jina House', ko: 'Jina House', th: 'Jina House' },
-    category: 'activity',
-    oneLine: {
-      en: 'A local activity spot in Chuncheon',
-      ko: '춘천의 로컬 액티비티 장소',
-      th: 'A local activity spot in Chuncheon',
-    },
-    stayMin: 120,
-    coord: null, // DEMO — PLACEHOLDER, 확정 정보 시 교체
     mock: false,
   },
 ];

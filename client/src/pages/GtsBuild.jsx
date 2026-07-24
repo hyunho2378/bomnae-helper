@@ -60,13 +60,17 @@ export default function GtsBuild() {
   // [V2] 장소 상세 오버레이 · { venue, rect(FLIP 시작점), instant(키보드 개시), kind(meal|pick — 토글 대상 풀) }
   const [detail, setDetail] = useState(null);
   const autoRef = useRef(0);
+  const toastRef = useRef(0); // [V22] 초과 안내 토스트 3초 자동 해제 타이머
 
   // 풀은 조회 전용(venues.js 값 수정 금지) · 참조 고정으로 VenueGrid 페이지 리셋 방지
   const mealPool = useMemo(() => venues.filter((v) => v.category === 'meal'), []);
   const foodPool = useMemo(() => venues.filter((v) => v.category === 'foodspace'), []);
   const activityPool = useMemo(() => venues.filter((v) => v.category === 'activity'), []);
 
-  useEffect(() => () => clearTimeout(autoRef.current), []);
+  useEffect(() => () => {
+    clearTimeout(autoRef.current);
+    clearTimeout(toastRef.current);
+  }, []);
 
   if (!ok) return null;
 
@@ -82,8 +86,15 @@ export default function GtsBuild() {
   const courseKmVal = courseKm(queueCoords);
   const courseMin = courseMinutes(courseKmVal);
 
-  // 정원 초과 시 자동 해제 금지 · 안내만(§9.4) — 수용되면 안내 해제
-  const guarded = (toggle) => (id) => setCapNotice(!toggle(id));
+  // 정원 초과 시 자동 해제 금지 · [V22] 안내 = 3초 오버레이 토스트(레이아웃 불변) · 재초과 시 재표시
+  const showCapToast = () => {
+    setCapNotice(true);
+    clearTimeout(toastRef.current);
+    toastRef.current = setTimeout(() => setCapNotice(false), 3000);
+  };
+  const guarded = (toggle) => (id) => {
+    if (!toggle(id)) showCapToast();
+  };
 
   // [V2] 돋보기 → 상세 오픈(그리드별 토글 대상 구분)
   const openDetail = (kind) => (venue, rect, instant) => setDetail({ venue, rect, instant, kind });
@@ -157,6 +168,19 @@ export default function GtsBuild() {
         nextDisabled={disabled}
         reasonKey={reasonKey}
         onExit={() => navigate('/gts/setup')}
+        toast={
+          capNotice ? (
+            // [V22] 절제된 경고: 다크 pill + 앰버 도트(붉은 경고 지양) · 3초 후 자동 해제(레이아웃 불변)
+            <div
+              role="status"
+              className="flex items-center gap-8 rounded-pill bg-ink px-16 py-8 text-small font-semibold text-white shadow-lg"
+              style={{ animation: `bh-toast-in 220ms ${motion.easeOut}` }}
+            >
+              <span aria-hidden="true" className="h-8 w-8 shrink-0 rounded-pill bg-yellow" />
+              <LangSwap k="gts.build.capFull" />
+            </div>
+          ) : null
+        }
       >
         {/* Step 0 · 식사 플랜 3택(§9.4 · 단일 선택 자동 전진) */}
         {step === 'plan' && (
@@ -180,11 +204,6 @@ export default function GtsBuild() {
             {mealPlan === 'lunchDinner' && (
               <LangSwap k="gts.build.mealsOrderHint" as="p" className="text-small font-medium text-inkSec" />
             )}
-            <div aria-live="polite">
-              {capNotice && (
-                <LangSwap k="gts.build.capFull" as="p" className="text-small font-medium text-spice" />
-              )}
-            </div>
             <VenueGrid
               pool={mealPool}
               selected={meals}
@@ -199,19 +218,15 @@ export default function GtsBuild() {
         {/* Step 2 · §10.4 반반 분할(탭 폐지): 좌 음식공간 4장 / 우 액티비티 4장 동시 노출 ·
             합산 정확히 2픽 · 카운터 상단 상시 */}
         {step === 'picks' && (
-          <section className="flex flex-col gap-12">
+          <section className="flex flex-col gap-8">
             <div className="flex flex-wrap items-baseline justify-between gap-12">
               <LangSwap k="gts.build.picksTitle" as="h2" className="text-h3 font-semibold" />
               <Counter n={picks.length} max={2} />
             </div>
-            <div aria-live="polite">
-              {capNotice && (
-                <LangSwap k="gts.build.capFull" as="p" className="text-small font-medium text-spice" />
-              )}
-            </div>
             {/* [V9] food·activity 풀은 절대 섞지 않음 · 각 풀 안에서만 큐 마지막 좌표 기준 재정렬 */}
-            <div className="grid gap-16 lg:grid-cols-2 lg:gap-24">
-              <section className="flex flex-col gap-12">
+            {/* [V22] 무스크롤 위해 모바일 간격 축소(gap-8) · lg는 넉넉히 유지 */}
+            <div className="grid gap-8 lg:grid-cols-2 lg:gap-24">
+              <section className="flex flex-col gap-8">
                 <LangSwap k="gts.build.tabFoodspace" as="h3" className="text-body font-semibold" />
                 <VenueGrid
                   pool={foodPool}
@@ -225,7 +240,7 @@ export default function GtsBuild() {
                   sortCoord={sortCoord}
                 />
               </section>
-              <section className="flex flex-col gap-12">
+              <section className="flex flex-col gap-8">
                 <LangSwap k="gts.build.tabActivity" as="h3" className="text-body font-semibold" />
                 <VenueGrid
                   pool={activityPool}

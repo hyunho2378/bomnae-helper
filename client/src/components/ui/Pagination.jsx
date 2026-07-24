@@ -17,21 +17,26 @@ export default function Pagination({ page, pages, onSelect, labelKey = 'common.p
   };
 
   return (
-    <nav aria-label="pagination" onKeyDown={onKeyDown} className="flex items-center gap-8">
+    <nav aria-label="pagination" onKeyDown={onKeyDown} className="flex items-center gap-4">
       <LangSwap k={labelKey} className="sr-only" />
       {Array.from({ length: pages }, (_, i) => (
+        // [V22] 터치 타겟 36px 유지(button) · 시각 원은 30px로 축소(무스크롤·경량화) · gap 8→4
         <button
           key={i}
           type="button"
           aria-current={i === page ? 'page' : undefined}
           onClick={() => onSelect(i)}
-          // 원 36px = [H2-11] 명세값(spacing 토큰 비존재 · 인라인 한정 허용)
           style={{ width: 36, height: 36 }}
-          className={`pressable inline-flex items-center justify-center rounded-pill font-display text-small ${
-            i === page ? 'bg-primary font-bold text-white' : 'bg-white font-semibold text-ink shadow-sm'
-          }`}
+          className="pressable inline-flex items-center justify-center rounded-pill"
         >
-          {i + 1}
+          <span
+            style={{ width: 30, height: 30 }}
+            className={`inline-flex items-center justify-center rounded-pill font-display text-caption ${
+              i === page ? 'bg-primary font-bold text-white' : 'bg-white font-semibold text-ink shadow-sm'
+            }`}
+          >
+            {i + 1}
+          </span>
         </button>
       ))}
     </nav>

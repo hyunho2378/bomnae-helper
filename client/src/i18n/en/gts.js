@@ -127,6 +127,15 @@ export default {
       dropoffPlaceholder: "e.g. Chuncheon Station, your stay address",
       dropoffOptional: "Optional. Leave blank if you are not sure yet.",
       dropoffRequired: "Enter your drop off point to continue",
+      // [V23] 필수 복원 · 배지 · 필수 안내 · 인라인 오류 · 부족 항목 라벨
+      requiredBadge: "Required",
+      dropoffRequiredNote: "Required. Tell us where to drop you off at the end of the day.",
+      payMethodRequired: "Select a payment method to continue.",
+      needLabel: "Still needed",
+      needPass: "Time pass",
+      needDropoff: "Drop off point",
+      needPay: "Payment method",
+      needConsent: "Refund agreement",
       priceTitle: "Price breakdown",
       payCta: "Pay",
       // [V7] 이용권 선택·전액 포함 밴드·환불 동의

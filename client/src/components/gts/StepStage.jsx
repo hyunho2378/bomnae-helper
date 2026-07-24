@@ -43,6 +43,7 @@ export default function StepStage({
   nextDisabled = false,
   reasonKey = null,
   onExit,
+  toast = null, // [V22] 상단중앙 오버레이 토스트(레이아웃 높이 미점유 · 초과 안내용)
   children,
 }) {
   const { t } = useLang();
@@ -124,16 +125,19 @@ export default function StepStage({
         }}
         className="relative flex h-[92dvh] w-full flex-col overflow-hidden rounded-xl shadow-lg lg:h-[90dvh]"
       >
-        {/* 상단 · 스텝 라벨 + 진행 도트(§41) */}
-        <div className="flex flex-col items-center gap-8 px-24 pb-16 pt-24 lg:px-32 lg:pb-24 lg:pt-32">
+        {/* [V22] 상단중앙 오버레이 토스트 · absolute라 레이아웃 높이 미점유(스크롤 유발 안 함) */}
+        {toast && (
+          <div className="pointer-events-none absolute inset-x-0 top-12 z-content flex justify-center px-16">
+            {toast}
+          </div>
+        )}
+        {/* 상단 · 스텝 라벨 + 진행 도트(§41) · [V22] 폰트·상하 여백 축소(무스크롤 확보) + middot 제거(공백 구분) */}
+        <div className="flex flex-col items-center gap-4 px-24 pb-4 pt-8 lg:px-32 lg:pb-12 lg:pt-16">
           <p className="flex items-baseline gap-8 tracking-glass">
-            <span className="font-display text-small font-bold">
+            <span className="font-display text-caption font-bold">
               {stepIndex + 1} / {stepCount}
             </span>
-            <span aria-hidden="true" className="text-small font-medium text-inkSec">
-              ·
-            </span>
-            <LangSwap k={titleKey} className="text-small font-semibold" />
+            <LangSwap k={titleKey} className="text-caption font-semibold" />
           </p>
           <div aria-hidden="true" className="flex items-center gap-8">
             {Array.from({ length: stepCount }, (_, i) => (
@@ -144,8 +148,8 @@ export default function StepStage({
           </div>
         </div>
 
-        {/* 콘텐츠 · 내부 스크롤 scroll-quiet(§41) — 전환 중엔 나가는 씬을 절대배치로 겹침 */}
-        <div className="relative flex-1 overflow-y-auto scroll-quiet px-24 pb-24 lg:px-32">
+        {/* 콘텐츠 · 내부 스크롤 scroll-quiet(§41) — 전환 중엔 나가는 씬을 절대배치로 겹침 · [V22] 하단 패딩 축소(무스크롤) */}
+        <div className="relative flex-1 overflow-y-auto scroll-quiet px-24 pb-12 lg:px-32">
           {leaving && (
             <div
               aria-hidden="true"

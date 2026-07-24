@@ -106,8 +106,8 @@ export default function VenueGrid({
   };
 
   return (
-    <div className="flex flex-col gap-16">
-      <div className={`grid gap-12 ${COLS[cols]}`}>
+    <div className="flex flex-col gap-4">
+      <div className={`grid gap-8 ${COLS[cols]}`}>
         {visible.map((venue) => {
           const orderIdx = selected.indexOf(venue.id);
           const isSelected = orderIdx !== -1;
@@ -124,7 +124,7 @@ export default function VenueGrid({
                 type="button"
                 onClick={() => onCardClick(venue.id)}
                 aria-pressed={isSelected}
-                className={`pressable relative flex h-[128px] w-full flex-col items-start gap-6 overflow-hidden rounded-lg p-12 text-left shadow-sm lg:h-[124px] ${
+                className={`pressable relative flex ${cols === 'half' ? 'h-[72px]' : 'h-[92px]'} w-full flex-col items-start gap-4 overflow-hidden rounded-lg p-12 text-left shadow-sm lg:h-[124px] ${
                   hasImage ? 'bg-ink' : venue.mock ? 'bg-surface' : 'bg-white'
                 } ${isSelected ? 'ring-2 ring-primary' : 'hover:shadow-md'}`}
                 // [V13] 큐로 내려가는 마이크로인터랙션 420ms · 축소하며 아래(큐)로 이동하는 경로가 보이게
@@ -156,23 +156,30 @@ export default function VenueGrid({
                     />
                   </>
                 )}
+                {/* [V22] 선택 배지 = 우상단(돋보기가 우하단으로 이동해 자리 반환) */}
                 {isSelected && (
-                  <span className="absolute right-48 top-8 z-[1] inline-flex items-center rounded-pill bg-primary px-12 py-4 text-caption font-semibold text-white">
+                  <span className="absolute right-8 top-8 z-[1] inline-flex items-center rounded-pill bg-primary px-8 py-2 text-caption font-semibold text-white">
                     {badgeKeys?.[orderIdx] ? <LangSwap k={badgeKeys[orderIdx]} /> : orderIdx + 1}
                   </span>
                 )}
+                {/* [V22] 제목 말줄임 · 우패딩으로 선택 배지와 분리(돋보기는 우하단이라 제목과 안 겹침)
+                    · half(컴팩트 picks) 카드는 1줄(칩 공간 확보), full(meal) 카드는 2줄 */}
                 <TriText
                   text={venue.name}
-                  className={`relative z-[1] text-body font-bold ${hasImage ? 'text-white' : ''}`}
-                  clampClass="line-clamp-1"
+                  className={`relative z-[1] pr-12 text-body font-bold ${hasImage ? 'text-white' : ''}`}
+                  clampClass={cols === 'half' ? 'line-clamp-1' : 'line-clamp-2'}
                 />
-                <TriText
-                  text={venue.oneLine}
-                  className={`relative z-[1] text-caption font-medium ${hasImage ? 'text-white/90' : 'text-inkSec'}`}
-                  clampClass="line-clamp-2"
-                />
+                {/* half 카드는 높이가 짧아 oneLine 생략(칩·제목 우선) · 상세 패널에 전체 소개 */}
+                {cols !== 'half' && (
+                  <TriText
+                    text={venue.oneLine}
+                    className={`relative z-[1] text-caption font-medium ${hasImage ? 'text-white/90' : 'text-inkSec'}`}
+                    clampClass="line-clamp-1"
+                  />
+                )}
+                {/* [V22] 칩 = 좌하단 · content 크기 고정(self-start)·돋보기(우하단) 자리 확보(max-w)·px-4로 라벨 잘림 방지 */}
                 <span
-                  className={`relative z-[1] mt-auto inline-flex items-center rounded-pill px-12 py-4 text-caption font-medium ${
+                  className={`relative z-[1] mt-auto inline-flex shrink-0 items-center self-start rounded-pill px-8 py-2 text-caption font-medium ${
                     hasImage
                       ? 'bg-white/25 text-white'
                       : venue.mock
@@ -191,7 +198,8 @@ export default function VenueGrid({
                   onClick={(e) =>
                     onDetail(venue, e.currentTarget.parentElement.getBoundingClientRect(), e.detail === 0)
                   }
-                  className="pressable absolute right-8 top-8 inline-flex items-center justify-center rounded-pill bg-primary text-white shadow-sm"
+                  /* [V22] 우상단 → 우하단(칩과 좌우 분리) · bg-primary라 이미지/폴백 양쪽 대비 확보 */
+                  className="pressable absolute bottom-8 right-8 inline-flex items-center justify-center rounded-pill bg-primary text-white shadow-sm"
                   style={{ width: 36, height: 36 }}
                 >
                   <ZoomIn size={18} aria-hidden="true" />
