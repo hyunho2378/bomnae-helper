@@ -6,6 +6,13 @@ import { useState } from 'react';
 import { useLang } from '../../i18n/LangContext';
 import { PAY_METHODS } from './payMethods';
 
+// 로고별 시각 배율 · SVG마다 내부 여백·종횡비가 달라 같은 h-80으로 렌더해도 시각 크기가 다르다.
+//   컨테이너(카드)는 불변, 이미지 스케일만 보정. 이후 다른 로고도 여기서 배율만 추가하면 된다(기본 1).
+const LOGO_SCALE = {
+  alipay: 1.9,
+  paypal: 1.4,
+};
+
 export default function PayMethodGrid({ value, onChange }) {
   const { t } = useLang();
   // [H2-15] 로고 폴백 단계: (svg) → 'png' → 'text' · 깨진 이미지 아이콘 노출 금지(§42)
@@ -35,7 +42,9 @@ export default function PayMethodGrid({ value, onChange }) {
                 src={stage[method.id] === 'png' ? method.file.replace(/\.svg$/, '.png') : method.file}
                 alt={method.label}
                 // [V18] 로고 2.5배(h-32=32px → h-80=80px) · 카드 gap/패딩도 비례 상향(gap-24·p-20·min-h-96)
+                // 로고별 시각 배율(LOGO_SCALE) · 컨테이너·레이아웃 박스는 h-80 그대로, transform으로 시각 크기만 보정
                 className="h-80 w-auto object-contain"
+                style={LOGO_SCALE[method.id] ? { transform: `scale(${LOGO_SCALE[method.id]})` } : undefined}
                 onError={() => fail(method.id)}
               />
             )}

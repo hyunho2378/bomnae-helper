@@ -1,4 +1,4 @@
-// Proof 스트립 · [V10] van-hero(/images/home/van-hero.jpg)를 히어로 이미지로 연결.
+// Proof 스트립 · [V10] van-hero(/images/home/van-hero.webp)를 히어로 이미지로 연결.
 //   데스크톱 풀블리드(고정 높이) / 모바일 16:9 크롭 · 하단 어두운 그라데이션(0→0.55)으로 텍스트 가독성 확보.
 //   alt = 3언어 사전 키(home.proof.alt) · 파일 부재/로드 실패 시 기존 갤러리 플레이스홀더로 폴백.
 //   About 비공개([V10] §3)로 링크 목적지는 /gts(Tour Builder)로 변경 — /about#proof는 이제 404 위장.
@@ -9,7 +9,7 @@ import { useLang } from '../../i18n/LangContext';
 import LangSwap from '../../i18n/LangSwap';
 import { gallery } from '../../data/pilot';
 
-const HERO_SRC = '/images/home/van-hero.jpg';
+const HERO_SRC = '/images/home/van-hero.webp';
 
 export default function PilotStrip() {
   const { t } = useLang();

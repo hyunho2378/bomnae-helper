@@ -8,7 +8,7 @@
 // oneLine 카피는 초안(확정 카피 교체 대상). th 표기는 기계 번역 초안 — 네이티브 검수 대기.
 // category: 'meal'(식사) | 'foodspace'(카페·베이커리·디저트) | 'activity'(액티비티)
 // stayMin 120 고정(픽 1개 = 2시간 슬롯, IA §9.4). coord는 [lng, lat].
-// [V20] 이미지 시스템: 전 장소에 image 필드 = `/images/venues/{id}.jpg` (slug = venue id · 단일 규칙).
+// [V20] 이미지 시스템: 전 장소에 image 필드 = `/images/venues/{id}.webp` (slug = venue id · 단일 규칙).
 //   파일은 운영자 배치(소문자-하이픈). 파일 부재/로드 실패 시 카드가 라이트 폴백으로 자동 전환(onError).
 // [V20] 목업 슬롯(mock-7~11) 제거 — 실장소 20곳으로 meal 확정(사용자 결정).
 // ============================================================
@@ -818,12 +818,14 @@ const RAW_VENUES = [
   },
 ];
 
-// [V20] 이미지 정규화 · 전 장소에 image = `/images/venues/{id}.jpg` 주입(slug = venue id · 단일 규칙).
+// [V20] 이미지 정규화 · 전 장소에 image = `/images/venues/{id}.webp` 주입(slug = venue id · 단일 규칙).
 //   VenueGrid(앞면)·VenueDetail(뒷면)이 venue.image를 읽고, 파일 부재·로드 실패 시 onError로
 //   기존 라이트 카드 폴백(§9.4 빈 박스 금지 유지). 운영자가 slug.jpg 파일을 배치한다.
+// [V24] 이미지 확장자 상수 · webp 변환(원본 jpg는 sharp q82로 일괄 변환). 되돌리려면 이 값만 'jpg'로.
+const VENUE_IMG_EXT = 'webp';
 export const venues = RAW_VENUES.map((v) => ({
   ...v,
-  image: `/images/venues/${v.id}.jpg`,
+  image: `/images/venues/${v.id}.${VENUE_IMG_EXT}`,
 }));
 
 export default venues;

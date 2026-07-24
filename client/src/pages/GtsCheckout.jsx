@@ -260,8 +260,9 @@ export default function GtsCheckout() {
                   onChange={(e) => setDropoffText(e.target.value)}
                   placeholder={t('gts.checkout.dropoffPlaceholder')}
                   aria-invalid={REQUIRE_DROPOFF && attempted && !dropoffOk}
-                  className={`h-48 rounded-md bg-surface px-16 text-body focus:ring-2 focus:ring-primary ${
-                    REQUIRE_DROPOFF && attempted && !dropoffOk ? 'ring-2 ring-spice' : ''
+                  // 포커스·오류 링을 ring-inset(요소 안쪽)으로 — 부모 경계에 잘리지 않고 크기·위치 불변(CardForm과 동일 문법)
+                  className={`h-48 rounded-md bg-surface px-16 text-body focus:ring-2 focus:ring-inset focus:ring-primary ${
+                    REQUIRE_DROPOFF && attempted && !dropoffOk ? 'ring-2 ring-inset ring-spice' : ''
                   }`}
                 />
               </label>

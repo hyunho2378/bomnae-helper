@@ -30,7 +30,9 @@ function Field({ labelKey, value, onChange, placeholder, inputMode, className = 
         onChange={onChange}
         placeholder={placeholder}
         inputMode={inputMode}
-        className="h-48 rounded-md bg-surface px-16 text-body focus:ring-2 focus:ring-primary"
+        // 포커스 링을 ring-inset(요소 안쪽 box-shadow)으로 — 부모 overflow-hidden(카드폼 확장 래퍼)에
+        //   잘리지 않고, 크기·위치 불변(box-shadow는 레이아웃 미점유). 좌우가 부모 패딩 안에 완전히 들어옴.
+        className="h-48 rounded-md bg-surface px-16 text-body focus:ring-2 focus:ring-inset focus:ring-primary"
       />
     </label>
   );

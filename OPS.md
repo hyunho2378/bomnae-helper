@@ -51,3 +51,7 @@
 - `journey_events` 기록은 `POST /api/track` 한 곳뿐이며 로그인 사용자 전용이다(`server/routes/track.js`). 전역 트래킹 미들웨어가 없어 `/health`는 이벤트를 남길 수 없다.
 - 관리자 참가자/완주율(`server/routes/admin.js`)은 `journey_events JOIN users`를 실계정 필터로 집계한다. `/health`는 사용자도 이벤트도 만들지 않으므로 구조적으로 집계에 포함될 수 없다.
 - 로컬 검증: 미로그인 `/health` 연속 호출 전후 `journey_events` 행 증가 = 0, 서버 로그에 `/health` 라인 0건, `Set-Cookie` 없음 확인 완료.
+
+## [V24] 이미지 포맷
+
+- venues·team·home 이미지는 webp로 넣는다. venues 파일명은 `{id}.webp`(slug=venue id)이며 `client/public/images/venues/{id}.webp`에 배치한다. 원본 jpg는 sharp quality 82로 일괄 변환(62.9MB→5.85MB, 약 91%↓). 되돌리려면 `venues.js`의 `VENUE_IMG_EXT`만 `jpg`로 바꾼다.
