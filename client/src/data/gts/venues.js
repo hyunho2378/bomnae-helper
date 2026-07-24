@@ -7,11 +7,13 @@
 //   구 실명 좌표(tongnamujip 등)는 대략값 + // PLACEHOLDER — verify (현장 핀 교체 대상).
 // oneLine 카피는 초안(확정 카피 교체 대상). th 표기는 기계 번역 초안 — 네이티브 검수 대기.
 // category: 'meal'(식사) | 'foodspace'(카페·베이커리·디저트) | 'activity'(액티비티)
-// 카테고리당 12개(새로고침 로테이션 검증용, §30 pageSize 8 × 2페이지 여유).
 // stayMin 120 고정(픽 1개 = 2시간 슬롯, IA §9.4). coord는 [lng, lat].
+// [V20] 이미지 시스템: 전 장소에 image 필드 = `/images/venues/{id}.jpg` (slug = venue id · 단일 규칙).
+//   파일은 운영자 배치(소문자-하이픈). 파일 부재/로드 실패 시 카드가 라이트 폴백으로 자동 전환(onError).
+// [V20] 목업 슬롯(mock-7~11) 제거 — 실장소 20곳으로 meal 확정(사용자 결정).
 // ============================================================
 
-export const venues = [
+const RAW_VENUES = [
   // ---------- meal (실명 7 = tongnamujip + [V5] 6 · 목업 5) ----------
   {
     id: 'tongnamujip',
@@ -106,7 +108,6 @@ export const venues = [
     coord: [127.7830248, 37.9294243], // 구글맵 실측
     mock: false,
   },
-  ...[7, 8, 9, 10, 11].map((n) => mockVenue(n, 'meal')),
 
   // ---------- meal (실명 13 신규 · [V13] 사용자 제공 목록) ----------
   //   할루시네이션 방지: 이름·소개·링크는 제공값 · 좌표는 실좌표 미조회라 mockCoords DEMO 결정 배치(coord:null)
@@ -124,7 +125,6 @@ export const venues = [
     coord: null, // DEMO — 실좌표 조회 시 교체(mockCoords 결정 배치)
     mock: false,
     link: 'https://instagram.com/sandak__official',
-    image: '/images/venues/sandak.jpg',
     story: {
       en: 'Sandak grills Chuncheon-style dakgalbi in a mountain setting, served with its own potato pancake and buckwheat noodles. Regulars come for that classic local combination in a calm, out-of-town spot.',
       ko: '산속에서 춘천식 닭갈비를 굽고 감자전과 막국수를 함께 낸다. 한적한 분위기에서 이 조합을 즐기려는 단골이 많다.',
@@ -144,7 +144,6 @@ export const venues = [
     coord: null, // DEMO
     mock: false,
     link: 'https://naver.me/FpwW3oYv',
-    image: '/images/venues/san-squid.jpg',
     story: {
       en: 'San-Squid serves live shellfish and clams grilled right at your table. It is a hands-on seafood meal that rewards a slower, shared pace.',
       ko: '활어조개를 테이블에서 직접 구워 먹는 곳이다. 여럿이 천천히 나눠 먹기 좋은 해산물 상차림이다.',
@@ -164,7 +163,6 @@ export const venues = [
     coord: null, // DEMO
     mock: false,
     link: 'https://instagram.com/modern_maemeal',
-    image: '/images/venues/modern-buckwheat.jpg',
     story: {
       en: "Modern Buckwheat reworks Chuncheon's buckwheat tradition into a cleaner, contemporary plate. It has earned a local following as a certified neighborhood favorite.",
       ko: '춘천 메밀을 현대적으로 재해석한 집이다. 로컬 사이에서 인증된 맛집으로 통한다.',
@@ -184,7 +182,6 @@ export const venues = [
     coord: null, // DEMO
     mock: false,
     link: 'https://naver.me/5MV7UDaf',
-    image: '/images/venues/haneoul.jpg',
     story: {
       en: 'Haneoul pairs chilled mori soba with an assorted cutlet platter for a light, varied lunch. The set makes it easy for a group to share a bit of everything.',
       ko: '시원한 모리소바와 모둠카츠를 함께 낸다. 여럿이 조금씩 나눠 먹기 좋은 구성이다.',
@@ -204,7 +201,6 @@ export const venues = [
     coord: null, // DEMO
     mock: false,
     link: 'https://naver.me/Grma4r8Q',
-    image: '/images/venues/hwadon-garden.jpg',
     story: {
       en: 'Hwadon Garden serves dinner in private rooms with a quiet garden feel. It suits groups who want a calmer, more private table.',
       ko: '정원 분위기 속 프라이빗룸에서 저녁을 낸다. 조용하고 프라이빗한 자리를 원하는 일행에게 어울린다.',
@@ -224,7 +220,6 @@ export const venues = [
     coord: null, // DEMO
     mock: false,
     link: 'https://naver.me/GbDRmj5m',
-    image: '/images/venues/himalayan-indian.jpg',
     story: {
       en: 'Himalayan Indian Cuisine cooks traditional curries for a change of pace from the local grills. It is a reliable stop for travelers who want something different midway through the day.',
       ko: '로컬 구이와는 다른 전통 인도 커리를 낸다. 하루 중간에 색다른 한 끼를 원할 때 좋은 선택이다.',
@@ -244,7 +239,6 @@ export const venues = [
     coord: null, // DEMO
     mock: false,
     link: 'https://naver.me/Gf0jYQgG',
-    image: '/images/venues/umi-dakgalbi.jpg',
     story: {
       en: "Umi Dakgalbi is a Blue Ribbon certified take on the city's signature dish. The recognition draws a steady line, so an off-peak slot helps.",
       ko: '춘천 대표 음식을 블루리본 인증으로 인정받은 집이다. 줄이 꾸준한 편이라 붐비는 시간대는 피하는 게 좋다.',
@@ -264,7 +258,6 @@ export const venues = [
     coord: null, // DEMO
     mock: false,
     link: 'https://smartstore.naver.com/hakgokri',
-    image: '/images/venues/hakgok.jpg',
     story: {
       en: "Hakgok serves both makguksu and dakgalbi, so a group can cover Chuncheon's two staples in one sitting. It is a practical single stop for first-time visitors.",
       ko: '막국수와 닭갈비를 한곳에서 낸다. 춘천의 두 대표 메뉴를 한 번에 맛보기 좋은 실용적인 한 곳이다.',
@@ -283,7 +276,6 @@ export const venues = [
     stayMin: 120,
     coord: null, // DEMO
     mock: false,
-    image: '/images/venues/saembat.jpg',
     story: {
       en: 'Saembat Makguksu plates pure buckwheat noodles alongside pressed pork. The pairing is a Chuncheon classic done simply and well.',
       ko: '순메밀 막국수에 편육을 곁들여 낸다. 단정하게 잘 차려낸 춘천의 정석 조합이다.',
@@ -302,7 +294,6 @@ export const venues = [
     stayMin: 120,
     coord: null, // DEMO
     mock: false,
-    image: '/images/venues/keunjip-hanwoo.jpg',
     story: {
       en: 'Keunjip Hanwoo focuses on dry-aged Korean beef for a richer, more concentrated flavor. It is the splurge option among the day’s meals.',
       ko: '드라이에이징 한우로 진한 풍미를 낸다. 하루 식사 중 특별한 한 끼를 원할 때의 선택이다.',
@@ -321,7 +312,6 @@ export const venues = [
     stayMin: 120,
     coord: null, // DEMO
     mock: false,
-    image: '/images/venues/silbi.jpg',
     story: {
       en: 'Chuncheon Silbi Makguksu serves its buckwheat noodles with pressed pork and a sharp mustard sauce. The mustard kick is what regulars come back for.',
       ko: '막국수에 편육과 알싸한 겨자소스를 곁들인다. 이 겨자 맛에 다시 찾는 단골이 많다.',
@@ -340,7 +330,6 @@ export const venues = [
     stayMin: 120,
     coord: null, // DEMO
     mock: false,
-    image: '/images/venues/nambu.jpg',
     story: {
       en: 'Nambu Makguksu keeps to a traditional buckwheat plate with a side of potato pancake. It is a straightforward, dependable local lunch.',
       ko: '전통 막국수에 감자전을 곁들이는 집이다. 군더더기 없이 믿음직한 로컬 점심이다.',
@@ -359,7 +348,6 @@ export const venues = [
     stayMin: 120,
     coord: null, // DEMO
     mock: false,
-    image: '/images/venues/pyeongyang.jpg',
     story: {
       en: 'This spot serves Pyongyang-style cold buckwheat noodles with a plate of boiled pork. The clean, cool broth suits a warm afternoon in the itinerary.',
       ko: '평양식 냉면에 수육을 함께 낸다. 맑고 시원한 육수가 따뜻한 오후 일정에 잘 맞는다.',
@@ -524,6 +512,188 @@ export const venues = [
     coord: [127.7785008, 37.8880807], // 구글맵 실측
     mock: false,
   },
+  // ---------- foodspace (실명 10 신규 · [V20] 사용자 제공 목록) ----------
+  //   이름·소개는 제공값 · 좌표 미확보(링크 없음)라 coord:null // DEMO · story 2문장(과장 금지) · th=en 폴백.
+  {
+    id: 'infield',
+    name: { en: 'Infield', ko: 'Infield', th: 'Infield' },
+    category: 'foodspace',
+    oneLine: {
+      en: 'Specialty coffee inside Son Heung-min Sports Park',
+      ko: '손흥민 스포츠파크 안의 스페셜티 커피',
+      th: 'Specialty coffee inside Son Heung-min Sports Park',
+    },
+    stayMin: 120,
+    coord: null, // DEMO
+    mock: false,
+    story: {
+      en: 'Infield is a specialty coffee cafe set inside Son Heung-min Sports Park, themed around football and leisure. It suits a relaxed stop between the more active parts of a day.',
+      ko: '손흥민 스포츠파크 안에 자리한 스페셜티 커피 카페로, 축구와 레저를 테마로 한다. 활동적인 일정 사이 편하게 쉬어 가기 좋다.',
+      th: 'Infield is a specialty coffee cafe set inside Son Heung-min Sports Park, themed around football and leisure. It suits a relaxed stop between the more active parts of a day.',
+    },
+  },
+  {
+    id: 'santorini',
+    name: { en: 'Santorini', ko: 'Santorini', th: 'Santorini' },
+    category: 'foodspace',
+    oneLine: {
+      en: 'Scenic cafe with Uiam Lake and Gubongsan views',
+      ko: '의암호와 구봉산 전망의 뷰 카페',
+      th: 'Scenic cafe with Uiam Lake and Gubongsan views',
+    },
+    stayMin: 120,
+    coord: null, // DEMO
+    mock: false,
+    story: {
+      en: 'Santorini is a large scenic cafe with panoramic views of Uiam Lake and Gubongsan, offering bakery and brunch. The wide outlook makes it a comfortable place to linger.',
+      ko: '의암호와 구봉산이 한눈에 담기는 대형 뷰 카페로, 베이커리와 브런치를 낸다. 탁 트인 전망 덕에 오래 머물기 좋다.',
+      th: 'Santorini is a large scenic cafe with panoramic views of Uiam Lake and Gubongsan, offering bakery and brunch. The wide outlook makes it a comfortable place to linger.',
+    },
+  },
+  {
+    id: 'farmers-garden',
+    name: { en: 'Farmers Garden', ko: 'Farmers Garden', th: 'Farmers Garden' },
+    category: 'foodspace',
+    oneLine: {
+      en: 'Garden bakery cafe with lawns and old trees',
+      ko: '잔디밭과 큰 나무가 있는 정원 베이커리 카페',
+      th: 'Garden bakery cafe with lawns and old trees',
+    },
+    stayMin: 120,
+    coord: null, // DEMO
+    mock: false,
+    story: {
+      en: 'Farmers Garden is a garden bakery cafe with spacious lawns and mature trees. The open greenery gives a group room to spread out.',
+      ko: '넓은 잔디밭과 오래된 나무가 있는 정원 베이커리 카페다. 탁 트인 녹지 덕에 일행이 여유롭게 머물 수 있다.',
+      th: 'Farmers Garden is a garden bakery cafe with spacious lawns and mature trees. The open greenery gives a group room to spread out.',
+    },
+  },
+  {
+    id: 'doldam-cafe',
+    name: { en: 'Doldam Cafe', ko: 'Doldam Cafe', th: 'Doldam Cafe' },
+    category: 'foodspace',
+    oneLine: {
+      en: 'Greenhouse garden cafe with homegrown-fruit drinks',
+      ko: '직접 기른 과일로 만드는 온실 정원 카페',
+      th: 'Greenhouse garden cafe with homegrown-fruit drinks',
+    },
+    stayMin: 120,
+    coord: null, // DEMO
+    mock: false,
+    story: {
+      en: 'Doldam is a greenhouse garden cafe that makes its drinks with homegrown fruit. The glasshouse setting keeps it bright through the seasons.',
+      ko: '직접 기른 과일로 음료를 만드는 온실 정원 카페다. 유리온실 공간이라 계절에 상관없이 환하다.',
+      th: 'Doldam is a greenhouse garden cafe that makes its drinks with homegrown fruit. The glasshouse setting keeps it bright through the seasons.',
+    },
+  },
+  {
+    id: 'sinbuk-coffee',
+    name: { en: 'Sinbuk Coffee', ko: 'Sinbuk Coffee', th: 'Sinbuk Coffee' },
+    category: 'foodspace',
+    oneLine: {
+      en: 'House-roasted coffee and mugwort misutgaru',
+      ko: '직접 볶은 커피와 고소한 쑥 미숫가루',
+      th: 'House-roasted coffee and mugwort misutgaru',
+    },
+    stayMin: 120,
+    coord: null, // DEMO
+    mock: false,
+    story: {
+      en: 'Sinbuk Coffee roasts its own beans and pairs them with a nutty mugwort misutgaru. It is a quiet local roastery worth a slower cup.',
+      ko: '직접 원두를 볶고 고소한 쑥 미숫가루를 함께 낸다. 느긋하게 한 잔 즐기기 좋은 동네 로스터리다.',
+      th: 'Sinbuk Coffee roasts its own beans and pairs them with a nutty mugwort misutgaru. It is a quiet local roastery worth a slower cup.',
+    },
+  },
+  {
+    id: 'slow-day',
+    name: { en: 'Slow Day', ko: 'Slow Day', th: 'Slow Day' },
+    category: 'foodspace',
+    oneLine: {
+      en: 'Brunch in a renovated vintage Korean house',
+      ko: '옛 한옥을 고친 브런치 카페',
+      th: 'Brunch in a renovated vintage Korean house',
+    },
+    stayMin: 120,
+    coord: null, // DEMO
+    mock: false,
+    story: {
+      en: 'Slow Day is a brunch cafe set in a renovated vintage Korean house. The old bones of the building give the room a calm, unhurried feel.',
+      ko: '옛 한옥을 고쳐 만든 브런치 카페다. 오래된 건물의 결이 차분하고 느긋한 분위기를 만든다.',
+      th: 'Slow Day is a brunch cafe set in a renovated vintage Korean house. The old bones of the building give the room a calm, unhurried feel.',
+    },
+  },
+  {
+    id: 'cafe-de-220volt',
+    name: { en: 'Cafe de 220 Volt', ko: 'Cafe de 220 Volt', th: 'Cafe de 220 Volt' },
+    category: 'foodspace',
+    oneLine: {
+      en: 'Roastery cafe with a vintage industrial interior',
+      ko: '빈티지 인더스트리얼 인테리어의 로스터리 카페',
+      th: 'Roastery cafe with a vintage industrial interior',
+    },
+    stayMin: 120,
+    coord: null, // DEMO
+    mock: false,
+    story: {
+      en: 'Cafe de 220 Volt is a roastery cafe with a vintage industrial interior. The worn metal-and-wood setting suits a longer coffee break.',
+      ko: '빈티지 인더스트리얼 인테리어의 로스터리 카페다. 낡은 금속과 나무의 분위기가 긴 커피 타임에 어울린다.',
+      th: 'Cafe de 220 Volt is a roastery cafe with a vintage industrial interior. The worn metal-and-wood setting suits a longer coffee break.',
+    },
+  },
+  {
+    id: 'carpe',
+    name: { en: 'Carpe', ko: 'Carpe', th: 'Carpe' },
+    category: 'foodspace',
+    oneLine: {
+      en: 'Lakeside cafe with Uiam Lake views and outdoor seats',
+      ko: '의암호 전망과 야외석의 호숫가 카페',
+      th: 'Lakeside cafe with Uiam Lake views and outdoor seats',
+    },
+    stayMin: 120,
+    coord: null, // DEMO
+    mock: false,
+    story: {
+      en: 'Carpe is a lakeside cafe with panoramic Uiam Lake views and outdoor seating. The waterside terrace is the reason to come.',
+      ko: '의암호가 파노라마로 펼쳐지는 호숫가 카페로 야외석을 갖췄다. 물가 테라스가 이곳의 매력이다.',
+      th: 'Carpe is a lakeside cafe with panoramic Uiam Lake views and outdoor seating. The waterside terrace is the reason to come.',
+    },
+  },
+  {
+    id: 'dancing-caffein',
+    name: { en: 'Dancing Caffein', ko: 'Dancing Caffein', th: 'Dancing Caffein' },
+    category: 'foodspace',
+    oneLine: {
+      en: 'Roastery cafe with house-roasted coffee and desserts',
+      ko: '직접 볶은 커피와 디저트의 로스터리 카페',
+      th: 'Roastery cafe with house-roasted coffee and desserts',
+    },
+    stayMin: 120,
+    coord: null, // DEMO
+    mock: false,
+    story: {
+      en: 'Dancing Caffein is a roastery cafe serving house-roasted coffee alongside its own desserts. It is a dependable stop for a carefully made cup.',
+      ko: '직접 볶은 커피와 자체 디저트를 내는 로스터리 카페다. 정성 들인 한 잔을 원할 때 믿음직한 곳이다.',
+      th: 'Dancing Caffein is a roastery cafe serving house-roasted coffee alongside its own desserts. It is a dependable stop for a carefully made cup.',
+    },
+  },
+  {
+    id: 'salon-jade',
+    name: { en: 'Salon Jade', ko: 'Salon Jade', th: 'Salon Jade' },
+    category: 'foodspace',
+    oneLine: {
+      en: 'Cafe overlooking Jade Garden Arboretum',
+      ko: '제이드가든 수목원이 보이는 카페',
+      th: 'Cafe overlooking Jade Garden Arboretum',
+    },
+    stayMin: 120,
+    coord: null, // DEMO
+    mock: false,
+    story: {
+      en: 'Salon Jade is a cafe that looks out over Jade Garden Arboretum. The greenery outside makes it an easy pairing with a garden walk.',
+      ko: '제이드가든 수목원을 바라보는 카페다. 창밖 녹음 덕에 정원 산책과 함께 들르기 좋다.',
+      th: 'Salon Jade is a cafe that looks out over Jade Garden Arboretum. The greenery outside makes it an easy pairing with a garden walk.',
+    },
+  },
 
   // ---------- activity (실명 11 = 6 + [V5] 5 · 목업 0) ----------
   // 구 'makguksu-museum'은 chuncheon-makguksu-museum(신북로 264 실주소)과 동일 장소라 제거([V5] 중복 정리).
@@ -672,24 +842,28 @@ export const venues = [
     coord: [127.6918678, 37.8930335], // 네이버 실측
     mock: false,
   },
-];
-
-// 목업 카드 공장 · 이름은 3언어 모두 "Mockup N" 동일(창작 실명 0 계약).
-// §30: 목업은 surface 면 + "Coming soon" Chip, 사진 영역 비렌더 — 렌더 규칙은 존 C4 소유.
-function mockVenue(n, category) {
-  return {
-    id: `mock-${n}`,
-    name: { en: `Mockup ${n}`, ko: `Mockup ${n}`, th: `Mockup ${n}` },
-    category,
+  // [V20] Jina House · 사용자 목록 포함 요청 · 설명·좌표·링크 미제공 → 임시 카피(확정 정보 대기 · PLACEHOLDER)
+  {
+    id: 'jina-house',
+    name: { en: 'Jina House', ko: 'Jina House', th: 'Jina House' },
+    category: 'activity',
     oneLine: {
-      en: 'Local partner slot, details coming soon',
-      ko: '로컬 제휴 슬롯입니다. 확정 후 공개됩니다.',
-      th: 'ร้านพันธมิตรท้องถิ่น จะประกาศเมื่อยืนยันแล้ว',
+      en: 'A local activity spot in Chuncheon',
+      ko: '춘천의 로컬 액티비티 장소',
+      th: 'A local activity spot in Chuncheon',
     },
     stayMin: 120,
-    coord: null,
-    mock: true,
-  };
-}
+    coord: null, // DEMO — PLACEHOLDER, 확정 정보 시 교체
+    mock: false,
+  },
+];
+
+// [V20] 이미지 정규화 · 전 장소에 image = `/images/venues/{id}.jpg` 주입(slug = venue id · 단일 규칙).
+//   VenueGrid(앞면)·VenueDetail(뒷면)이 venue.image를 읽고, 파일 부재·로드 실패 시 onError로
+//   기존 라이트 카드 폴백(§9.4 빈 박스 금지 유지). 운영자가 slug.jpg 파일을 배치한다.
+export const venues = RAW_VENUES.map((v) => ({
+  ...v,
+  image: `/images/venues/${v.id}.jpg`,
+}));
 
 export default venues;

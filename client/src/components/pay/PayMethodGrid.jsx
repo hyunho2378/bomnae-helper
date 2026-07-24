@@ -14,7 +14,7 @@ export default function PayMethodGrid({ value, onChange }) {
     setStage((s) => ({ ...s, [id]: s[id] === 'png' ? 'text' : 'png' }));
 
   return (
-    <div role="radiogroup" aria-label={t('gts.pay.title')} className="grid grid-cols-2 gap-12 md:grid-cols-3 lg:grid-cols-4">
+    <div role="radiogroup" aria-label={t('gts.pay.title')} className="grid grid-cols-2 gap-24 md:grid-cols-3 lg:grid-cols-4">
       {PAY_METHODS.map((method) => {
         const selected = value === method.id;
         return (
@@ -24,18 +24,18 @@ export default function PayMethodGrid({ value, onChange }) {
             role="radio"
             aria-checked={selected}
             onClick={() => onChange(method.id)}
-            className={`pressable flex min-h-64 flex-col items-center justify-center gap-8 rounded-lg bg-white p-16 shadow-sm ${
+            className={`pressable flex min-h-96 flex-col items-center justify-center gap-8 rounded-lg bg-white p-20 shadow-sm ${
               selected ? 'ring-2 ring-primary' : 'hover:shadow-md'
             }`}
           >
             {stage[method.id] === 'text' ? (
-              <span className="text-body font-semibold">{method.label}</span>
+              <span className="text-h3 font-semibold">{method.label}</span>
             ) : (
               <img
                 src={stage[method.id] === 'png' ? method.file.replace(/\.svg$/, '.png') : method.file}
                 alt={method.label}
-                // 로고 높이 32px = 아이콘 5단계 스케일 준용(h-32 토큰 클래스)
-                className="h-32 w-auto object-contain"
+                // [V18] 로고 2.5배(h-32=32px → h-80=80px) · 카드 gap/패딩도 비례 상향(gap-24·p-20·min-h-96)
+                className="h-80 w-auto object-contain"
                 onError={() => fail(method.id)}
               />
             )}

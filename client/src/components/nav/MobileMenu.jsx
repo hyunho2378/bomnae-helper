@@ -5,14 +5,13 @@
 //   첫 방문 1회 햄버거 펄스(2초) · 웹스토리지 금지(DESIGN §13)라 모듈 인메모리 플래그(앱 로드당 1회).
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useLang } from '../../i18n/LangContext';
 import { CURRENCY_ORDER, CURRENCY_SYMBOL, useCurrency } from '../../context/CurrencyContext';
 import LangSwap from '../../i18n/LangSwap';
 import Button from '../ui/Button';
-import Avatar from '../ui/Avatar';
 import LoginGate from '../ui/LoginGate';
 import LogoutConfirm from '../ui/LogoutConfirm';
 import useBodyScrollLock from '../ui/useBodyScrollLock';
@@ -143,14 +142,15 @@ export default function MobileMenu() {
               aria-hidden="true"
               onClick={close}
               className="bh-menu-scrim absolute inset-0 bg-scrim"
-              style={{ animation: `bh-menu-fade 200ms ${motion.easeOut}` }}
+              style={{ animation: `bh-menu-fade 240ms ${motion.easeOut}` }}
             />
             {/* 우측 슬라이드 풀하이트 패널 */}
             <div
               ref={panelRef}
               tabIndex={-1}
               className="bh-menu-panel absolute inset-y-0 right-0 flex w-[86%] max-w-[360px] flex-col bg-white shadow-lg"
-              style={{ animation: `bh-menu-slide 280ms ${motion.easeOut}` }}
+              // [V18] 열림 0.1s 더 느리게(280→380) + 드로어 이징(부드럽게)
+              style={{ animation: `bh-menu-slide 380ms ${motion.easeDrawer}` }}
             >
               <div className="flex items-center justify-between px-16 py-12">
                 <span className="font-display text-small font-semibold uppercase tracking-eyebrow text-inkMeta">
@@ -188,11 +188,11 @@ export default function MobileMenu() {
                 <div className="mt-8 flex flex-col gap-2 border-t border-line pt-8">
                   {user ? (
                     <>
+                      {/* [V18] 프로필 옆 원형 아이콘(Avatar) 제거 — 텍스트 라벨만 */}
                       <NavLink to="/profile" onClick={close} className={({ isActive }) => navItemClass(isActive)}>
                         {({ isActive }) => (
                           <>
                             <ActiveBar on={isActive} />
-                            <Avatar user={user} size={24} />
                             <LangSwap k="nav.profile" />
                           </>
                         )}
@@ -270,12 +270,8 @@ export default function MobileMenu() {
                   </div>
                 </div>
 
-                {/* 하단 · Team / Privacy / Terms / 공식 메일 */}
+                {/* 하단 · Privacy / Terms / 공식 메일 ([V18] Team 제거 — 푸터에만 둔다) */}
                 <div className="mt-8 flex flex-col gap-1 border-t border-line pt-8">
-                  <Link to="/team" onClick={close} className={navItemClass(pathname === '/team')}>
-                    {pathname === '/team' && <ActiveBar on />}
-                    <LangSwap k="meta.title.team" />
-                  </Link>
                   <a
                     href="/legal/privacy"
                     target="_blank"

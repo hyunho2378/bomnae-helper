@@ -85,6 +85,9 @@ export default function VenueDetail({ venue, originRect, instant = false, isSele
   // enter(원위치) → center(중앙 확대) → open(도킹/시트) → closing(역재생)
   const [phase, setPhase] = useState(still ? 'open' : 'enter');
   const [capFull, setCapFull] = useState(false);
+  // [V20] 히어로 이미지 · 로드 실패 시 히어로 생략(텍스트만) — §9.4 빈 박스 금지
+  const [imgErr, setImgErr] = useState(false);
+  const hasImage = !!venue.image && !imgErr;
   const rootRef = useRef(null);
   const timers = useRef([]);
   const later = (fn, ms) => timers.current.push(setTimeout(fn, ms));
@@ -244,6 +247,22 @@ export default function VenueDetail({ venue, originRect, instant = false, isSele
     </Block>
   );
 
+  // [V20] 히어로 이미지 배너 · 상단 꽉 채움(object-cover) + 하단 그라데이션 · 이름은 아래 블록에서 1회 표기.
+  //   이미지 없으면 null → 히어로 생략(텍스트만). 로드 실패 시 onError로 imgErr → 전체 히어로 제거.
+  const heroBanner = (heightClass) =>
+    hasImage ? (
+      <div className={`relative w-full shrink-0 overflow-hidden ${heightClass}`}>
+        <img
+          src={venue.image}
+          alt={venue.name.en}
+          loading="lazy"
+          onError={() => setImgErr(true)}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-ink/50 to-transparent" />
+      </div>
+    ) : null;
+
   const closeBtn = (extraClass, style) => (
     <button
       type="button"
@@ -284,7 +303,7 @@ export default function VenueDetail({ venue, originRect, instant = false, isSele
       {/* 승격 카드 · 기준 지오메트리는 정적, 이동은 transform 만(FLIP) */}
       <div
         aria-hidden="true"
-        className="rounded-lg bg-surface shadow-lg"
+        className={`overflow-hidden rounded-lg shadow-lg ${hasImage ? 'bg-ink' : 'bg-surface'}`}
         style={{
           position: 'fixed',
           left: originRect.left,
@@ -298,9 +317,20 @@ export default function VenueDetail({ venue, originRect, instant = false, isSele
             : `transform ${phase === 'open' && isDesktop ? DOCK_MS : CENTER_MS}ms ${EASE}, opacity 360ms ${motion.easeOut}`,
         }}
       >
-        <div className="flex h-full w-full items-center justify-center p-16">
-          <TriText text={venue.name} className="text-center font-display text-body font-bold" />
-        </div>
+        {/* [V20] 승격 카드도 앞면과 동일 이미지(FLIP 연속성) · 없으면 surface+이름 */}
+        {hasImage ? (
+          <>
+            <img src={venue.image} alt="" loading="lazy" onError={() => setImgErr(true)} className="absolute inset-0 h-full w-full object-cover" />
+            <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/40 to-ink/25" />
+            <div className="absolute inset-0 flex items-center justify-center p-16">
+              <TriText text={venue.name} className="text-center font-display text-body font-bold text-white" />
+            </div>
+          </>
+        ) : (
+          <div className="flex h-full w-full items-center justify-center p-16">
+            <TriText text={venue.name} className="text-center font-display text-body font-bold" />
+          </div>
+        )}
       </div>
 
       {/* 데스크탑 · 우측 상세 패널(폭 50% · radius 좌측만 xl · shadow.lg · 내부 스크롤) */}
@@ -316,7 +346,11 @@ export default function VenueDetail({ venue, originRect, instant = false, isSele
           <div className="absolute right-16 top-16 z-content">
             {closeBtn('bg-white text-inkSec shadow-sm hover:text-ink')}
           </div>
-          <div className="flex-1 overflow-y-auto scroll-quiet">{blocks('px-32 pb-24 pt-40 lg:px-40')}</div>
+          {/* [V20] 상단 히어로 이미지(있을 때만) → 아래 스토리/후기/정보. 없으면 히어로 생략(텍스트만) */}
+          <div className="flex-1 overflow-y-auto scroll-quiet">
+            {heroBanner('h-[240px]')}
+            {blocks(`px-32 pb-24 lg:px-40 ${hasImage ? 'pt-24' : 'pt-40'}`)}
+          </div>
           {cta('px-32 pb-24 pt-12 lg:px-40', false)}
         </div>
       )}
@@ -333,13 +367,9 @@ export default function VenueDetail({ venue, originRect, instant = false, isSele
                 : { animation: `bh-venue-fade 360ms ${motion.easeOut} both` }
           }
         >
+          {/* [V20] 상단 히어로 이미지(있을 때만 40dvh) → 아래 스토리/후기/정보. 없으면 히어로 생략(텍스트만) */}
           <div className="flex-1 overflow-y-auto scroll-quiet">
-            <div className="flex items-center justify-center bg-surface px-24" style={{ height: '40dvh' }}>
-              <TriText
-                text={venue.name}
-                className="text-center font-display text-h2 font-bold tracking-display"
-              />
-            </div>
+            {heroBanner('h-[40dvh]')}
             {blocks('px-16 py-24')}
           </div>
           {/* §18.3 safe-area — CTA 바 하단 여백 */}

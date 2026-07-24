@@ -164,7 +164,8 @@ export default function BottomSheet({ open, onClose, title, children }) {
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
-        className={`absolute inset-x-0 bottom-0 flex max-h-[90dvh] touch-none flex-col rounded-t-xl bg-glass shadow-sheet backdrop-blur-glass transition-transform duration-sheet ease-drawer motion-reduce:transition-none ${
+        // [V18] 패널 = 불투명 흰색(§35 라이트 머티리얼) · 어두운 스크림이 반투명 글래스로 비쳐 탁해지던 문제 수리(패널·스크림 분리)
+        className={`absolute inset-x-0 bottom-0 flex max-h-[90dvh] touch-none flex-col rounded-t-xl bg-white shadow-sheet transition-transform duration-sheet ease-drawer motion-reduce:transition-none ${
           shown ? 'translate-y-0' : 'translate-y-full'
         }`}
       >

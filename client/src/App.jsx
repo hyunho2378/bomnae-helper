@@ -1,7 +1,8 @@
 // 라우터 셸 v4 · IA §9.1 — /gts 4단계 신설, 구 loop 계열 라우트 제거(파일은 DEPRECATED 보존).
 // 리다이렉트: /loop* → /gts(=setup), /hands-free·/gate/hands-free → /gts/setup, /pilot → /about.
 // GtsProvider 전역 배선(§31 — 스텝 상태는 라우트 이동에도 유지, 새로고침 시 setup부터).
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
+import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import PageLayout from './components/layout/PageLayout';
 import RequireAuth from './components/ui/RequireAuth'; // [V1]
 import { ArrivalProvider } from './context/ArrivalContext';
@@ -28,6 +29,20 @@ import Reviews from './pages/Reviews';
 import TravelLog from './pages/TravelLog'; // [V3] 발자취(공개 열람 · 템플릿 시작은 /gts 가드 경유)
 import Ticket from './pages/Ticket';
 
+// [V20] 새로고침·직접 URL 진입 시 홈으로 리셋(사용자 요청) — 앱 최초 마운트(=전체 페이지 로드) 1회만 동작.
+//   SPA 내부 네비게이션은 App이 재마운트되지 않아 영향 없음(정상 이동). 트레이드오프: OAuth 복귀·
+//   /ticket 딥링크도 홈으로 이동함(필요 시 예외 경로 화이트리스트 가능 — 보고에 명시).
+function ResetToHomeOnLoad() {
+  const navigate = useNavigate();
+  const ran = useRef(false);
+  useEffect(() => {
+    if (ran.current) return;
+    ran.current = true;
+    if (window.location.pathname !== '/') navigate('/', { replace: true });
+  }, [navigate]);
+  return null;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -37,6 +52,7 @@ export default function App() {
           <BookingProvider>
             <ArrivalProvider>
               <GtsProvider>
+                <ResetToHomeOnLoad />
                 <Routes>
                   <Route element={<PageLayout />}>
                     <Route path="/" element={<Home />} />

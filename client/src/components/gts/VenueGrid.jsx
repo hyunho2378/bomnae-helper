@@ -39,6 +39,9 @@ export default function VenueGrid({
   const { t } = useLang();
   const [page, setPage] = useState(0);
   const [leavingId, setLeavingId] = useState(null); // [V9] 큐로 내려가는 중인 카드
+  // [V20] 로드 실패 이미지 id 집합 — onError 시 해당 카드를 라이트 폴백으로 전환(§9.4 빈 박스 금지)
+  const [failedImg, setFailedImg] = useState(() => new Set());
+  const markFailed = (id) => setFailedImg((s) => (s.has(id) ? s : new Set(s).add(id)));
   const timerRef = useRef(0);
   const cardRefs = useRef(new Map()); // [V9] FLIP 위치 측정용
   const prevPos = useRef(new Map());
@@ -109,6 +112,8 @@ export default function VenueGrid({
           const orderIdx = selected.indexOf(venue.id);
           const isSelected = orderIdx !== -1;
           const leaving = leavingId === venue.id;
+          // [V20] 이미지 앞면: 파일 있고 로드 실패 안 했으면 사진+그라데이션+흰 텍스트, 아니면 라이트 폴백
+          const hasImage = !!venue.image && !failedImg.has(venue.id);
           return (
             <div
               key={venue.id}
@@ -120,7 +125,7 @@ export default function VenueGrid({
                 onClick={() => onCardClick(venue.id)}
                 aria-pressed={isSelected}
                 className={`pressable relative flex h-[128px] w-full flex-col items-start gap-6 overflow-hidden rounded-lg p-12 text-left shadow-sm lg:h-[124px] ${
-                  venue.mock ? 'bg-surface' : 'bg-white'
+                  hasImage ? 'bg-ink' : venue.mock ? 'bg-surface' : 'bg-white'
                 } ${isSelected ? 'ring-2 ring-primary' : 'hover:shadow-md'}`}
                 // [V13] 큐로 내려가는 마이크로인터랙션 420ms · 축소하며 아래(큐)로 이동하는 경로가 보이게
                 //   (opacity는 약간 늦게 페이드 → 이동 중에도 카드가 보임 = "사라짐 아닌 이동" 인지)
@@ -135,20 +140,44 @@ export default function VenueGrid({
                     : undefined
                 }
               >
+                {/* [V20] 앞면 배경 사진 + 하단→상단 그라데이션(하단 0.72·상단 0.28로 밝은 사진서도 흰 텍스트 대비 확보) */}
+                {hasImage && (
+                  <>
+                    <img
+                      src={venue.image}
+                      alt={venue.name.en}
+                      loading="lazy"
+                      onError={() => markFailed(venue.id)}
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
+                    <span
+                      aria-hidden="true"
+                      className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/40 to-ink/25"
+                    />
+                  </>
+                )}
                 {isSelected && (
-                  <span className="absolute right-48 top-8 inline-flex items-center rounded-pill bg-primary px-12 py-4 text-caption font-semibold text-white">
+                  <span className="absolute right-48 top-8 z-[1] inline-flex items-center rounded-pill bg-primary px-12 py-4 text-caption font-semibold text-white">
                     {badgeKeys?.[orderIdx] ? <LangSwap k={badgeKeys[orderIdx]} /> : orderIdx + 1}
                   </span>
                 )}
-                <TriText text={venue.name} className="text-body font-bold" clampClass="line-clamp-1" />
+                <TriText
+                  text={venue.name}
+                  className={`relative z-[1] text-body font-bold ${hasImage ? 'text-white' : ''}`}
+                  clampClass="line-clamp-1"
+                />
                 <TriText
                   text={venue.oneLine}
-                  className="text-caption font-medium text-inkSec"
+                  className={`relative z-[1] text-caption font-medium ${hasImage ? 'text-white/90' : 'text-inkSec'}`}
                   clampClass="line-clamp-2"
                 />
                 <span
-                  className={`mt-auto inline-flex items-center rounded-pill px-12 py-4 text-caption font-medium text-inkSec ${
-                    venue.mock ? 'bg-white' : 'bg-surface'
+                  className={`relative z-[1] mt-auto inline-flex items-center rounded-pill px-12 py-4 text-caption font-medium ${
+                    hasImage
+                      ? 'bg-white/25 text-white'
+                      : venue.mock
+                        ? 'bg-white text-inkSec'
+                        : 'bg-surface text-inkSec'
                   }`}
                 >
                   <LangSwap k={venue.mock ? 'gts.build.comingSoon' : `gts.build.cat.${venue.category}`} />

@@ -22,7 +22,8 @@ export default function Footer() {
     <footer className="bg-primary text-white">
       <Container>
         <div className="flex flex-col gap-24 py-32 lg:flex-row lg:items-start lg:justify-between lg:gap-40">
-          <div className="flex flex-col gap-8">
+          {/* [V18] 모바일: 슬로건 아래 여백 확대(mb-16)로 Explore 섹션과 명확히 분리 · lg는 gap-40 유지 */}
+          <div className="mb-16 flex flex-col gap-8 lg:mb-0">
             <span className="flex items-center gap-8">
               <LogoMark className="h-24 w-24 shrink-0 text-white" aria-hidden="true" />
               <span className="font-display text-logo font-semibold">Global Tourism System</span>
@@ -59,11 +60,13 @@ export default function Footer() {
             </a>
           </div>
         </div>
-        <div className="flex flex-col gap-8 pb-24 sm:flex-row sm:items-center sm:justify-between">
+        {/* [V18] 모바일: flex-col-reverse로 저작권 줄을 항상 최하단에(링크 위→저작권 아래) · sm+는 좌우 배치 */}
+        <div className="flex flex-col-reverse gap-8 pb-24 sm:flex-row sm:items-center sm:justify-between">
           {/* [V10] "Team Bomnae Helper"를 /team 링크로 · 앞뒤 텍스트는 pre/post(t로 유령폭 회피) */}
           <p className="text-caption font-medium">
             {t('common.footer.copyrightPre')}
-            <Link to="/team" className="font-semibold underline underline-offset-2 hover:opacity-80">
+            {/* [V18] 밑줄 제거 · hover 시에만 색 변화(§17 링크 문법) */}
+            <Link to="/team" className="font-semibold transition-colors duration-fast hover:text-white/70">
               {t('common.footer.teamName')}
             </Link>
             {t('common.footer.copyrightPost')}

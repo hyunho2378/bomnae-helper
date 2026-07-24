@@ -43,7 +43,7 @@ export default function Dialog({ open, onClose, title, children }) {
 
   return createPortal(
     <div className="fixed inset-0 z-dialog hidden place-items-center lg:grid">
-      {/* [V13] 어두운 스크림(§35) — 밝은 StepStage 글래스 패널 위에서도 모달이 묻히지 않게 */}
+      {/* [V13] 어두운 스크림(§35) — 밝은 패널 위에서도 모달이 묻히지 않게 */}
       <div aria-hidden="true" onClick={onClose} className="absolute inset-0 bg-scrim" />
       <div
         ref={panelRef}
@@ -52,7 +52,8 @@ export default function Dialog({ open, onClose, title, children }) {
         tabIndex={-1}
         onKeyDown={onKeyDown}
         // §34 팝 진입 · 모달만 origin center 예외(0.97→1 + opacity)
-        className="pop-panel origin-center relative w-full max-w-dialog rounded-xl bg-glass p-32 shadow-lg backdrop-blur-glass"
+        // [V18] 패널 = 불투명 흰색(§35 라이트 머티리얼) · 어두운 스크림이 반투명 글래스로 비쳐 탁해지던 문제 수리(패널·스크림 분리)
+        className="pop-panel origin-center relative w-full max-w-dialog rounded-xl bg-white p-32 shadow-lg"
       >
         <div className="absolute right-8 top-8">
           <IconButton icon={X} label="common.close" size={20} onClick={onClose} />
